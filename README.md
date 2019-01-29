@@ -1,5 +1,6 @@
 # Actions (beta)
 [![N|Solid](https://g3links.com/actions/g3links_brand.png)](https://g3links.com/actions)
+
 Actions is a secure PHP  collaboration website tool for groups and/or individuals; well suited for registering tasks, tracking issues, customer complains or just as messenger.
 ### Foundations based in three elements:
 - **User:** person or identity registered with a valid email (verification is required).  
@@ -16,11 +17,10 @@ Actions is a secure PHP  collaboration website tool for groups and/or individual
 - **alerts and tracking:** subscribe to actions to receive notifications on top of the standard system.
 - **create teams:** group users in teams to broadcast, assign and communicate faster.
 ### Installation
-**[SQLite](https://www.sqlite.org/index.html)**: SQL database engine with PDO extensions.
-**[G3 links data](https://github.com/g3links/data)**: database and config definitions
-**MBString**: enable the php extension ‘mbstring’.
-
-Get dependecies using composer, locate under 'actions' (or website) folder
+- **[SQLite](https://www.sqlite.org/index.html)**: SQL database engine with PDO extensions.
+- **[G3 links data](https://github.com/g3links/data)**: database and config definitions
+- **MBString**: enable the php extension ‘mbstring’.
+- Get dependecies using composer, locate under 'actions' (or website) folder
 ```sh
 $ composer upddate --no-dev
 ```
