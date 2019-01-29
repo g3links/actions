@@ -1,0 +1,28 @@
+<script>
+
+//    $(document).ready(function () {
+//        });
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center" ><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for track in tracks %}
+        <div class="tableRow taskselect {% if track.deleted == 1 %}onHoldAction{% endif %}" >
+            <div class="tableCell">
+                <label>{{ track.idtrack }}</label>
+            </div>
+            <div class="tableCell">
+                <label>{{ track.name }}</label>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if tracks is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

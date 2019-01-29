@@ -1,0 +1,28 @@
+<script>
+
+//    $(document).ready(function () {
+//        });
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center" ><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for category in categories %}
+        <div class="tableRow taskselect {% if category.deleted %}onHoldAction{% endif %}" >
+            <div class="tableCell">
+                <label>{{ category.name }}</label>
+            </div>
+            <div class="tableCell center">
+                <label>{% if category.seq != '0' %}{{ category.seq }}{% else %}-{% endif %}</label>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if categories is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

@@ -1,0 +1,21 @@
+<script>
+
+    $(document).ready(function () {
+    {% if totalunreadmessages > 0 %}
+            $("#withmessages").show();
+    {% endif %}
+
+            document.getElementById('on').addEventListener('click', function () {
+                g3.ActionFloat('{{ noteroute.window }}');
+
+                $("#withmessages").hide();
+            });
+
+        });
+
+</script>
+
+<div id="on" class="mainmenuitem labelselect imgBell" >
+    <label class="marginleft">{{ noteroute.title }} </label>
+    <label id="withmessages" hidden class="floatRight onMessages" >{{ totalunreadmessages }}</label>
+</div>

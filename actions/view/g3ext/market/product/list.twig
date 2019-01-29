@@ -1,0 +1,63 @@
+<script>
+    $(document).ready(function () {
+    {% if lbl_filter is not empty %}
+        document.getElementById("reset").addEventListener("click", function () {
+            resetList();
+        });
+    {% endif %}
+    {% for product in products %}
+            document.getElementById("mpf{{ product.idproduct }}").addEventListener("click", function () {
+                modalproductform("{{ product.idproduct }}");
+            });
+    {% endfor %}
+        });
+</script>
+
+<p class="titleName">
+    {% if lbl_filter is not empty %}
+        <span id="reset" class="modal-close txtRed" ></span>
+        {{ lbl_filter }}
+    {% endif %}
+</p>
+
+<div class="table tableBorder">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col3 }}</label></div>
+    </div>
+    {% if products is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+
+    {% for product in products %}
+        <div id="mpf{{ product.idproduct }}" class="tableRow taskselect {% if product.idproject != '0' %}sharedDataRecord{% else %}pnlBackWhite{% endif %}" >
+            <div class="tableCell marginsmall" style="width: 70px;">
+                <img src="{{ product.image }}" >
+            </div>
+
+            <div class="tableCell margin">                
+                {% if product.inactive %}
+                    <div class="onHoldAction">{{ lbl_inactive }}</div>
+                {% endif %}
+
+                <div class="txtBlack txtLarge">{{ product.name }}</div>
+                <div class="txtDark">{{ product.keycode }}</div>                
+
+                {% if product.productdescription is not empty %}
+                    <div class="txtLabel marginsmall">{{ product.productdescription|nl2br }}</div>
+                {% endif %}
+                {% if product.productmanifest is not empty %}
+                    <div class="txtLabel marginsmall">{{ product.productmanifest|nl2br }}</div>
+                {% endif %}
+            </div>
+
+            <div class="tableCell margin" style="width: 80px;">
+                <label class="txtLabel">{{ product.idcurrency }}: </label>
+                <label>{{ product.saleprice }}</label>
+            </div>
+
+        </div>
+
+    {% endfor %}
+</div>

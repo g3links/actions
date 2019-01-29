@@ -1,0 +1,116 @@
+<script>
+
+    var modaluser = document.getElementById("user");
+
+    $(document).ready(function () {
+        $("#notetext").val("");
+
+        let notetext = document.getElementById("notetext");
+        notetext.style.height = "";
+
+        openUserSelection();
+
+        document.getElementById("cmod").addEventListener("click", function () {
+            getSpan();
+        });
+        document.getElementById("submit").addEventListener("click", function () {
+            saveusernote();
+        });
+    });
+
+    async function openUserSelection() {
+        let response = await fetch("{{ getfilteredusersroute }}");
+        $("#projrendermembers").html(await response.text());
+    }
+
+    async function saveusernote() {
+        let enterednote = $("#notetext").val();
+        if (enterednote === "") {
+            window.alert("note cannot be empty");
+            return false;
+        }
+
+        let userbeenselected = false;
+        document.querySelectorAll(".user").forEach(function (chkbox) {
+            if ($("#" + chkbox.id).is(":checked")) {
+                userbeenselected = true;
+            }
+        });
+
+        document.querySelectorAll(".group").forEach(function (chkbox) {
+            if ($("#" + chkbox.id).is(":checked")) {
+                userbeenselected = true;
+            }
+        });
+
+        if (!userbeenselected) {
+            window.alert("please select users or groups");
+            return false;
+        }
+
+        $("#submitpnl").hide();
+
+        //get form  
+        let form = $("#postMessage");
+        let params = form.serializeArray();
+
+        //Declaring new Form Data Instance  
+        let formData = new FormData();
+        //Now Looping the parameters for all form input fields and assigning them as Name Value pairs. 
+        $(params).each(function (index, element) {
+            formData.append(element.name, element.value);
+        });
+
+        let response = await fetch("{{ addnoteroute }}",
+                {
+                    body: formData,
+                    method: "post"
+                });
+        var resp = await response.text();
+        getSpan();
+
+//        $.ajax({
+//            type: "post",
+//            url: '{* addnoteroute }}',
+//            data: formData,
+//            contentType: false,
+//            processData: false,
+//            success: function (response) {
+//            }
+//        });
+    }
+
+
+</script>
+
+<div id="user" class="modalNote">
+    <div class="modalNote-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <div class="titleName margin">
+            <label>{{ lbl_from }}: {{ lbl_projtitle }}</label>
+        </div>
+
+        <form id="postMessage" enctype="multipart/form-data" method="post" >
+            <div class="table" >
+                <div class="tableRow">
+                    <div class="tableCell">
+                        <textarea id="notetext" name="notetext" cols="1" rows="2" style="width: 100%;" autofocus="" onkeyup="adjustNoteTextHeight(this)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="titleName margin">
+                <label>{{ lbl_to }}:</label>
+            </div>
+            <div id="projrendermembers"></div>
+            <p id="submitpnl" class="center" >
+                <label id="submit" >{{ lbl_note }}</label>
+            </p>
+
+            <input type="hidden" name="action" value="{{ actionid }}" >
+        </form>
+
+    </div>
+
+</div>

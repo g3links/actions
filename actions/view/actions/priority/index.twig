@@ -1,0 +1,17 @@
+<script>
+
+    $(document).ready(function () {
+        loaddata();
+    });
+
+    async function loaddata() {
+        let response = await fetch("{{ loaddataroute }}");
+        $("#modalform").html(await response.text());
+        $("#loading").hide();
+    }
+
+</script>
+
+<div id="loading" class="loading floatRight"></div>
+
+<div id="modalform"></div>

@@ -1,0 +1,39 @@
+<script>
+
+    var modaluser = document.getElementById("user");
+
+    $(document).ready(function () {
+        $("#rendertasklist").html("");
+
+        document.getElementById("cmod").addEventListener("click", function () {
+            getSpan();
+        });
+
+        tasktoattach();
+    });
+
+    async function tasktoattach() {
+        let response = await fetch("{{ taskattachroute }}");
+        $("#rendertasklist").html(await response.text());
+    }
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ updatedtaskattachroute }}" method="post" onsubmit="closeForm();" >
+            <div id="projecttasklist">
+                <p>
+                    <label class="titleName">{{ lbl_name }}</label>
+                </p>
+                <div id="rendertasklist" ></div>
+            </div>
+            <p id="submitpnl" class="center" >
+                <input  type="submit" id="submit" name="saveAssignedTask" value="{{ lbl_submit }}"  >
+            </p>
+        </form>
+    </div>
+
+</div>

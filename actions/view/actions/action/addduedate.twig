@@ -1,0 +1,43 @@
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script>
+
+    $(document).ready(function () {
+        initDatepicker();
+
+        document.getElementById('cdr').addEventListener('click', function () {
+            $("#newdaterow-{{ idrow }}").remove();
+        });
+
+    });
+
+</script>
+
+<div id="newdaterow-{{ idrow }}" class="tableRow">
+    <div class="tableCell center">
+        <input class="datepicker" style="width: 80px;" type="text" id="si-{{ idrow }}" name="si-{{ idrow }}" >
+        <select class="formInputOption" style="margin: 0px;" id="sih-{{ idrow }}" name="sih-{{ idrow }}">
+            {% for hour in hours %}
+                <option value="{{ hour.pad }}" >{{ hour.ampm }}</option>
+            {% endfor %}
+        </select>
+        <select class="formInputOption" style="margin: 0px;" id="sim-{{ idrow }}" name="sim-{{ idrow }}">
+            {% for min in mins %}
+                <option value="{{ min }}" >{{ min }}</option>
+            {% endfor %}
+        </select>
+    </div>                            
+    <div class="tableCell center">
+        <input class="datepicker" style="width: 80px;" type="text" id="di-{{ idrow }}" name="di-{{ idrow }}" >
+        <select class="formInputOption" style="margin: 0px;" id="dih-{{ idrow }}" name="dih-{{ idrow }}">
+            {% for hour in hours %}
+                <option value="{{ hour.pad }}" >{{ hour.ampm }}</option>
+            {% endfor %}
+        </select>
+        <select class="formInputOption" style="margin: 0px;" id="dim-{{ idrow }}" name="dim-{{ idrow }}">
+            {% for min in mins %}
+                <option value="{{ min }}" >{{ min }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="tableCell center"><span id="cdr" class="imgBtn imgHide" ></span></div>
+</div>

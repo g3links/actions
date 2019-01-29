@@ -1,0 +1,26 @@
+<script>
+
+    $(document).ready(function () {
+    {% for todohold in todoshold %}
+            document.getElementById('sth{{ todohold.idproject }}-{{ todohold.idtask }}').addEventListener('click', function () {
+                selectedTask('{{ todohold.idproject }}', '{{ todohold.idtask }}', '{{ todohold.projname }}');
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<div>
+    <span class="onHoldSelection">{{ lbl_title|capitalize }}</span>
+    {% for todohold in todoshold %}
+        <div id="sth{{ todohold.idproject }}-{{ todohold.idtask }}" class="taskselect taskBody marginsmall priority{{ todohold.idpriority }}" >
+            <div class="txtLabel floatRight">
+                <div class="">{{ todohold.dueon|date("j M Y g:ia") }}</div>
+                <div class="right">{{ todohold.lbl_categoryname }}</div>
+            </div>
+            <span class="txtLabel">{{ todohold.projname }}</span>
+            <div>{{ todohold.title }}</div>
+        </div>
+    {% endfor %}
+</div>
+<div class="marginsmall"></div>

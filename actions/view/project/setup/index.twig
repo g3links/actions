@@ -1,0 +1,22 @@
+<script>
+    $(document).ready(function () {
+        addprojowner();
+    });
+
+    async function addprojowner() {
+        let response = await fetch("{{ loadsetuproute }}");
+        $("#modalsetup").html(await response.text());
+        $("#loading").hide();
+    }
+
+
+</script>
+
+<div id="loading" >
+    <div class="loading pnlFloat"></div>
+    <span>{{ lbl_loading }}</span>
+</div>
+
+<div id="modalsetup"></div>
+
+<hr  class="separatordark">

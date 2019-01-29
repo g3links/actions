@@ -1,0 +1,43 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        $("#submitpnl").hide();
+
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+
+    });
+
+{% if isrole %}
+        function enableFileUploadSave() {
+            $("#submitpnl").show();
+        }
+{% endif %}
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ uploadfileroute }}" method="post" enctype="multipart/form-data"  onchange="enableFileUploadSave();" onkeyup="enableFileUploadSave();" onsubmit="closeForm();">
+            <p>
+                <label class="titleName">{{ lbl_title }}</label>
+            </p>
+
+            <input type="file" name="upfile" id="fileSelect" >
+            <br>
+            <br>
+            <div class="center" style="width: 100%;" hidden id="submitpnl">
+                <input type="submit" id="submit" name="submit" value="{{ lbl_submit|capitalize }}">
+            </div>
+            <p>{{ lbl_tip }}</p>
+
+            <input type="hidden" name="idproject"  value="{{ idproject }}" >
+        </form>
+    </div>
+
+</div>

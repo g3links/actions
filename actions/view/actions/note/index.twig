@@ -1,0 +1,35 @@
+<script>
+
+    $(document).ready(function () {
+        viewNotes();
+    });
+
+    async function viewNotes() {
+        let response = await fetch("{{ viewlistnotesroute }}");
+        $("#rendernotes").html(await response.text());
+        $("#loading").hide();
+    }
+
+    async function modalnoteform(idproject, idnote) {
+        let apppath = "{{ noteformroute }}";
+        let replacedpath = apppath.replace("[idproject]", idproject);
+        replacedpath = replacedpath.replace("[idnote]", idnote);
+
+        let response = await fetch(replacedpath);
+        $("#rendernoteform").html(await response.text());
+    }
+
+
+    setInterval(function () {
+        autoloadNotepage();
+    }, 1200000); // autoload() after 20 minutes 
+    function autoloadNotepage() {
+        location.reload();
+    }
+
+</script>
+
+<div id="loading" class="loading floatRight"></div>
+
+<div id="rendernotes"></div>
+<div id="rendernoteform"></div>

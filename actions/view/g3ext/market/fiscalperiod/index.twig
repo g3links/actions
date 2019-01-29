@@ -1,0 +1,57 @@
+<script>
+
+    $(document).ready(function () {
+    {% if editfiscalperiodroute is not empty %}
+            document.getElementById("mfp0").addEventListener("click", function () {
+                modalfiscalperiodform(0);
+            });
+        {% for fiscalperiod in fiscalperiods %}
+                document.getElementById("mfp{{ fiscalperiod.idfiscalperiod }}").addEventListener("click", function () {
+                    modalfiscalperiodform({{ fiscalperiod.idfiscalperiod }});
+                });
+        {% endfor %}
+    {% endif %}
+        });
+
+//    function callbackForm() {
+//        window.location.reload(true);
+//    }
+
+    {% if editfiscalperiodroute is not empty %}
+        async function modalfiscalperiodform(idfiscalperiod) {
+            let apppath = "{{ editfiscalperiodroute }}";
+            let replacedpath = apppath.replace("[idfiscalperiod]", idfiscalperiod);
+
+            let response = await fetch(replacedpath);
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+</script>
+
+{% if editfiscalperiodroute is not empty %}
+    <div id="mfp0" class="linkBtnMenu taskselect imgAdd" title="{{ lbl_newfiscalperiod }}"></div>
+{% endif %}
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center" ><label>{{ th_col2 }}</label></div>
+        <div class="tableHead txtLabel center" ><label>{{ th_col3 }}</label></div>
+    </div>
+
+    {% for fiscalperiod in fiscalperiods %}
+        <div id="mfp{{ fiscalperiod.idfiscalperiod }}" class="tableRow taskselect" >
+            <div class="tableCell"><label>{{ fiscalperiod.fiscalname }}</label></div>
+            <div class="tableCell center"><label>{% if fiscalperiod.seq != '0' %}{{ fiscalperiod.seq }} {% else %}-{% endif %}</label></div>
+            <div class="tableCell center"><input type="checkbox" {% if fiscalperiod.isclosed %} checked {% endif %} disabled  ></div>
+        </div>
+    {% endfor %}
+
+    {% if fiscalperiods is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>
+
+<div id="modalform"></div>
+

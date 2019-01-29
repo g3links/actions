@@ -1,0 +1,12 @@
+<label class="txtLabel" >{{ lbl_categories }}:</label>
+<select name="idcategory" >
+    {% for category in categories %}
+        <option value="{{ category.idcategory }}"
+                {% if category.idcategory == action.idcategory %}
+                    selected="selected"
+                {% endif %}
+                >{{ category.name }}
+        </option>
+    {% endfor %}
+</select>
+

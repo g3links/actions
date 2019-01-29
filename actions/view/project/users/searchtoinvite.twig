@@ -1,0 +1,27 @@
+<script>
+    $(document).ready(function () {
+    {% for user in users %}
+            document.getElementById('ms{{ user.iduser }}').addEventListener('click', function () {
+                memberSelected('{{ user.iduser }}', '{{ user.name }}', '{{ user.email }}');
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<div id="resultsearch" class="table pnlBackWhite">
+    <div class="tableRow"  >
+        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>
+    </div>
+    {% for user in users %}
+        <div id="ms{{ user.iduser }}" class="tableRow linkBtnMenu taskselect" >
+            <div class="tableCell">{{ user.name }}</div>
+            <div class="tableCell">{{ user.email }}</div>
+        </div>
+    {% endfor %}
+
+    {% if lbl_notfound|length > 0 %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

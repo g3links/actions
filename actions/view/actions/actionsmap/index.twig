@@ -1,0 +1,310 @@
+<div class="MapToday" hidden></div>
+<div class="MapCalendar" hidden></div>
+<div class="MapCalendarDay" hidden></div>
+<div class="MapBarOverdue" hidden></div>
+<div class="MapBarBeyond" hidden></div>
+<div class="MapProgress" hidden></div>
+<div class="MapAction" hidden></div>
+<div class="MapPriority1" hidden></div>
+<div class="MapPriority2" hidden></div>
+<div class="MapPriority3" hidden></div>
+
+<script>
+    $(document).ready(function () {
+        window.addEventListener("resize", function () {
+            resizeActionsMap();
+        });
+        document.getElementById("canvas_actions").addEventListener("click", function (event) {
+            selectActionFromCanvas(event);
+        });
+
+        document.getElementById("prevw").addEventListener("click", function () {
+            prevweek();
+            draw();
+        });
+        document.getElementById("nextw").addEventListener("click", function () {
+            nextweek();
+            draw();
+        });
+        //restore at specific page
+        navmappage_th = 0;
+        drawActionsTimeline(window.innerWidth);
+    });
+
+    function resizeActionsMap() {
+        let canvasr = document.getElementById("canvas_actions");
+        if (canvasr) {
+            resizeActionsTimeline(window.innerWidth);
+        }
+    }
+
+
+    let openActionpath = '';
+    let openActionwidth = '';
+    let openActionFramename = '';
+    let openActionTitle = '';
+    let heightPercentage = 40; // % of width            
+    let gapScroll = 30;
+    let widthprogress = 17;
+    let heightProgress = 8;
+    let ajustClickpos = 1
+    let drawDefaultWidth = 500;
+    let Actions = [];
+    let totalColumns = 17;
+    let todayColumn = 3;
+    let monthline = [];
+    let timeline = [];
+    let actionsPostitions = [];
+
+    function setRangeDates() {
+        timeline = [];
+        monthline = [];
+
+        var firstday = new Date();
+        todayColumn = 3 - navmappage_th;
+
+        firstday.setDate(firstday.getDate() - 2 + navmappage_th);
+        monthline.push(firstday.toDateString().split(' ')[1] + ' ' + firstday.toDateString().split(' ')[3]);
+        let lastmonth = '';
+        for (var day = 0; day < (totalColumns + 1); day++) {
+            timeline.push(firstday.getDate());
+            firstday.setDate(firstday.getDate() + 1);
+            lastmonth = firstday.toDateString().split(' ')[1] + ' ' + firstday.toDateString().split(' ')[3];
+        }
+        monthline.push(lastmonth);
+
+// set actions
+        Actions = [];
+
+        var firstday = new Date();
+        firstday.setDate(firstday.getDate() - 2 + navmappage_th);
+        firstday.setDate(firstday.getDate() + day);
+
+    {% for action in actions %}
+            var actionday = new Date('{{ action.dueon|date('Y-m-d\\TH:i:sP') }}');
+            var mapcolumn = parseInt((firstday - actionday) / (1000 * 60 * 60 * 24));
+            if (mapcolumn > 18) {
+                mapcolumn = 0;
+            } else {
+                if (mapcolumn <= 0) {
+                    mapcolumn = 18;
+                } else {
+                    mapcolumn = ((totalColumns + 2) - mapcolumn);
+                }
+            }
+            var a_action = [{{ action.idproject }}, {{ action.idtask }}, {{ action.idparent }}, {{ action.progress }}, mapcolumn, {{ action.idpriority }}, '{{ action.projname }}'];
+            Actions.push(a_action);
+
+    {% endfor %}    
+        }
+
+
+        function loadResources() {
+            Actions = [];
+            timeline = [];
+
+            openActionpath = '{{ MapActionroute.apppath }}';
+            openActionwidth = '{{ MapActionroute.appwidth }}';
+            openActionFramename = '{{ MapActionroute.appFramename }}';
+            openActionTitle = '{{ MapActionroute.title }}';
+
+            setRangeDates();
+        }
+
+        function resizeActionsTimeline(owidth) {
+            let canvasr = $("#canvas_actions");
+            if (!canvasr) {
+                return;
+            }
+            owidth = Math.floor(owidth - gapScroll);
+            let height = Math.floor(owidth * heightPercentage / 100);
+            ajustClickpos = drawDefaultWidth / owidth;
+            console.log("draw canvas actions: "+owidth);
+            canvasr.css("width", owidth);
+            canvasr.css("height", height);
+        }
+
+        function drawActionsTimeline(owidth) {
+            loadResources();
+            drawDefaultWidth = Math.floor(owidth - gapScroll);
+            draw();
+        }
+
+        function draw() {
+            let canvasr = $("#canvas_actions");
+            if (!canvasr) {
+                return;
+            }
+
+//            drawDefaultWidth = Math.floor(owidth - gapScroll);
+            let height = Math.floor(drawDefaultWidth * heightPercentage / 100);
+            let ctx = document.getElementById("canvas_actions").getContext('2d');
+            ctx.canvas.width = drawDefaultWidth;
+            ctx.canvas.height = height;
+            //***************************************************
+            let marginleft = 0;
+            let margintop = 0;
+            let marginbottom = 0;
+            let marginright = 0;
+            let percentBarWidth = 8; //%
+            let adjusttitletocenter = 4;
+            let topMonth = 7;
+            let topDayNum = 16;
+            let topDay = 20;
+            let lineWidthDay = 0.4;
+            let lineLinkAction = 0.5;
+            let intervalPerAction = 10; //number to reposition the next action (column)
+            let topposition = [];
+            let todayStyle = $('.MapToday').css('background-color');
+            let calendarStyle = $('.MapCalendar').css('background-color');
+            let calendarColumnStyle = $('.MapCalendarDay').css('background-color');
+            let barOverdueStyle = $('.MapBarOverdue').css('background-color');
+            let barBeyondStyle = $('.MapBarBeyond').css('background-color');
+            let progressStyle = $('.MapProgress').css('background-color');
+            let actionStyle = $('.MapAction').css('background-color');
+
+            actionsPostitions = [];
+            //***************************************************
+
+            //calculate working area
+            let workWidth = ctx.canvas.width - marginleft - marginright;
+            let workHeight = height - margintop - marginbottom - topDay;
+            //recalculate bar area
+            let barWidth = parseInt((workWidth * percentBarWidth) / 100);
+            let widthDay = parseFloat((workWidth - (barWidth * 2)) / totalColumns);             // month title
+            ctx.fillText(monthline[0], barWidth + marginleft, topMonth + margintop);
+            //display to the left
+            ctx.fillText(monthline[1], ((totalColumns - 3) * widthDay) + barWidth, topMonth + margintop);
+            // bar overdue
+            ctx.fillStyle = barOverdueStyle;
+            ctx.fillRect(0 + marginleft, topDay, barWidth, workHeight);
+            // bar beyond
+            ctx.fillStyle = barBeyondStyle;
+            ctx.fillRect((totalColumns * widthDay) + barWidth + marginleft, topDay, barWidth, workHeight);
+            // bar calendar
+            ctx.lineWidth = lineWidthDay;
+            ctx.strokeStyle = calendarColumnStyle;
+            ctx.fillStyle = calendarStyle;
+            for (let i = 0; i < totalColumns; i++) {
+                // day title
+                ctx.fillText(timeline[i], (i * widthDay) + barWidth + marginleft + adjusttitletocenter, topDayNum + margintop);
+                // day column
+                ctx.strokeRect((i * widthDay) + barWidth + marginleft, topDay, widthDay, workHeight);
+            }
+            if (todayColumn > 0 & todayColumn < 18) {
+                // today line
+                ctx.strokeStyle = todayStyle;
+                ctx.lineWidth = lineLinkAction;
+                ctx.beginPath();
+                ctx.moveTo((todayColumn * widthDay) + barWidth + marginleft, topDay + margintop);
+                ctx.lineTo((todayColumn * widthDay) + barWidth + marginleft, topDay + margintop + workHeight);
+                ctx.stroke();
+            }
+
+//draw actions (include the bar's overdue and beyond)
+//initialize positions per column
+            for (let i = 0; i < (totalColumns + 2); i++) {
+                topposition.push(topDay + 2);
+            }
+
+            for (let act = 0; act < Actions.length; act++) {
+                //get percentage for 4 sections
+                var progss = parseInt(Actions[act][3] / 25);
+                var actionprogress = Math.min(progss, 4);
+                var x = (barWidth - 14) + marginleft + (Actions[act][4] * widthDay);
+                var y = topposition[Actions[act][4]];
+                var priorityStyle = $('.MapPriority' + Actions[act][5]).css('background-color');
+                ctx.fillStyle = priorityStyle;
+                if (Actions[act][4] === 0) {
+                    x = ((barWidth / 2) - 10) + marginleft;
+                }
+                if (Actions[act][4] > 0 & Actions[act][4] < 18) {
+                    x = (Actions[act][4] * widthDay) + (barWidth / 2) + marginleft - 2;
+                }
+
+                ctx.fillRect(x, y, widthprogress, heightProgress);
+                var location = [Actions[act][1], x, y, Actions[act][2], Actions[act][0], Actions[act][6]];
+                actionsPostitions.push(location);
+
+                ctx.fillStyle = actionStyle;
+                for (let col = 0; col < 4; col++) {
+                    ctx.fillRect(x + (col * 4) + 1, y + 1, 3, heightProgress - 2);
+                }
+                ctx.fillStyle = progressStyle;
+                for (let col = 0; col < actionprogress; col++) {
+                    ctx.fillRect(x + (col * 4) + 1, y + 1, 3, heightProgress - 2);
+                }
+
+                topposition[Actions[act][4]] += intervalPerAction;
+            }
+
+            ctx.strokeStyle = calendarStyle;
+            ctx.lineWidth = lineLinkAction;
+            let a = 0; // index action from
+            let b = 0; // index action to
+
+            for (let i = 0; i < actionsPostitions.length; i++) {
+                if (actionsPostitions[i][3] !== 0) {
+                    for (let j = 0; j < actionsPostitions.length; j++) {
+                        if (actionsPostitions[j][0] === actionsPostitions[i][3]) {
+                            if (actionsPostitions[i][1] !== actionsPostitions[j][1]) {
+                                // find line direction
+                                a = j;
+                                b = i;
+                                if (actionsPostitions[i][1] < actionsPostitions[j][1]) {
+                                    a = i;
+                                    b = j;
+                                }
+
+                                ctx.beginPath();
+                                ctx.moveTo(actionsPostitions[a][1] + widthprogress, actionsPostitions[a][2] + 4);
+                                ctx.lineTo(actionsPostitions[b][1], actionsPostitions[b][2] + 4);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function selectActionFromCanvas(e) {
+            let canvasr = document.getElementById("canvas_actions");
+            console.log("X= "+e.clientX+", cl: "+canvasr.offsetLeft);
+
+            const pos = {
+                x: (e.clientX - canvasr.offsetLeft) * ajustClickpos,
+                y: (e.clientY - canvasr.offsetTop) * ajustClickpos
+            };
+            for (let i = 0; i < actionsPostitions.length; i++) {
+                if (pos.x >= (actionsPostitions[i][1]) & pos.x <= (actionsPostitions[i][1] + widthprogress) &
+                        pos.y >= actionsPostitions[i][2] & pos.y <= (actionsPostitions[i][2] + heightProgress)) {
+                    selectClickedTask(actionsPostitions[i][4], actionsPostitions[i][0], actionsPostitions[i][5]);
+                    break;
+                }
+            }
+        }
+
+        function selectClickedTask(idproject, idtask, tabname)
+        {
+            //Open specific action
+            let replacedpath = openActionpath.replace('[idproject]', idproject);
+            replacedpath = replacedpath.replace('[idtask]', idtask);
+            g3.ActionWindow(idproject, openActionFramename, openActionwidth, replacedpath, openActionTitle, tabname);
+        }
+
+        function prevweek() {
+            navmappage_th = navmappage_th - 7;
+            setRangeDates();
+        }
+        function nextweek() {
+            navmappage_th = navmappage_th + 7;
+            setRangeDates();
+        }
+
+</script>
+
+<span id="prevw" class="imgBack imgBtn txtXLarge" ></span>
+<span id="nextw" class="imgForward imgBtn txtXLarge" ></span>
+
+<canvas id="canvas_actions" class="actionsPlotter" ></canvas>
+

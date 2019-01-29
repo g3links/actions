@@ -1,0 +1,19 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById('clickhere').addEventListener('click', function () {
+            window.top.location.href = '{{ link_activate }}';
+        });
+    });
+
+</script>
+
+
+<div class="marginbig" style="background-color: darkorange;">
+    <img  style="padding-left: 3px;padding-top: 3px; width: 200px;" src="{{ host }}g3links_brand.png" alt="g3">
+    <h1 style="color: white; ">{{ lbl_security }}</h1>
+</div>
+<h3>Hi, {{ username }}</h3>
+
+<p>
+    {{ link_confirm }}  <label id="clickhere" class="linkPlain">{{ link_confirmhere }}</label>
+</p>

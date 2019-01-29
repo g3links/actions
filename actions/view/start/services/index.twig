@@ -1,0 +1,42 @@
+<script>
+
+    $(document).ready(function () {
+    {% for project in projects %}
+            document.getElementById("sp-{{ project.idproject }}").addEventListener("click", function () {
+                g3.Action('{{ project.actionroute.window }}');
+                g3.Action('{{ project.setuproute.window }}');
+            });
+
+        {% for module in project.modules %}
+                document.getElementById("str{{ project.idproject }}-{{ module.moduleid }}").addEventListener("click", function () {
+                    g3.Action('{{ module.approute.window }}');
+                });
+        {% endfor %}
+    {% endfor %}
+        });
+
+</script>
+
+<div class="pnlStartContainer" >
+    {% for project in projects %}
+        <div class="pnlStart " >
+            <span id="sp-{{ project.idproject }}" class="txtLabel point">{{ project.title }}</span>
+            <div class="table">
+                {% for module in project.modules %}
+                    <div id="str{{ project.idproject }}-{{ module.moduleid }}" class="tableRow linkTitle taskselect" >
+                        <div class="tableCell colIconWidth {{ module.image }}"></div>
+                        <div class="tableCell">
+                            {% if module.approute is not empty %}
+                                <label>{{ module.approute.title }}</label>
+                            {% endif %}
+                            {% if module.value > 0 %}
+                                <label class="onMessages" >{{ module.value }}</label>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="marginsmall"></div>

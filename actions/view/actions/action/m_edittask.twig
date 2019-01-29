@@ -1,0 +1,82 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+
+        let ele = document.getElementById('descriptiontext');
+        adjustNoteTextHeight(ele);
+    });
+
+</script>
+
+<style>
+    .modalUser-content {
+        width: 400px;
+    }
+
+</style>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <p class="title">{{ lbl_titleform }}</p>
+
+        <form action="{{ updatetaskroute }}" method="post"  style="width: 100%" onsubmit="closeForm();" >
+            <div style="width: 100%;">
+
+                <p>
+                    {% if categories is not empty %}
+                        {% set vars = {'action': action, 'lbl_categories':lbl_categories, 'categories':categories} %}
+                        {% include inc_categories with vars %}
+                    {% endif %}
+                </p>
+                <p>
+                    {% set vars = {'action': action, 'lbl_title':lbl_title} %}
+                    {% include inc_title with vars %}
+                </p>
+                <p>
+                    {% set vars = {'action': action, 'lbl_description':lbl_description} %}
+                    {% include inc_description with vars %}
+                </p>
+                <p>
+                    {% set vars = {'action': action, 'lbl_progress':lbl_progress} %}
+                    {% include inc_progress with vars %}
+                </p>
+                <p>
+                    {% set vars = {'action': action, 'allPriorities':allPriorities, 'lbl_priority':lbl_priority} %}
+                    {% include inc_priority with vars %}
+                </p>
+                <p>
+                    {% set vars = {'action': action,'lbl_duedate':lbl_duedate,'lbl_duedate_dueon':lbl_duedate_dueon,'lbl_duedate_th_col1':lbl_duedate_th_col1,'lbl_duedate_th_col2':lbl_duedate_th_col2,'hours':hours,'mins':mins, 'aaddduedateroute': aaddduedateroute} %}
+                    {% include inc_duedate with vars %}
+                </p>
+                <!--
+                {* if hasproducts %}
+                    {* set vars = {'action': action, 'hasproducts':hasproducts, 'aaddduedateroute': aaddduedateroute, 'aaddproductroute':aaddproductroute,  'lbl_products':lbl_products, 'lbl_products_title':lbl_products_title,'lbl_products_th_col1':lbl_products_th_col1, 'lbl_products_th_col2': lbl_products_th_col2} %}
+                    {* include inc_products with vars %}
+                {* endif %}
+                {* if hasdevices %}
+                    {* set vars = {'action': action,'aadddeviceroute':aadddeviceroute,'hasdevices':hasdevices,'lbl_adddevice':lbl_adddevice,'lbl_devices':lbl_devices,'lbl_devices_th_col1':lbl_devices_th_col1,'lbl_devices_th_col2':lbl_devices_th_col2} %}
+                    {* include inc_devices with vars %}
+                {* endif %}
+                -->
+                <p>
+                    {% set vars = {'action': action, 'lbl_commenttext':lbl_commenttext} %}
+                    {% include inc_commenttext with vars %}
+                </p>
+                <p id="submitpnl" class="center">
+                    {% if updatetaskroute is not empty %}
+                        <input type="submit" id="submit" name="save" value="{{ lbl_submit }}" >
+                    {% endif %}
+                </p>
+            </div>
+
+        </form>
+    </div>
+
+</div>

@@ -1,0 +1,153 @@
+<script>
+
+    $(document).ready(function () {
+        DisplayTotalNewMessagesWarning();
+
+    {% for note in notes %}
+            document.getElementById('notetool{{ note.idproject }}{{ note.idnote }}').addEventListener('click', function () {
+                markAsRead('{{ note.idproject }}', '{{ note.idnote }}', '{{ note.isnew }}');
+            });
+            document.getElementById('reply{{ note.idproject }}-{{ note.idnote }}').addEventListener('click', function () {
+                openPopupFollowMessage('{{ note.idproject }}', '{{ note.idnote }}', '{{ note.isnew }}');
+            });
+            document.getElementById('yesdelete{{ note.idproject }}-{{ note.idnote }}').addEventListener('click', function () {
+                yesdeletenote('{{ note.idproject }}', '{{ note.idnote }}');
+            });
+
+        {% for detail in note.detail %}
+            {% if detail.link is not empty %}
+                    document.getElementById('notemssg{{ note.idproject }}{{ note.idnote }}').addEventListener('click', function () {
+                        g3.Action('{{ detail.link.window }}');
+                        markAsRead('{{ note.idproject }}', '{{ note.idnote }}', '{{ note.isnew }}');
+                    });
+                    document.getElementById('contmssg{{ note.idproject }}-{{ note.idnote }}').addEventListener('click', function () {
+                        g3.Action('{{ detail.link.window }}');
+                    });
+
+            {% else %}
+                {% if note.isnew == '1' %}
+                        document.getElementById('notemssg{{ note.idproject }}{{ note.idnote }}').addEventListener('click', function () {
+                            markAsRead('{{ note.idproject }}', '{{ note.idnote }}', '{{ note.isnew }}');
+                        });
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+        });
+
+        var totalNewMessages = 0;
+        function DisplayTotalNewMessagesWarning()
+        {
+            totalNewMessages = parseInt('{{ total_new_notes }}');
+            if (totalNewMessages > 0) {
+                let ele = document.getElementById("newmessagewarning");
+                ele.innerHTML = totalNewMessages;
+                $("#pnlNewMessages").show();
+            }
+        }
+
+        async function markAsRead(idproject, idnote, isnew) {
+            if (isnew === 0) {
+                return false;
+            }
+
+            let apppath = '{{ markasreadroute }}';
+            let replacedpath = apppath.replace("[idproject]", idproject);
+            replacedpath = replacedpath.replace("[idnote]", idnote);
+
+            let response = await fetch(replacedpath);
+            var resp = await response.text();
+
+            let ele = document.getElementById("notetool" + idproject + idnote);
+            if (ele) {
+                $("#ok" + idproject + idnote).hide();
+            }
+
+            totalNewMessages--;
+            if (totalNewMessages > 0) {
+                let elew = document.getElementById("newmessagewarning");
+                if (elew) {
+                    elew.innerHTML = totalNewMessages;
+                    $("#pnlNewMessages").show();
+                }
+            } else {
+                $("#pnlNewMessages").hide();
+            }
+        }
+
+        async function yesdeletenote(idproject, idnote) {
+            let apppath = "{{ archivenoteroute }}";
+            let replacedpath = apppath.replace("[idproject]", idproject);
+            replacedpath = replacedpath.replace("[idnote]", idnote);
+
+            let response = await fetch(replacedpath);
+            var resp = await response.text();
+
+            let contentToRemove = document.querySelectorAll("#notemssg" + idproject + idnote);
+            setTimeout(function () {
+                $("#notebreak" + idproject + idnote).slideUp("slow");
+                $("#notetool" + idproject + idnote).slideUp("slow");
+//                    $(contentToRemove).slideUp("slow");
+                $(contentToRemove).hide();
+            }, 1000);
+        }
+
+        function openPopupFollowMessage(idproject, idnote, isnew)
+        {
+            modalnoteform(idproject, idnote);
+            markAsRead(idproject, idnote, isnew);
+        }
+
+</script>
+
+<div id="pnlNewMessages"  class="newMessages" hidden>
+    <label id="newmessagewarning" style="padding-left: 15px;"></label>
+    <label style="padding-right: 15px;">  {{ lbl_title }}</label>
+</div>
+
+{% if notes is empty  %}
+    <p>{{ lbl_nonotes }}</p>    
+{% endif %}
+
+{% for note in notes %}
+    <div id="notebreak{{ note.idproject }}{{ note.idnote }}">
+        <br>
+        <br>    
+    </div>
+    <div id="notetool{{ note.idproject }}{{ note.idnote }}" >
+        {% if note.isnew == '1' %}
+            <div id="ok{{ note.idproject }}{{ note.idnote }}" title="{{lbl_flag }}" class="pnlFloat taskselect imgBtn imgFlag"></div>
+        {% endif %}
+
+        <div id="reply{{ note.idproject }}-{{ note.idnote }}" class="pnlFloat taskselect point imgMessg" title="{{ lbl_reply }}" >
+            <label class="txtLabel" >{{ note.title }}</label>
+        </div>
+
+        <span id="yesdelete{{ note.idproject }}-{{ note.idnote }}" class="floatRight taskselect imgBtn imgClose" title="{{ lbl_remove }}"></span>
+
+        <div class="txtsmall">{{ note.members }}</div>
+    </div>
+
+    {% for detail in note.detail %}
+        {% if iduser == detail.iduser %}
+            {% set classname = 'noteSent' %}
+        {% else %}
+            {% set classname = 'noteReceived' %}
+        {% endif %}
+
+        <div id="notemssg{{ note.idproject }}{{ note.idnote }}" class="{{ classname }}" >
+            <div id="contmssg{{ note.idproject }}-{{ note.idnote }}" class="contentMssg {% if detail.link is not empty %}point{% endif %}" >
+                <div class="txtsmall txtGrey">
+                    {% if detail.link is not empty %}
+                        <div class="imgGoto" title="{{ lbl_open }}" ></div>
+                    {% endif %}
+                    <label class="floatRight">{{ detail.createdon|date("j M Y g:ia") }}</label>
+                    {{ detail.sendername }}
+                </div>
+                <div class="contentMssgBody marginsmall">{{ detail.notetext|nl2br }}</div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endfor %}

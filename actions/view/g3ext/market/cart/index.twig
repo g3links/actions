@@ -1,0 +1,55 @@
+<script>
+
+    $(document).ready(function () {
+    {% if allownew %}
+            document.getElementById("newc").addEventListener("click", function () {
+                searchproductscartdetail(0);
+            });
+    {% endif %}
+    {% if productsroute is not empty %}
+            document.getElementById("products").addEventListener("click", function () {
+                g3.Action('{{ productsroute.window }}');
+            });
+    {% endif %}
+            loadcarts();
+        });
+
+        var navpageselected = 0;
+        var gateselected = "{{ defaultgate }}";
+        async function loadcarts()
+        {
+            $('#loading').show();
+
+            let apppath = "{{ listroute }}";
+            let replacedpath = apppath.replace('[idgate]', gateselected);
+            replacedpath = replacedpath.replace('[navpage]', navpageselected);
+
+            let response = await fetch(replacedpath);
+            $("#modalform").html(await response.text());
+            $("#loading").hide();
+        }
+
+        function selectGate(idgate)
+        {
+            gateselected = idgate;
+            loadcarts();
+        }
+
+        // used by footpage control
+        function pageSelected(navtopage) {
+            navpageselected = navtopage;
+            loadcarts();
+        }
+
+</script>
+
+{% if allownew %}
+    <div id="newc" class="linkBtnSrv taskselect imgAdd" >  {{ lbl_newtitle }}</div>
+{% endif %}
+{% if productsroute is not empty %}
+    <div id="products" class="linkBtnSrv taskselect imgProduct" >  {{ productsroute.title }}</div>
+{% endif %}
+
+<div id="loading" class="loading floatRight"></div>
+
+<div id="modalform"></div>

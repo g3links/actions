@@ -1,0 +1,50 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById('vhch').addEventListener('click', function () {
+            $('#linkForcommentView').show();
+            $('#viewcommentHistory').slideUp("slow");
+        });
+
+    {% if commentrestoreroute is not empty %}
+        {% for comment in historycomments %}
+            {% if comment.deleted %}
+                    document.getElementById('rc{{ comment.idcomment }}').addEventListener('click', function () {
+                        restoreComment({{ comment.idcomment }});
+                    });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+        });
+
+    {% if commentrestoreroute is not empty %}
+        function restoreComment(idcomment) {
+            let apppath = '{{ commentrestoreroute }}';
+            let replacedpath = apppath.replace('[idcomment]', idcomment);
+
+            location.href = replacedpath;
+        }
+    {% endif %}
+
+</script>
+
+<p id="vhch" class="linkPlain" >{{ lbl_viewhistory }}</p>
+
+{% for comment in historycomments %}
+    <div class="pnlBackMint">
+        {% if commentrestoreroute is not empty and comment.deleted %}
+            <label id="rc{{ comment.idcomment }}" class="linkPlain floatRight txtsmall" >{{ lbl_restore }}</label>
+        {% endif %}
+
+        <div class="txtLabel">
+            {{ comment.username }},
+            {% if comment.deleted %}
+                {{ comment.lastmodifiedon|date("j M Y g:ia") }}
+            {% else %}
+                {{ comment.createdon|date("j M Y g:ia") }}
+            {% endif %}
+        </div>
+        <div class="txtBlack">{{ comment.description|nl2br }}</div>
+    </div>
+{% endfor %}

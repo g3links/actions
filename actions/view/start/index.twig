@@ -1,0 +1,47 @@
+<script>
+
+    $(document).ready(function () {
+        loadActionTags();
+        loadServices();
+        loadActions();
+    });
+
+    async function loadServices() {
+        let response = await fetch("{{ servicesroute }}");
+        $('#renderservice').html(await response.text());
+    }
+
+    async function loadActionTags() {
+        let response = await fetch("{{ servicetagsroute }}");
+        $('#renderservicetags').html(await response.text());
+    }
+
+    async function loadActions() {
+        let response = await fetch("{{ liatactionsroute }}");
+        $('#renderactions').html(await response.text());
+        $('#loading').hide();
+    }
+
+    function searchTags(tagtype, tagname) {
+        console.log('search tag: ' + tagtype + ', ' + tagname);
+        let apppath = '{{ searchtagsroute.window }}';
+        let replacedpath = apppath.replace('[type]', tagtype);
+        replacedpath = replacedpath.replace('[searchtext]', tagname);
+
+        g3.Action(replacedpath);
+    }
+
+    function selectedTask(idproject, idtask, tabname) {
+        let apppath = "{{ viewtaskroute.apppath }}";
+        let replacedpath = apppath.replace("[idproject]", idproject);
+        replacedpath = replacedpath.replace("[idtask]", idtask);
+        g3.ActionWindow(idproject, "{{ viewtaskroute.appFramename }}", "{{ viewtaskroute.appwidth }}", replacedpath, "{{ viewtaskroute.title }}", tabname);
+    }
+
+</script>
+
+<div id="loading" class="loading floatRight"></div>
+
+<div id="renderservicetags"></div>
+<div id="renderservice"></div>
+<div id="renderactions"></div>

@@ -1,0 +1,74 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+
+    {% for taskhold in taskholds %}
+            document.getElementById('cohr{{ taskhold.idtaskhold }}').addEventListener('click', function () {
+                clearOldHoldRow({{ taskhold.idtaskhold }});
+            });
+    {% endfor %}
+
+    {% for r in range(1, 2) %}
+            document.getElementById('chr{{ r }}').addEventListener('click', function () {
+                clearHoldRow({{ r }});
+            });
+    {% endfor %}
+
+        });
+
+        function clearOldHoldRow(idrow) {
+            $("#h-" + idrow).val('');
+        }
+
+        function clearHoldRow(idrow) {
+            $("#hi-" + idrow).val('');
+        }
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ editholdroute }}" method="post"  style="width: 100%" onsubmit="closeForm();" >
+
+            <p class="titleName">{{ lbl_hold }}</p>
+            <p class="txtLabel">{{ lbl_update }}:</p>
+
+            <div class="table">
+                <div class="tableRow">
+                    <div class="tableHead center txtLabel"><label>{{ th_col1 }}</label></div>                            
+                    <div class="tableHead"></div>                            
+                </div>
+
+                {% for taskhold in taskholds %}
+                    <div class="tableRow">
+                        <div class="tableCell">
+                            <input style="width: 95%;border-bottom: 0.5px solid gainsboro;" type="text" id="h-{{ taskhold.idtaskhold }}"  name="h-{{ taskhold.idtaskhold }}" value="{{ taskhold.description|nl2br }}" >
+                        </div>                            
+                        <div class="tableCell" style="width: 5%;" ><span id="cohr{{ taskhold.idtaskhold }}" class="imgBtn imgHide" ></span></div>
+                    </div>
+                {% endfor %}
+
+                {% for r in range(1, 2) %}
+                    <div class="tableRow">
+                        <div class="tableCell">
+                            <input style="width: 95%;border: 0px;border-bottom: 0.5px solid gainsboro;" type="text" id="hi-{{ r }}" name="hi-{{ r }}" >
+                        </div>                            
+                        <div class="tableCell" style="width: 5%;"><span id="chr{{ r }}" class="imgBtn imgHide" ></span></div>
+                    </div>
+                {% endfor %}
+            </div>
+            <p id="submitpnl" class="center">
+                <input type="submit" id="submit" name="updatehold" value="{{ lbl_submit }}" >
+            </p>
+
+        </form>
+    </div>
+
+</div>

@@ -1,0 +1,33 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById('rl').addEventListener('click', function () {
+            resetLanguage();
+        });
+    });
+    function resetLanguage() {
+        window.top.location.href = '{{ resetlangroute }}';
+    }
+
+</script>
+
+<div class="pnlBackWhite">
+    <form action="{{ updatelangroute }}" method="post" >
+        <div class="table">
+            {% for language in languages %}
+                <div class="tableRow">
+                    <div class="tableCell {{ language.idlang }}Flag" style="width: 40px;"></div>
+                    <div class="tableCell">
+                        <input type="radio" id="lang{{ language.idlang }}" name="lang" value="{{ language.idlang }}" {% if langcode == language.idlang %}checked{% endif %}>
+                        <label for="lang{{ language.idlang }}">{{ language.name }}</label>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="center margin">        
+            <input type="submit" id="submit" name="updatelang" value="{{ submit }}" >
+        </div>
+        <div class="right margin">        
+            <label id="rl" class="linkPlain" >{{ lbl_reset }}</label>
+        </div>
+    </form>
+</div>

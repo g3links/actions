@@ -1,0 +1,22 @@
+<script>
+
+    $(document).ready(function () {
+    {% if assignedusernames is not empty %}
+            document.getElementById('rf').addEventListener('click', function () {
+                removeFilter();
+            });
+    {% endif %} 
+        });
+
+</script>
+
+<p id="filterlist">
+
+    {% for username in assignedusernames %}
+        <label class="{% if username.iduser != '0' %}btnMember{% else %}btnGroup{% endif %}" >{{ username.name }}</label>
+    {% endfor %}
+
+    {% if assignedusernames is not empty %}
+        <span id="rf" class="imgBtn imgHide" ></span>
+    {% endif %}
+</p>

@@ -1,0 +1,34 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        $("#notetext").val('');
+
+        let notetext = document.getElementById('notetext');
+        notetext.style.height = "";
+        
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+
+</script>
+
+<div id="user" class="modalNote">
+    <div class="modalNote-content">
+        <span id="cmod" class="modal-close" ></span>
+        <label class="titleName">{{ lbl_title }}</label>
+
+        <form id="postReplyMessage" action="{{ addnoteroute }}" method="post" >
+            <textarea id="notetext" name="notetext" cols="1" rows="2" style="width: 100%;" autofocus="" required onkeyup="adjustNoteTextHeight(this)"></textarea>
+            <p id="submitpnl" class="right">
+                <input type="submit" id="submit" value="{{ submitnote }}" >
+            </p>
+            <input type="hidden" name="idnote" value="{{ idnote }}" >
+            <input type="hidden" name="action" value="{{ lbl_action }}" >
+        </form>
+
+    </div>
+
+</div>

@@ -1,0 +1,121 @@
+<script>
+    $(document).ready(function () {
+
+        document.getElementById("clearuser").addEventListener("click", function () {
+            location.href = '{{ resetlogonroute }}';
+        });
+    {% if allowcreateuser %}
+            document.getElementById("llogin").addEventListener("click", function () {
+                activepanel("loginform", 'llogin');
+            });
+            document.getElementById("lregister").addEventListener("click", function () {
+                activepanel("registerform", "lregister");
+            });
+            document.getElementById("lreset").addEventListener("click", function () {
+                activepanel("resetform", "lreset");
+            });
+            document.getElementById("changepwd").addEventListener("click", function () {
+                activepanel("changepwdform", "changepwd");
+            });
+    {% endif %}
+        });
+
+        function activepanel(elem, link) {
+            $("#resetform").hide();
+            $("#llogin").show();
+            $("#registerform").hide();
+            $("#lregister").show();
+            $("#changepwdform").hide();
+            $("#lreset").show();
+            $("#loginform").hide();
+            $("#changepwd").show();
+
+            $("#" + elem).show();
+            $("#" + link).hide();
+        }
+
+        function validateRegisterForm() {
+            if ($("pwdnew").val() != $("pwdnew1").val()) {
+                alert("password did not match");
+                return false;
+            }
+        }
+
+        function validateChangeForm() {
+            if ($("pwdchg").val() != $("pwdchg1").val()) {
+                alert("password did not match");
+                return false;
+            }
+        }
+
+</script>
+
+<div class="floatRight txtLabel">{{ lbl_host }}</div>
+<!-- ERRORS -->
+{% if messageerror is not empty %}
+    <div class="loginNotFound margin" >
+        <div class="txtXLarge">{{ lbl_security }}</div>
+        <p>{{ messageerror }}</p>
+    </div>
+{% endif %}
+
+<!-- logon -->
+<div id="loginform">
+    <form class="marginbig" method="post" action="{{ logonuserroute }}">
+        <div class="titleName">{{ lbl_submitlogin }}</div>
+        <input class="marginsmall pnlFloatBorder" name="emaillogon" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
+        <input class="marginsmall pnlFloatBorder" name="pwdlogon" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
+        <input name="callback" type="hidden" value="{{ callback }}" >
+        <div class="margin"></div>
+        <input class="submit pnlFloatBorder" name="logon" type="submit" value="{{ lbl_submitlogin }}" >
+    </form>
+</div>
+
+<!-- register account -->
+{% if allowcreateuser %}
+    <div id="registerform" hidden>
+        <form class="marginbig" method="post" action="{{ logonnewroute }}" onsubmit="return validateRegisterForm()" >
+            <div class="titleName">{{ lbl_submitregister }}</div>
+            <input class="pnlFloatBorder" name="usernamenew" type="text" maxlength="60" placeholder="{{ lbl_username }}" autofocus required ><br>
+            <input class="pnlFloatBorder" name="emailnew" type="email" placeholder="{{ lbl_email }}" required ><br>
+            <input class="pnlFloatBorder" name="pwdnew" type="password" placeholder="{{ lbl_password }}" minlength="4" required >
+            <input class="pnlFloatBorder" name="pwdnew1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required >
+            <div class="margin"></div>
+            <input class="submitblue pnlFloatBorder" name="new" type="submit" value="{{ lbl_submitregister }}" >
+        </form>
+    </div>
+
+    <!-- change password -->
+    <div id="changepwdform" hidden>
+        <form class="marginbig" method="post" action="{{ changepwdroute }}" onsubmit="return validateChangeForm()">
+            <div class="titleName">{{ lbl_submitchnagepwd }}</div>
+            <input class="marginsmall pnlFloatBorder" name="emailchg" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
+            <input class="marginsmall pnlFloatBorder" name="pwdlogon" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
+            <input class="marginsmall pnlFloatBorder" name="pwdchg" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required><br>
+            <input class="marginsmall pnlFloatBorder" name="pwdchg1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required ><br>
+            <div class="margin"></div>
+            <input class="submit pnlFloatBorder" name="change" type="submit" value="{{ lbl_submitchnagepwd }}" >
+        </form>
+    </div>
+{% endif %}
+
+<div id="resetform" hidden>
+    <form class="marginbig" method="post" action="{{ emailresetpwdroute  }}">
+        <div class="titleName">{{ lbl_resetpwd }}</div>
+        <input class="marginsmall pnlFloatBorder" name="emailreset" type="email" placeholder="{{ lbl_email }}" autofocus required ><br>
+        <div class="margin"></div>
+        <input class="submit linkMessage pnlFloatBorder" name="reset" type="submit" value="{{ lbl_sendreset }}" >
+    </form>
+</div>
+
+{% if allowcreateuser %}
+    <div><span id="llogin" class="linkTitle" hidden >{{ lbl_submitlogin|capitalize }}</span></div>
+    <div><span id="lregister" class="linkTitle" >{{ lbl_submitregister|capitalize }}</span></div>
+    <div><span id="changepwd" class="linkTitle" >{{ lbl_changepwd|capitalize }}</span></div>
+    <div><span id="lreset" class="linkTitle" >{{ lbl_resetpwd|capitalize }}</span></div>
+{% endif %}
+<span id="clearuser" class="linkTitle" >{{ lbl_clearuser|capitalize }}</span><br>
+
+<div class="margin"></div>
+<span class="margin"><a target="_blank" href="{{ aboutroute }}">{{ lnk_message }}</a></span>
+

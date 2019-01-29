@@ -1,0 +1,9 @@
+<label class="txtLabel" >{{ lbl_priority }}:</label>
+{% for priority in allPriorities %}
+    <input id="prt{{ priority.idpriority }}" type="radio" name="idpriority" value="{{ priority.idpriority }}"
+           {% if priority.idpriority == action.idpriority %}
+               checked
+           {% endif %}
+           >
+    <label for="prt{{ priority.idpriority }}">{{ priority.name|capitalize }}</label>
+{% endfor %}

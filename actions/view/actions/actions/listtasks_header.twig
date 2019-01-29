@@ -1,0 +1,85 @@
+<script>
+
+    $(document).ready(function () {
+        totalpages = parseInt("{{ totalpages }}"); //var set in index parent page
+        
+        document.getElementById("spriority").addEventListener("click", function () {
+            sorttype_th = "";
+            sortdirection_th = "{{ sortdirection }}";
+            pageSelected();
+        });
+        document.getElementById("stitle").addEventListener("click", function () {
+            sorttype_th = "TITLE";
+            sortdirection_th = "{{ sortdirection }}";
+            pageSelected();
+        });
+        document.getElementById("sdate").addEventListener("click", function () {
+            sorttype_th = "DATE";
+            sortdirection_th = "{{ sortdirection }}";
+            pageSelected();
+        });
+    {% if hasprojname %}
+            document.getElementById("sproject").addEventListener("click", function () {
+                sorttype_th = "PROJECT";
+                sortdirection_th = "{{ sortdirection }}";
+                pageSelected();
+            });
+    {% endif %}
+            findTaskSelected();
+        });
+
+        function findTaskSelected() {
+    {% if idtaskselected > 0 %}
+            highlightselectedTask("{{ idproject }}", "{{ idtaskselected }}");
+    {% endif %}
+        }
+
+        function selectedTask(idproject, idtask, tabname)
+        {
+            highlightselectedTask(idproject, idtask);
+//        // find the task and refresh details, otherwise close detail form
+//        let eleFound = document.getElementById("t1-" +idproject + '-' + idtask);
+//        if (eleFound) {
+            let apppath = "{{ viewtaskroute.apppath }}";
+            let replacedpath = apppath.replace("[idproject]", idproject);
+            replacedpath = replacedpath.replace("[idtask]", idtask);
+            g3.ActionWindow(idproject, "{{ viewtaskroute.appFramename }}", "{{ viewtaskroute.appwidth }}", replacedpath, "{{ viewtaskroute.title }}", tabname);
+            //       } else
+            //       {
+//            g3.ActionClose(idproject, 'iframe_taskdetail');
+//        }
+        }
+
+        var previuosidtaskselected_t = 0;
+        var previuosidprojectselected_t = 0;
+        function highlightselectedTask(idproject, idtask)
+        {
+            if (previuosidtaskselected_t > 0) {
+                let eleFound = document.getElementById("st" + previuosidprojectselected_t + "-" + previuosidtaskselected_t);
+                if (eleFound) {
+                    $("#st" + previuosidprojectselected_t + "-" + previuosidtaskselected_t).css("background-color", "");
+                }
+            }
+            let eleFound = document.getElementById("st" + idproject + "-" + idtask);
+            if (eleFound) {
+                $("#st" + idproject + "-" + idtask).css("background-color", "lavender");
+            }
+            previuosidtaskselected_t = idtask;
+            previuosidprojectselected_t = idproject;
+        }
+
+</script>
+
+<div class="table">
+    <div class="tableRow">
+        <div id="spriority" class="tableHead txtLabel {{ s_priority }}" style="width: 15px;" ></div>
+        <div id="stitle" class="tableHead txtLabel {{ s_description }}" ><label>  {{ lbl_sorttitle }}</label></div>
+        <div id="sdate" class="tableHead txtLabel {{ s_date }}" style="width: 80px;" ><label>  {{ lbl_sortdate }}</label></div>
+        {% if hasprojname %}
+            <div id="sproject" class="tableHead txtLabel {{ s_projname }}" style="width: 90px;" ><label>  {{ lbl_sortproject }}</label></div>
+        {% endif %}
+    </div>
+</div>
+{% if lbl_notfound is not empty %}
+    {{ lbl_notfound }}
+{% endif %}

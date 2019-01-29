@@ -1,0 +1,60 @@
+<script>
+
+    $(document).ready(function () {
+    {% for action in actions %} 
+            document.getElementById("st{{ action.idproject }}-{{ action.idtask }}").addEventListener("click", function () {
+                selectedTask("{{ action.idproject }}", "{{ action.idtask }}", "{{ action.projname }}");
+            });
+    {% endfor %} 
+        });
+
+</script>
+
+{% for action in actions %} 
+    {% set indent = action.indent * 2 %}
+    <div id="st{{ action.idproject }}-{{ action.idtask }}" class="taskBody taskselect priority{{ action.idpriority }} marginsmall" style="margin-left: {{ indent }}%; width: {{ 99 - indent }}%;" >
+        <div class="{% if action.isoverdue %}warningAction{% endif %}">
+            {% if indent > 0 %}
+                <span class="imgTreeline"></span>
+            {% endif %}
+
+            <span class="txtLabel">{{ action.username }}</span>
+
+            {% for tag in action.tags %}
+                <span class="linkTagMenu txtDark">{{ tag.tagname }}</span> 
+            {% endfor %}
+
+            <span class="floatRight">
+                <span class="txtLabel">{{ action.dueon|date("j M Y g:ia") }}</span>
+                {% if hasprojname %}
+                    <div class="txtDark txtsmall right {% if action.isoverdue %}warningAction{% endif %}" >{{ action.projname }}</div>
+                {% endif %}
+                <div class="right">
+                    {% for taskusername in action.taskusernames %}
+                        <span class="btnMember">{{ taskusername.title }}</span>
+                    {% endfor %}
+                    {% for taskgroupname in action.taskgroupnames %}
+                        <span class="btnGroup">{{ taskgroupname.title }}</span>
+                    {% endfor %}
+                    {% if action.hasattach %}
+                        <span class="imgAttachSmall" ></span>
+                    {% endif %}
+                </div>
+            </span>
+        </div>
+
+        <div class="title {% if action.onhold %}onHoldAction{% endif %}">{{ action.title }}</div>
+        {% if action.description is empty %}
+            <br>
+        {% endif %}
+        <div class="txtDark">{{ action.description|nl2br }}</div>
+
+        {% if action.trackname is not empty %}
+            <div>
+                <span class="txtLabel">{{ lbl_trackname }}:</span>
+                <span class="txtDark" >{{ action.trackname }} - {{ action.categoryname }}</span>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %} 
+

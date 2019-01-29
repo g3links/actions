@@ -1,0 +1,9 @@
+<div class="table mainmenuproject" >
+    <div>{{ lbl_title }}</div>
+    {% for projectinvitation in projectinvitations %}
+        <form action="{{ projinvacceptroute }}" method="post" >
+            <input type="submit" class="onMessages" value="{{ projectinvitation.title }}" >
+            <input type="hidden" id="idprojectinv" name="idprojectinv" value="{{ projectinvitation.idprojectinv }}" >
+        </form>
+    {% endfor %}
+</div>

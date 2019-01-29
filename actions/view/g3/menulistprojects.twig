@@ -1,0 +1,98 @@
+<script>
+    $(document).ready(function () {
+
+    {% for project in projects %}
+            document.getElementById('app{{ project.idproject }}').addEventListener('click', function () {
+                selectedProject('{{ project.idproject }}', '{{ project.startupwidth }}', '{{ project.title }}', '{{ project.remoteurl }}');
+            });
+        {% if project.remoteurl is not empty %}
+                document.getElementById('set-{{ project.idproject }}').addEventListener('click', function () {
+                    openSetupProject('{{ project.idproject }}', '{{ project.startupwidth }}', '{{ project.title }}');
+                });
+        {% endif %}
+    {% endfor %}
+
+    {% if cacheselecteproject > 0 %}
+            let projlink = document.getElementById('app{{ cacheselecteproject }}');
+            if (projlink) {
+                $('#app{{ cacheselecteproject }}')[0].click();
+            }
+    {% endif %}
+        });
+
+        function selectedProject(idproject, pagewidth, tabname, remoteurl)
+        {
+            highlightselectedProject(idproject);
+
+            //opne actions list
+            let apppath = '{{ actionroute.apppath }}';
+            if (remoteurl.length > 0) {
+                apppath = remoteurl;
+            }
+            let replacedapppath = apppath.replace('[idproject]', idproject);
+            g3.ActionWindow(idproject, '{{ actionroute.appFramename }}', pagewidth, replacedapppath, '{{ actionroute.title|capitalize }}', tabname);
+        }
+
+        function openSetupProject(idproject, pagewidth, tabname)
+        {
+            highlightselectedProject(idproject);
+
+            //opne actions list
+            let apppath = '{{ initsetuproute.apppath }}';
+            let replacedapppath = apppath.replace('[idproject]', idproject);
+            g3.ActionWindow(idproject, '{{ initsetuproute.appFramename }}', pagewidth, replacedapppath, '{{ initsetuproute.title|capitalize }}', tabname);
+        }
+
+        function selectedSpecialProject(idproject)
+        {
+            highlightselectedProject(idproject);
+        }
+
+        var previuosidprojectselected = 0;
+        function highlightselectedProject(idproject)
+        {
+            $("#app" + previuosidprojectselected).css("background-color", "");
+            $("#app" + idproject).css("background-color", "silver");
+            previuosidprojectselected = idproject;
+        }
+
+</script>
+
+<style>
+    .grid_projects {
+        display: grid;
+        grid-template-columns: auto auto 0px;
+/*        grid-template-rows: auto; */
+    }
+    .coltitle {
+        grid-column: 1 / span 3;
+        grid-row: 1;
+    }
+    .colservice {
+        grid-column: 2 / span 2;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+</style>
+
+<div class="txtBlue txtsmall">{{ lbl_title|capitalize }}</div>
+
+<div class="mainmenuproject" >
+    {% for project in projects %}
+        <div class="grid_projects" >
+            <div class="coltitle menuprojectservice labelselect" id="app{{ project.idproject }}" >
+                <label>{{ project.title }}</label>
+            </div>
+            <div class="colservice">
+                {% if project.ispublic %}
+                    <span class="imgShare" title="{{ lbl_share }}"></span>
+                {% endif %}
+                {% if project.remoteurl is not empty %}
+                    <span class="imgActions point" id="set-{{ project.idproject }}" title="{{ lbl_remote }}"></span>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+

@@ -1,0 +1,21 @@
+<script>
+
+    $(document).ready(function () {
+        searchForActions();
+    });
+
+    async function searchForActions() {
+        let response = await fetch("{{ loaddataroute }}");
+        $("#displaysearch").html(await response.text());
+        $("#loading").hide();
+    }
+    
+</script>
+
+<div class="pnlMenuHeader">
+    <label class="titleName">{{ lbl_title }}</label>:
+    <label >{{ searchtext }}</label>    
+</div>
+
+<div id="loading" class="loading floatRight"></div>
+<div id="displaysearch"></div>

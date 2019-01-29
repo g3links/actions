@@ -1,0 +1,10 @@
+<div class="pageNavigation" >
+    {% for i in range(low=0, high=totalpages - 1, step=1) %}
+        <label 
+            {% if i != navpage %} 
+                class="linkPlain" 
+                onclick="pageSelected('{{ i }}');"
+            {% endif %}
+            >{{ i+1 }}</label>
+    {% endfor %}
+</div>

@@ -1,0 +1,26 @@
+<script>
+
+    $(document).ready(function () {
+    {% for todoopen in todosopen %}
+            document.getElementById('sto{{ todoopen.idproject }}-{{ todoopen.idtask }}').addEventListener('click', function () {
+                selectedTask('{{ todoopen.idproject }}', '{{ todoopen.idtask }}', '{{ todoopen.projname }}');
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<div>
+    <span class="onOpenSelection">{{ lbl_title|capitalize }}</span>
+    {% for todoopen in todosopen %}
+        <div id="sto{{ todoopen.idproject }}-{{ todoopen.idtask }}" class="taskselect taskBody marginsmall priority{{ todoopen.idpriority }}" >
+            <div class="txtLabel floatRight">
+                <div class="">{{ todoopen.dueon|date("j M Y g:ia") }}</div>
+                <div class="right">{{ todoopen.lbl_categoryname }}</div>
+            </div>
+            <span class="txtLabel">{{ todoopen.projname }}</span>
+            <div>{{ todoopen.title }}</div>
+        </div>
+    {% endfor %}
+</div>
+<div class="marginsmall"></div>

@@ -1,0 +1,20 @@
+<script>
+//    $(document).ready(function () {
+//    });
+
+</script>
+
+<div class="imgUser"></div>
+
+<div id="viewInvitationData">
+
+    <form action="{{ sendinvitationroute }}" method="post" class="pnlBackWhite">
+        <div>
+        <input class="pnlFloatBorder" style="width: 70%;" placeholder="{{ lbl_name }}" type="text" name="name" required ><br>
+        <input class="pnlFloatBorder" style="width: 70%;" placeholder="{{ lbl_email }}" type="email" name="email" required >
+        <div>
+        <input class="floatRight" type="submit" id="submit" value="{{ submit }}" >
+    </form>
+    <p class="txtDark">{{ lbl_tip }}</p>
+</div>
+

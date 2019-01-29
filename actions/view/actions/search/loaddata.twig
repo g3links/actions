@@ -1,0 +1,63 @@
+<script>
+
+    $(document).ready(function () {
+{% for action in listactions %}
+        document.getElementById('sst{{ action.idproject }}-{{ action.idtask }}').addEventListener('click', function () {
+            selectedSearchTask('{{ action.idproject }}', '{{ action.idtask }}', '{{ action.idgate }}', '{{ action.projname }}');
+        });
+{% endfor %}
+    });
+    
+    function selectedSearchTask(idproject, idtask, idgate, tabname) {
+        //Open actions list
+//        let Projapppath = '{* tasksgateroute.apppath }}';
+//        let replacedprojpath = Projapppath.replace('[idproject]', idproject);
+//        replacedprojpath = replacedprojpath.replace('[status]', status);
+//        g3.ActionWindow(idproject, '{* tasksgateroute.appFramename }}', '{* tasksgateroute.appwidth }}', replacedprojpath, '{* tasksgateroute.title }}', tabname);
+
+        //Open specific action
+        let Actionapppath = '{{ viewtaskroute.apppath }}';
+        let replacedpath = Actionapppath.replace('[idproject]', idproject);
+        replacedpath = replacedpath.replace('[idtask]', idtask);
+        g3.ActionWindow(idproject, '{{ viewtaskroute.appFramename }}', '{{ viewtaskroute.appwidth }}', replacedpath, '{{ viewtaskroute.title }}', tabname);
+    }
+
+    let navpage_th = 0;
+    function pageSelected(navtopage) {
+        navpage_th = navtopage;
+        let searchtext = '{{ searchtext }}';
+        let apppath = '{{ searchactionsroute.window }}';
+        let replacedpath = apppath.replace('[searchtext]', searchtext);
+        replacedpath = replacedpath.replace('[navpage]', navtopage);
+
+        g3.Action(replacedpath);
+    }
+
+</script>
+
+{% for action in listactions %}
+    <div id="sst{{ action.idproject }}-{{ action.idtask }}" class="taskBody taskselect priority{{ action.idpriority }}" >
+        <div class="txtsmall floatRight" >
+            <label class="btnLinkedAction" >{{ action.lbl_gatename|capitalize }}</label>
+            <br>
+            <label class="txtDark" >{{ action.createdon|date("j M Y g:ia") }}</label>
+        </div>
+
+        <div class="txtsmall marginleft">
+            {{ action.projname }}
+            {{ action.lbl_username }}
+            {% for tag in action.tags %}
+                <label class="linkTagMenu">{{ tag.tagname }}</label> 
+            {% endfor %}
+        </div>
+
+        <div class="title linkPlain marginleft">{{ action.title }}</div>
+        <div class="txtDark marginleft">{{ action.description|nl2br }}</div>
+
+        <br>
+    </div>
+{% endfor %}
+
+{% if listactions is empty %}
+    {{ lbl_notfound }}
+{% endif %}

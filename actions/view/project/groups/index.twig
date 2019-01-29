@@ -1,0 +1,65 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            $("#projusergroup").hide();
+        });
+    {% if editprojectgrouproute is not empty %}
+            document.getElementById("uug0").addEventListener("click", function () {
+                updateUserGroup(0);
+            });
+        {% for group in groups %}
+                document.getElementById("uug{{ group.idgroup }}").addEventListener("click", function () {
+                    updateUserGroup("{{ group.idgroup }}");
+                });
+        {% endfor %}
+    {% endif %}
+        });
+
+    {% if editprojectgrouproute is not empty %}
+        async function updateUserGroup(idgroup) {
+            let apppath = '{{ editprojectgrouproute }}';
+            let replacedpath = apppath.replace("[idgroup]", idgroup);
+
+            $("#projusergroup").show();
+            
+            let response = await fetch(replacedpath);
+            $("#projusergroupview").html(await response.text());
+        }
+    {% endif %}
+
+</script>
+
+{% if editprojectgrouproute is not empty %}
+    <div id="uug0" class="linkBtnSrv taskselect imgAdd" >
+        <label class="marginleft">{{ lbl_creategroup }}</label>
+    </div>
+{% endif %}
+
+{% for group in groups %}
+    <div id="uug{{ group.idgroup }}" class="taskselect {% if group.deleted %}pnlBackInactive{% else %}pnlBackWhite{% endif %}" >
+        <div class="txtLabel floatRight imgIn">{{ group.createdon|date("j M Y g:ia") }}</div>
+        <b class="titleName" >{{ group.groupname }}</b>
+
+        <div class="margin">
+            {% for activeuser in group.activeusers %}
+                <div style="margin-left: 20px;">
+                    <label>{{ activeuser.name }}</label>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+
+{% if groups is empty %}
+    <p>
+        {{ lbl_notfound }}
+    </p>
+{% endif %}
+
+<div id="projusergroup" class="modalUser" hidden>
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+        <div id="projusergroupview"></div>
+    </div>
+</div>

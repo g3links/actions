@@ -1,0 +1,35 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById('updateuser').addEventListener('click', function () {
+            location.href = "{{ editprofileroute }}";
+        });
+    });
+
+</script>
+
+<div class="pnlMenuHeader">    
+    <div id="updateuser" class="linkBtnSrv taskselect imgEdit"><label class="marginleft">{{ lbl_updateuser }}</label></div>
+</div>
+
+<div class="pnlBackWhite">
+    <div class="table" >
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_username }}</div>
+            <div class="tableCell txtDark">{{ user.name }}</div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_email }}</div>
+            <div class="tableCell txtDark">{{ user.email }}</div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_keyname }}</div>
+            <div class="tableCell txtDark">{{ user.keyname }}</div>
+        </div>
+        <p>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_theme }}</div>
+            <div class="tableCell txtDark">{{ theme.name }}</div>
+        </div>
+    </div>
+</div>

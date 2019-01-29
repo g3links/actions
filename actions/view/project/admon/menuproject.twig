@@ -1,0 +1,74 @@
+<script>
+
+    $(document).ready(function () {
+    {% if allowmessg %}
+            document.getElementById("notepf").addEventListener("click", function () {
+                noteprojectform();
+            });
+    {% endif %}
+    {% if allowfilter %}
+            document.getElementById("userassignedf").addEventListener("click", function () {
+                assignedform();
+            });
+    {% endif %}
+    {% if allownewaction %}
+            document.getElementById("newactionf").addEventListener("click", function () {
+                g3.Action('{{ newactionroute.window }}');
+            });
+    {% endif %}
+    {% if allowsetup %}
+            document.getElementById("setupf").addEventListener("click", function () {
+                g3.Action('{{ initsetuproute.window }}');
+            });
+    {% endif %}
+            document.getElementById("lnkmap").addEventListener("click", function () {
+                g3.Action('{{ actionsmaproute.window }}');
+            });
+            document.getElementById("filterviews").addEventListener("click", function () {
+                setupFilterView();
+            });
+        });
+
+        async function noteprojectform() {
+            let response = await fetch("{{ initmenuroute }}");
+            $("#modalform").html(await response.text());
+        }
+
+        async function assignedform() {
+            let response = await fetch("{{ filterusersroute }}");
+            $("#modalform").html(await response.text());
+        }
+
+        async function setupFilterView() {
+            let response = await fetch("{{ filterviewsroute }}");
+            $("#modalform").html(await response.text());
+        }
+
+</script>
+
+<div class="pnlMenuHeader">    
+    {% if allowmessg %}
+        <div id="notepf" class="linkBtnSrv taskselect imgBell" title="{{ lbl_noteprojecttitle }}">
+            <label class="marginleft">{{ link_noteproject }}</label>
+        </div>
+    {% endif %}
+    {% if allowfilter %}
+        <div id="userassignedf" class="linkBtnSrv taskselect imgFilter" title="{{ lbl_filtertitle }}">
+            <label class="marginleft">{{ link_filter }}</label>
+        </div>
+    {% endif %}
+    {% if allownewaction %}
+        <div id="newactionf" class="linkBtnSrv taskselect imgAdd" >
+            <label class="marginleft">{{ newactionroute.title }}</label>
+        </div>
+    {% endif %}
+    {% if allowsetup %}
+        <div id="setupf" class="linkBtnSrv taskselect imgSetup" >
+            <label class="marginleft">{{ lbl_setup }}</label>
+        </div>
+    {% endif %}
+    <div id="lnkmap" class="linkBtnSrv taskselect imgTimeline" >
+        <label class="marginleft">{{ lbl_showmap }}</label>
+    </div>
+    <div id="filterviews" class="linkBtnSrv taskselect imgMenu floatRight" title="{{ lbl_filterview }}" ></div>
+</div>

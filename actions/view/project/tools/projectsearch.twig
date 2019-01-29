@@ -1,0 +1,59 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById("sfproj").addEventListener("click", function () {
+            searchForProjects();
+        });
+    });
+
+    async function searchForProjects() {
+
+        let searhfor = $("#search").val();
+        if (searhfor.length === 0)
+        {
+            return false;
+        }
+
+        let apppath = "{{ searchprojectroute }}";
+        let replacedpath = apppath.replace("[search]", searhfor);
+
+        $("#projform").hide();
+        let response = await fetch(replacedpath);
+        $("#projlist").html(await response.text());
+    }
+
+    function projectSelected(idproject, title, marketname)
+    {
+        $("#idproject").val(idproject);
+        $("#title").html(title);
+        $("#marketname").html(marketname);
+
+        $("#projform").show();
+    }
+
+</script>
+
+<p>
+    <label class="txtDark">{{ lbl_search }}:</label>
+    <input type="text" id="search" value="{{ search }}" required autofocus >
+    <button id="sfproj" class="search" >{{ lbl_search }}</button>
+</p>
+
+<div id="projlist"></div>
+
+{% if isauthorized %}
+    <br>
+
+    <div id="projform" hidden >
+        <p class="txtDark">{{ lbl_join }}</p>
+        <div class="pnlBackWhite center">
+            <div id="title" ></div>
+            <div id="marketname" ></div>
+        </div>
+
+        <form class="margin center" action="{{ joinprojectroute }}" method="post">
+            <button type="submit" id="submit" name="joinproject" >{{ submit }}</button>
+
+            <input type="hidden" id="idproject" name="idproject" >
+        </form>
+    </div>
+{% endif %}

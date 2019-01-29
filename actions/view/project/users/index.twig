@@ -1,0 +1,254 @@
+<script>
+
+    $(document).ready(function () {
+    {% if editprojectuserroleroute is not empty %}
+        {% for projectuser in projectusers %}
+                document.getElementById("oprojr{{ projectuser.iduser }}").addEventListener("click", function () {
+                    openProjectRole("{{ projectuser.iduser }}");
+                });
+        {% endfor %}
+    {% endif %}
+    {% if projregisteruserroute is not empty %}
+            document.getElementById("email").addEventListener("click", function () {
+                searchEmail();
+                $("#invitemailform").hide();
+                $("#registermailform").hide();
+            });
+            document.getElementById("selectregister").addEventListener("click", function () {
+                $("#pnlinvite").hide();
+                $("#pnlregister").show();
+                $("#pnlsearch").show();
+                $("#invitemailform").hide();
+                $("#registermailform").hide();
+                selectedOption = "register";
+            });
+    {% endif %}
+    {% if projinviteroute is not empty %}
+            document.getElementById("selectinvite").addEventListener("click", function () {
+                $("#pnlregister").hide();
+                $("#pnlinvite").show();
+                $("#pnlsearch").show();
+                $("#invitemailform").hide();
+                $("#registermailform").hide();
+                selectedOption = "invite";
+            });
+    {% endif %}
+    {% if removeinvitationroute is not empty %}
+        {% for projectinvitation in projectinvitations %}
+                document.getElementById("ri{{ projectinvitation.idprojectinv }}").addEventListener("click", function () {
+                    removeInvitation("{{ projectinvitation.idprojectinv }}");
+                });
+        {% endfor %}
+    {% endif %}
+        });
+
+        var selectedOption = "";
+        function memberSelected(iduser, name, email) {
+            if (selectedOption === "invite") {
+                $("#inviteiduser").val(iduser);
+                $("#invitedname").html(name);
+                $("#invitedemail").html(email);
+
+                $("#invitemailform").show();
+            }
+            if (selectedOption === "register") {
+                $("#registeriduser").val(iduser);
+                $("#registerdname").html(name);
+                $("#registerdemail").html(email);
+
+                $("#registermailform").show();
+            }
+        }
+
+    {% if editprojectuserroleroute is not empty %}
+        async function openProjectRole(iduser) {
+            let apppath = "{{ editprojectuserroleroute }}";
+            let replacedpath = apppath.replace("[iduser]", iduser);
+
+            let response = await fetch(replacedpath);
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+        async function searchEmail() {
+            let searchval = $("#search").val();
+            if (searchval.length === 0) {
+                return false;
+            }
+
+            let apppath = "{{ searchemailroute }}";
+            let replacedpath = apppath.replace("[search]", searchval);
+
+            let response = await fetch(replacedpath);
+            $("#maillist").html(await response.text());
+        }
+
+    {% if removeinvitationroute is not empty %}
+        function removeInvitation(idprojectinv) {
+            let apppath = "{{ removeinvitationroute }}";
+            let replacedapppath = apppath.replace("[idprojectinv]", idprojectinv);
+
+            location.href = replacedapppath;
+        }
+    {% endif %}
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>                
+        <div class="tableHead txtLabel center"><label>{{ th_col3 }}</label></div>
+    </div>
+    {% for projectuser in projectusers %}
+        <div id="oprojr{{ projectuser.iduser }}" class="tableRow taskselect {% if projectuser.idaccess != 1 %}sharedDataRecord{% endif %} {% if projectuser.inactive %}Inactive{% endif %}" >
+            <div class="tableCell" ><label>{{ projectuser.name }}</label></div>
+            <div class="tableCell"><label>{{ projectuser.rolename }}</label></div>                
+            <div class="tableCell txtLabel"><label>{{ projectuser.email }}</label></div>
+        </div>
+    {% endfor %}
+
+    {% if lbl_notfound is not empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>
+
+{% if projregisteruserroute is not empty %}
+    <div class="pnlMenuHeader margin">
+        <div id="selectregister" class="linkBtnMenu imgJoin taskselect">{{ lbl_register }} </div>
+        <div id="selectinvite" class="linkBtnMenu imgGroup taskselect">{{ lbl_invite }} </div>
+    </div>
+
+    <div id="pnlregister" class="margin" hidden>
+        <span class="titleName">{{ lbl_register }} </span>
+        <span class="txtLabel">{{ lbl_registertip }}</span>
+    </div>
+
+    <div id="pnlinvite" class="margin" hidden>
+        <span class="titleName">{{ lbl_invite }} </span>
+        <span class="txtLabel">{{ lbl_invitetip }}</span>
+    </div>
+    <div id="pnlsearch" class="margin" hidden>
+        <label class="txtLabel">{{ lbl_search }}: </label>
+        <input type="text" id="search" minlength="3" required autofocus >
+        <button id="email" class="search" >{{ lbl_search }}</button>
+    </div>
+
+    <div id="maillist"></div>
+
+    <form action="{{ projregisteruserroute }}" id="registermailform" hidden method="post">
+        <p class="txtDark">{{ lbl_security }}</p>
+
+        <div class="table pnlBackWhite">
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_name }}:</div>
+                <div class="tableCell">
+                    <label style="width: 100%;" id="registerdname" ></label>
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_email }}:</div>
+                <div class="tableCell">            
+                    <label style="width: 100%;" id="registerdemail" ></label>
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_role }}</div>
+                <div class="tableCell">
+                    <select style=" background-color: lightyellow; " id="role" name="idrole">
+                        {% for role in roles %}
+                            <option value="{{ role.idrole }}"
+                                    {% if role.idrole == 3 %}
+                                        selected="selected"
+                                    {% endif %}
+                                    >{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <p style="text-align: center;">            
+            <button type="submit" id="submit" name="insert" >{{ lbl_submit }}</button>
+        </p>
+
+        <input type="hidden" id="registeriduser" name="targetiduser" >
+
+    </form>
+
+
+    {% if projinviteroute is not empty %}
+        <form action="{{ projinviteroute }}" id="invitemailform" hidden method="post">
+            <p class="txtDark">{{ lbl_securityi }}</p>
+
+            <div class="table pnlBackWhite">
+                <div class="tableRow">
+                    <div class="tableCell txtLabel">{{ lbl_name }}:</div>
+                    <div class="tableCell">
+                        <label style="width: 100%;" id="invitedname" ></label>
+                    </div>
+                </div>
+                <div class="tableRow">
+                    <div class="tableCell txtLabel">{{ lbl_email }}:</div>
+                    <div class="tableCell">            
+                        <label style="width: 100%;" id="invitedemail" ></label>
+                    </div>
+                </div>
+                <div class="tableRow">
+                    <div class="tableCell txtLabel">{{ lbl_role }}</div>
+                    <div class="tableCell">
+                        <select style=" background-color: lightyellow; " id="role" name="idrole">
+                            {% for role in roles %}
+                                <option value="{{ role.idrole }}"
+                                        {% if role.idrole == 3 %}
+                                            selected="selected"
+                                        {% endif %}
+                                        >{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center;">            
+                <button type="submit" id="submit" name="sendemailinvitation" >{{ lbl_submitinvite }}</button>
+            </p>
+
+            <input type="hidden" id="inviteiduser" name="targetiduser" >
+
+            <p class="txtDark">{{ lbl_send }}</p>
+
+        </form>
+    {% endif %}
+
+    <div id="modalform"></div>
+{% endif %}
+
+{% for projectinvitation in projectinvitations %}
+    <div class="pnlBackMint">
+        {% if removeinvitationroute is not empty %}
+            <div id="ri{{ projectinvitation.idprojectinv }}" class="linkBtnMenu taskselect floatRight imgDelete" >{{ lbl_removeinvitation }}</div>
+        {% endif %}
+
+        <div class="table">
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_username }}</div>
+                <div class="tableCell">{{ projectinvitation.usernameinvited }}</div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_useremail }}</div>
+                <div class="tableCell">{{ projectinvitation.useremailinvited }}</div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_role }}</div>
+                <div class="tableCell">{{ projectinvitation.description|nl2br }}</div>
+            </div>
+            <div class="tableRow txtLabel">
+                <div class="tableCell">{{ lbl_sender }}</div>
+                <div class="tableCell">{{ projectinvitation.sender }}</div>
+            </div>
+            <div class="tableRow txtLabel">
+                <div class="tableCell"></div>
+                <div class="tableCell">{{ projectinvitation.createdon|date("j M Y g:ia") }}</div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

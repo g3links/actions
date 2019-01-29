@@ -1,0 +1,52 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <label>{{ lbl_title }}</label>
+
+        <label>{{ lbl_group }}:</label>
+            <label class="titleName" >{{ fiscalperiodname }}</label>
+            <br>
+            <label class="titleName" >{{ budgetbook.name }}</label>
+            <br>
+            <label>{{ budgetbook.acc }}</label>
+        <hr>
+
+        <form action="{{ updatejournalroute }}" method="post" onsubmit="closeForm();">
+            <div class="table margin">
+                {% for period in periods %}
+                    <div class="tableRow">
+                        <div class="tableCell" style="width: 30%;">{{ period.name }}</div>
+                                    <div class="tableCell txtLabel">{{ lbl_dollar }}</div>
+                                    <div class="tableCell">
+                                        <input class="formInputText right" name="p-{{ period.idperiod }}-value" type="number" placeholder="00.0" min="0" step="0.1" value="{{ period.value }}"  style="width: 100px;" >
+                                    </div>
+                        </div>
+                {% endfor %}
+            </div>
+
+            {% if updatejournalroute is not empty %}
+                <p id="submitpnl" class="center">
+                    <input type="submit" id="submit" name="save" value="{{ lbl_submit }}" >
+                </p>
+            {% endif %}
+
+            <input type="hidden" name="idproduct"  value="{{ idproduct }}" >
+            <input type="hidden" name="idbg"  value="{{ idbg }}" >
+
+        </form>
+
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<script>
+    $(document).ready(function () {
+
+        let slider = document.getElementById("progress");
+        let output = document.getElementById("progressnumber");
+        output.innerHTML = slider.value + '%';
+
+        progress.oninput = function () {
+            output.innerHTML = this.value + '%';
+        }
+
+    });
+
+
+</script>
+
+<label class="txtLabel" >{{ lbl_progress }}:</label>
+<input type="range" style="width: 70%;margin-left: 20px;" id="progress" name="progress" min="0" max="100" value="{{ action.progress }}">
+<span id="progressnumber"></span>

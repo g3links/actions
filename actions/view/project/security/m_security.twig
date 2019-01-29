@@ -1,0 +1,91 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+
+    {% if resetprojsecurityusersroute is not empty %}
+            document.getElementById('rrole').addEventListener('click', function () {
+                location.href = '{{ resetprojsecurityusersroute }}';
+            });
+    {% endif %}
+
+        });
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <p class="txtDark">{{ lbl_title }}</p>
+
+        <p>
+            <label class="title">( {{ seccode }} )</label>
+            <label class="title">{{ projectsecurity.name }}: </label> 
+            <label class="titleName">{{ projectsecurity.rolename }}</label>
+        </p>
+
+        <form action="{{ editprojsecurityusersroute }}" id="updatemodulerole"  method="post" enctype="multipart/form-data" onsubmit="closeForm();" >
+
+            <div class="margin">
+                <label class="txtLabel">{{ lbl_generic }}: </label> 
+                <select name="idrole" >
+                    {% for role in roles %}
+                        <option value="{{ role.idrole }}"
+                                {% if role.idrole == projectsecurity.idrole %}
+                                    selected="selected"
+                                {% endif %}
+                                >{{ role.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="margin">
+                <div class="txtLabel">{{ lbl_security }}</div>
+                <div class="table">
+                    <div class="tableRow">
+                        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+                        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>
+                    </div>
+
+                    {% for projectuser in projectsecurity.projectusers %}
+                        <div class="tableRow">
+                            <div class="tableCell"><label>{{ projectuser.name }}</label></div>
+                            <div class="tableCell">
+                                {% if editprojsecurityusersroute is empty %}
+                                    <label>{{ projectuser.roledescription }}</label>
+                                {% endif %}
+                                {% if editprojsecurityusersroute is not empty %}
+                                    <select name="iduser-{{ projectuser.iduser }}" >
+                                        {% for role in userroles %}
+                                            <option value="{{ role.idrole }}"
+                                                    {% if role.idrole == projectuser.idrole %}
+                                                        selected="selected"
+                                                    {% endif %}
+                                                    >{{ role.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <p id="submitpnl" class="center" style="margin-top: 30px;">
+                {% if editprojsecurityusersroute is not empty %}
+                    <input type="submit" id="submit" value="{{ lbl_submit }}" >
+                <p>
+                    <label id="rrole" class="linkPlain" >{{ lbl_reset }}</label>
+                </p>
+            {% endif %}
+            </p>
+
+            <input type="hidden" name="defaultidrole" value="{{ projectsecurity.idrole }}" >
+        </form>
+    </div>
+</div>

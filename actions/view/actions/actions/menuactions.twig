@@ -1,0 +1,31 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById('app-2').addEventListener('click', function () {
+            g3.Action('{{ listmyactionsroute.window }}');
+            selectedSpecialProject('{{ listmyactionsroute.tabname }}');
+        });
+        document.getElementById('app-1').addEventListener('click', function () {
+            g3.Action('{{ listallactionsroute.window }}');
+            selectedSpecialProject('{{ listallactionsroute.tabname }}');
+        });
+    });
+
+</script>
+
+<div id="p0">
+    <div id="app-2" class="mainmenuitem labelselect imgUserList" >
+        <label>{{ listmyactionsroute.title }}</label>
+        <label class="floatRight offMessages" >{{ total }}</label>
+        {% if totalHold > 0 %}
+            <label class="floatRight onMessages" >{{ totalHold }}</label>
+        {% endif %}
+    </div>
+</div>
+
+<div id="app-1" class="mainmenuitem labelselect imgActionsActive" >
+    <label>{{ listallactionsroute.title }}</label>
+    <label class="floatRight offMessages" >{{ totalList }}</label>
+    {% if totalallHold > 0 %}
+        <label class="floatRight onMessages" >{{ totalallHold }}</label>
+    {% endif %}
+</div>

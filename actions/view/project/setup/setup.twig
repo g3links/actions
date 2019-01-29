@@ -1,0 +1,39 @@
+<script>
+
+    $(document).ready(function () {
+    {% for module in modules %}
+        {% if module.approute is not empty %}
+            {% if module.approute.window|length > 0 %} 
+                document.getElementById('set{{ idproject }}-{{ module.moduleid }}').addEventListener('click', function () {
+                    g3.Action('{{ module.approute.window }}');
+                });
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+        });
+
+</script>
+
+<div class="titleModule"><label>{{ lbl_title }}</label></div>
+
+{% for module in modules %}
+    <div class="table">
+        <div id="set{{ idproject }}-{{ module.moduleid }}" class="tableRow linkTitle taskselect" >
+            <div class="tableCell colIconWidth {{ module.imagesymbol }}"></div>
+            <div class="tableCell">
+                {% if module.title is not empty %}
+                    <label>{{ module.title }}</label>
+                {% endif %}
+                {% if module.approute is not empty %}
+                    <label>{{ module.approute.title }}</label>
+                {% endif %}
+                {% if module.value > 0 %}
+                    <label class="onMessages" >{{ module.value }}</label>
+                {% endif %}
+                {% if module.isshared %}
+                    <label class="txtsmall sharedData">{{ lbl_shared }}</label>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfor %}

@@ -1,0 +1,20 @@
+<p class="title">{{ lbl_title }}</p>
+
+<div class="table pnlBackWhite" >
+    <div class="tableRow">
+        <div class="tableHead center txtLabel"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead center txtLabel"><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for contact in contacts %}
+        <div class="tableRow taskselect">
+            <div class="tableCell"><label>{{ contact.name }}</label></div>
+            <div class="tableCell"><label>{{ contact.email }}</label></div>
+        </div>
+    {% endfor %}
+
+    {% if contacts is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>
+

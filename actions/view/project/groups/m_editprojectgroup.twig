@@ -1,0 +1,30 @@
+<script>
+
+//    $(document).ready(function () {
+//    });
+
+</script>
+
+<p>
+    <label class="titleName">{{ lbl_title }}</label>
+</p>
+
+<form action="{{ updateprojgrouproute }}" method="post" onsubmit="closeForm();">
+
+    <b><input placeholder="{{ lbl_name }}" name="groupname" class="txtLarge" value="{{ projectgroup.groupname }}" required ></b>
+    <div class="margin">
+        {% for activeuser in projectgroup.activeusers %}
+            <input id="u-{{ activeuser.iduser }}" name="user{{ activeuser.iduser }}" type="checkbox" {% if activeuser.isactive %}checked{% endif %} >
+            <label for="u-{{ activeuser.iduser }}" >{{ activeuser.name }}</label>
+            <br>
+        {% endfor %}
+    </div>
+    {% if updateprojgrouproute is not empty %}
+        <p  id="submitpnl" style="text-align: center;">
+            <input id="submit" type="submit" name="update" value="{{ lbl_submit }}" >
+            <input type="submit" class="linkBtnMenu taskselect" name="active" value="{% if projectgroup.deleted %}{{ lbl_active }}{% else %}{{ lbl_inactive }}{% endif %}" >
+            <input type="submit" class="linkBtnMenu taskselect" name="delete" value="{{ lbl_delete }}" >
+        </p>
+    {% endif %}
+
+</form>

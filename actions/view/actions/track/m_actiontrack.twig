@@ -1,0 +1,78 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+    
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ edittrackroute }}" method="post"  style="width: 100%" onsubmit="closeForm();" >
+            <div style="width: 100%;">
+                {% if not iscategory %}
+                    <p>
+                        <label class="txtsmall"  >{{ lbl_assignedto }}:</label>
+                        <label class ="titleName">{{ username }} </label>
+                    </p>
+                {% endif %}
+                {% if hascategories %}
+                    <p>
+                        <label class="txtsmall"  >{{ lbl_category }}:</label>
+                        <select id="idcategory" name="idcategory" >
+                            {% for category in categories %}
+                                <option value="{{ category.idcategory }}"
+                                {% if category.idcategory == action.idcategory %}
+                                            selected="selected"
+                                {% endif %}
+                                        >{{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                {% endif %}
+
+                {% if hastracks %}
+                    <p>
+                        <label class="txtsmall" >{{ lbl_changestatus }}:</label>
+                    <div class="formInputOption">
+                        {% set selectnext = false %}
+                        {% for track in tracks %}
+                            <input type="radio" name="idtrack" value="{{ track.idtrack }}"
+                            {% if selectnext %}
+                                checked
+                                {% set selectnext = false %}
+                            {% endif %}
+                            {% if track.idtrack == action.idtrack %}
+                                {% set selectnext = true %}
+                            {% endif %}
+                                   >{{ track.name }}<br>
+                        {% endfor %}
+                    </div>
+                    </p>
+                {% endif %}
+
+                {% if hascategories or hastracks %}
+                    <p>
+                        <label class="txtsmall">{{ lbl_comments }}:</label>
+                        <textarea class="formInputTextAuto" id="commenttext" name="commenttext" cols="1" rows="2" onkeyup="adjustNoteTextHeight(this);"></textarea>
+                    </p>
+
+                    <p id="submitpnl" style="text-align: center;">
+                        <input type="submit" id="submit" name="save" value="{{ lbl_save }}" >
+                    </p>
+                {% endif %}
+            </div>
+
+            <input type="hidden" name="idproject" value="{{ idproject }}"  >
+            <input type="hidden" name="iscategory" value="{{ lbl_iscategory }}"  >
+        </form>
+    </div>
+
+</div>

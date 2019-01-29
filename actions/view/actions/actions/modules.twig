@@ -1,0 +1,36 @@
+<script>
+
+    $(document).ready(function () {
+    {% for module in project.modules %}
+            document.getElementById('str{{ project.idproject }}-{{ module.moduleid }}').addEventListener('click', function () {
+                g3.Action('{{ module.approute.window }}');
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<div class="pnlStartContainer" >
+    {% for groupname in groups %}
+        <div class="pnlStart" >
+            <div class="table">
+                {% for module in project.modules %}
+                    {% if module.groupname == groupname %}
+                        <div id="str{{ project.idproject }}-{{ module.moduleid }}" class="tableRow linkTitle taskselect" >
+                            <div class="tableCell colIconWidth {{ module.image }}"></div>
+                            <div class="tableCell">
+                                {% if module.approute is not empty %}
+                                    <label>{{ module.approute.title }}</label>
+                                {% endif %}
+                                {% if module.value > 0 %}
+                                    <label class="onMessages" >{{ module.value }}</label>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="marginsmall"></div>

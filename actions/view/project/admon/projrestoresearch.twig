@@ -1,0 +1,35 @@
+<script>
+
+    $(document).ready(function () {
+    {% for project in projects %}
+            document.getElementById('parchs{{ project.idproject }}').addEventListener('click', function () {
+                projectArchivedSelected('{{ project.idproject }}', '{{ project.title }}');
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<p>
+    <label class="txtDark">{{ lbl_title }}</label>
+    <br>
+    <label class="txtsmall txtDark">{{ lbl_tip }}</label>
+</p>
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>        
+        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>        
+        <div class="tableHead txtLabel center"><label>{{ th_col3 }}</label></div>        
+    </div>
+    {% for project in projects %}
+        <div id="parchs{{ project.idproject }}" class="tableRow taskselect {% if project.idrole != 1 %} Inactive {% endif %}" >
+            <div class="tableCell"><label>{{ project.title }}</label></div>        
+            <div class="tableCell"><label>{{ project.marketname }}</label></div>        
+            <div class="tableCell"><label>{{ project.lastmodifiedon|date("j M Y g:ia") }}</label></div>        
+        </div>
+    {% endfor %}
+</div>
+
+{% if projects is empty %}
+    {{ lbl_notfound }}
+{% endif %}

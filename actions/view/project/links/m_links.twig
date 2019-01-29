@@ -1,0 +1,93 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById("cmod").addEventListener("click", function () {
+            getSpan();
+        });
+
+    {% if linktomoduleroute is not empty %}
+            document.getElementById("submit").addEventListener("click", function () {
+                savechangeslinks();
+            });
+    {% endif %}
+
+        });
+
+    {% if linktomoduleroute is not empty %}
+        async function savechangeslinks() {
+            $("#submitpnl").hide();
+
+            //get form  
+            let form = $("#updatemodulelinks");
+            let params = form.serializeArray();
+
+            //Declaring new Form Data Instance  
+            let formData = new FormData();
+            //Now Looping the parameters for all form input fields and assigning them as Name Value pairs. 
+            $(params).each(function (index, element) {
+                formData.append(element.name, element.value);
+            });
+
+            let response = await fetch("{{ linktomoduleroute }}",
+                    {
+                        body: formData,
+                        method: "post"
+                    });
+            var resp = await response.text();
+            callbackForm();
+            getSpan();
+
+//            $.ajax({
+//                type: "post",
+//                url: "{* linktomoduleroute }}",
+//                data: formData,
+//                contentType: false,
+//                processData: false,
+//                success: function (response) {
+//                    callbackForm();
+//                    getSpan();
+//                }
+//            });
+        }
+    {% endif %}
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <p class="title">{{ lbl_title }}</p>
+
+        <form id="updatemodulelinks" method="post" enctype="multipart/form-data" >
+            <div class="table pnlBackWhite">
+                <div class="tableRow">
+                    <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+                    <div class="tableHead txtLabel center" ><label>{{ th_col2 }}</label></div>
+                </div>
+
+                {% for project in projlist %}
+                    <div class="tableRow taskselect" >
+                        <div class="tableCell"><label>{{ project.title }}</label></div>
+                        <div class="tableCell center">
+                            <input type="hidden" name="h-{{ project.idproject }}" value="" >
+                            <input type="checkbox" name="p-{{ project.idproject }}" {% if project.active %}checked{% endif %} >
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if projlist is empty %}
+                    {{ lbl_notfound }}
+                {% endif %}
+
+            </div>
+            {% if linktomoduleroute is not empty %}
+                <p id="submitpnl" class="center" style="margin-top: 30px;">
+                    <label id="submit" >{{ lbl_submit }}</label>
+                </p>
+            {% endif %}
+        </form>
+    </div>
+</div>

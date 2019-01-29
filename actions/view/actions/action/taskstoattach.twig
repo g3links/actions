@@ -1,0 +1,5 @@
+{% for action in actions %}
+    <input type="checkbox" id="u-{{ action.idtask }}" name="u-{{ action.idtask }}" {% if action.selected == 1 %}checked{% endif %} >
+    <label {% if action.selected == 1 %}style="color: green;"{% endif %} for="u-{{ action.idtask }}" >{{ action.title }}</label>
+    <br>
+{% endfor %}

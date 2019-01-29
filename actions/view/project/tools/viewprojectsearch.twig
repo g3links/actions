@@ -1,0 +1,31 @@
+<script>
+    $(document).ready(function () {
+    {% for project in projects %}
+        document.getElementById('projs{{ project.idproject }}').addEventListener('click', function () {
+            projectSelected('{{ project.idproject }}', '{{ project.title }}', '{{ project.marketname }}');
+        });
+    {% endfor %}
+    });
+    
+</script>
+
+<p class="title">{{ lbl_title }}</p>
+
+<div class="table pnlBackWhite" >
+    <div class="tableRow">
+        <div class="tableHead center txtLabel"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead center txtLabel"><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for project in projects %}
+        <div id="projs{{ project.idproject }}" class="tableRow taskselect" >
+            <div class="tableCell"><label>{{ project.title }}</label></div>
+            <div class="tableCell"><label>{{ project.marketname }}</label></div>
+        </div>
+    {% endfor %}
+
+    {% if projects is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>
+

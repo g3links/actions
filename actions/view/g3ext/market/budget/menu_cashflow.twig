@@ -1,0 +1,25 @@
+<script>
+    $(document).ready(function () {
+    {% for budgetgroup in budgetgroups %}
+            document.getElementById('lcf{{ budgetgroup.idbg }}').addEventListener('click', function () {
+                loadCashflow('{{ budgetgroup.idbg }}', '{{ budgetgroup.name }}');
+            });
+    {% endfor %}
+        });
+
+        function loadCashflow(idbg, titlename) {
+            let apppath = '{{ budgetreportroute.apppath }}';
+            let replacedpath = apppath.replace('[ssid]', idbg);
+            g3.ActionWindow('{{ budgetreportroute.tabname }}', '{{ budgetreportroute.appFramename }}','{{ budgetreportroute.appwidth }}' , replacedpath, titlename, '{{ tab }}');
+        }
+
+</script>
+
+{% for budgetgroup in budgetgroups %}
+    <div class="table">
+        <div id="lcf{{ budgetgroup.idbg }}" class="tableRow linkTitle taskselect" >
+            <div class="tableCell colIconWidth"></div>
+            <div class="tableCell">{{ budgetgroup.name|capitalize }}</div>
+        </div>
+    </div>
+{% endfor %}

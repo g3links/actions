@@ -1,0 +1,97 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById('cas').addEventListener('click', function () {
+            $("#confirmsleepaccountview").toggle();
+        });
+        document.getElementById('cad').addEventListener('click', function () {
+            $("#confirmdeleteaccountview").toggle();
+        });
+        document.getElementById('casc').addEventListener('click', function () {
+            $("#confirmsleepaccountview").toggle();
+        });
+        document.getElementById('cadc').addEventListener('click', function () {
+            $("#confirmdeleteaccountview").toggle();
+        });
+        document.getElementById('ysa').addEventListener('click', function () {
+            location.href = "{{ inactiveaccountroute }}";
+        });
+        document.getElementById('yda').addEventListener('click', function () {
+            location.href = "{{ closeaccountroute }}";
+        });
+    });
+
+</script>
+
+<div class="pnlMenuHeader">    
+    <div id="cas" class="linkBtnSrv taskselect imgArchive" ><label class="marginleft">{{ lbl_disableaccount }}</label></div>
+    <div id="cad" class="linkBtnSrv taskselect imgDelete" ><label class="marginleft">{{ lbl_deleteaccount }}</label></div>
+</div>
+
+<div id="confirmsleepaccountview" class="pnlConfirm" hidden >
+    <label id="ysa" class="linkPlain" >{{ lbl_confirmdisableaccount }}</label>
+    <br>
+    <br>
+    <label id="casc" class="linkPlain" >{{ lbl_cancel }}</label>
+</div>                    
+<div id="confirmdeleteaccountview"  class="pnlConfirm" hidden>
+    <p>{{ lbl_deleteaccountwarning }}</p>
+    <label id="yda" class="linkPlain" >{{ lbl_deleteaccountconfirm }}</label>
+    <br>
+    <br>
+    <label id="cadc" class="linkPlain" >{{ lbl_cancel }}</label>
+</div>                    
+
+
+<div class="marginbig">
+    <form action="{{ updateprofileroute }}" method="post" >
+        <div class="table" >
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_username }}</div>
+                <div class="tableCell" >
+                    <input class="formInputText" style="width: 100%;" type="text" name="username" required value="{{ user.name }}" >
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_email }}</div>
+                <div class="tableCell" >
+                    <input class="formInputText" style="width: 100%;" type="email" name="email" required value="{{ user.email }}" >
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_keyname }}</div>
+                <div class="tableCell" >
+                    <input class="formInputText" type="text" name="keyname" required value="{{ user.keyname }}" >
+                </div>
+            </div>
+            <p>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_theme }}</div>
+                <div class="tableCell txtsmall" >
+                    <select name="idtheme" >
+                        {% for theme in themes %}
+                            <option value="{{ theme.idtheme }}"
+                                    {% if theme.idtheme == user.theme %}
+                                        selected="selected"
+                                    {% endif %}
+                                    >{{ theme.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            </p>
+            <div class="tableRow">
+                <div class="tableCell" ></div>
+                <div class="tableCell center">
+                    <br>
+                    <input type="submit" id="submit" name="updateuser" value="{{ submit }}" >
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="passw" value="{{ passw }}" >
+        {{ token }}
+    </form>
+</div>
+
+<div class="txtLabel">{{ lbl_enableaccount }}</div>

@@ -1,0 +1,39 @@
+<script>
+
+    var pageViewSelected = 0;
+
+    $(document).ready(function () {
+        loadThisDeviceRawData(pageViewSelected);
+    });
+
+    async function loadThisDeviceRawData(navpage) {
+        pageViewSelected = navpage;
+
+        let app = "{{ rawdataroute }}";
+        let replacedpath = app.replace("[navpage]", navpage);
+
+        let response = await fetch(replacedpath);
+        $("#renderRawData").html(await response.text());
+        $("#loading").hide();
+    }
+
+</script>
+
+<p>
+    {{ lbl_name }}: <label class="titleName">{{ device.name }}</label><br>
+    {{ lbl_partnro }}: <label class="titleName">{{ device.partnro }}</label>
+</p>
+
+<label>{{ lbl_total }}</label><br>
+
+<div id="loading" class="loading floatRight"></div>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center" style="width: 65%;"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center" style="width: 35%;"><label>{{ th_col2 }}</label></div>
+    </div>
+
+    <div id="renderRawData"></div>    
+</div>
+

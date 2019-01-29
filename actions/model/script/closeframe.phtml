@@ -1,0 +1,21 @@
+<script>
+
+    $(document).ready(function () {
+
+<?php
+
+if (!isset($framename)) {
+    ?>
+            g3.ActionClose('<?php echo $tabname; ?>');
+    <?php
+} else {
+    ?>
+            g3.ActionCloseWindow('<?php echo $tabname; ?>', '<?php echo $framename; ?>');
+    <?php
+}
+?>
+
+    });
+
+</script>
+

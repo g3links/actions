@@ -1,0 +1,14 @@
+<p>
+    <label>{{ lbl_title }}</label>
+    <select id="idtrack" name="idtrack" onchange="trackFilter(this.value);" >
+        <option value="0"></option>
+        {% for track in tracks %}
+            <option value="{{ track.idtrack }}"
+            {% if track.idtrack == idtrack %}
+                        selected="selected"
+            {% endif %}
+                    >{{ track.name }}
+            </option>
+        {% endfor %}
+    </select>
+<p>

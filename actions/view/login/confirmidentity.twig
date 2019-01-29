@@ -1,0 +1,29 @@
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+
+        <!-- ERRORS -->
+        {% if messageerror is not empty %}
+            <div class="loginNotFound margin" >
+                <div class="txtXLarge">{{ lbl_security }}</div>
+                <p>{{ messageerror }}</p>
+            </div>
+        {% endif %}
+
+        <form class="marginbig" method="post" action="{{ confirmidentityroute }}">
+            <div class="marginbig txtDark">
+                <div>{{ username }}</div>
+                <div>{{ useremail }}</div>
+            </div>
+            <div class="center">
+                <div class="titleName">{{ lbl_confirmidentity }}</div>
+
+                <input class="marginsmall pnlFloatBorder" name="pwdlogon" type="password" placeholder="{{ lbl_password }}" autofocus minlength="4" required ><br>
+                <div class="margin"></div>
+                <input class="submit pnlFloatBorder" name="logon" type="submit" value="{{ lbl_submitlogin }}" >
+            </div>
+            <input name="iduser" type="hidden" value="{{ iduser }}" >
+            <input name="callback" type="hidden" value="{{ callback }}" >
+        </form>
+
+    </div>
+</div>

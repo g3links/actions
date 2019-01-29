@@ -1,0 +1,19 @@
+<script>
+    $(document).ready(function () {
+        let visitortime = new Date();
+        let visitortimezone = -visitortime.getTimezoneOffset();
+
+        var apppath = "{{ timezoneroute }}";
+        var replacedpath = apppath.replace("[time]", visitortimezone);
+        replacedpath = replacedpath.replace("[lang]", navigator.language);
+
+        setlocaltime(replacedpath);
+    });
+
+    async function setlocaltime(replacedpath) {
+        let response = await fetch(replacedpath);
+        var resp = await response.text();
+        window.top.location.href = "{{ callbackroute }}";
+    }
+    
+</script>

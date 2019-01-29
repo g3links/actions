@@ -1,0 +1,38 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+
+</script>
+
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ updatecomment }}" method="post"  style="width: 100%" onsubmit="closeForm();" >
+            <div style="width: 100%;">
+                {% if isrole %}
+                    <p>
+                        <label class="txtLabel">{{ lbl_title }}:</label>
+                        <textarea autofocus class="formInputTextAuto" id="commenttext" name="commenttext" cols="1" rows="2" onkeyup="adjustNoteTextHeight(this);"></textarea>
+                    </p>
+                {% endif %}
+
+
+                <p id="submitpnl" class="center">
+                    {% if isrole %}
+                        <input type="submit" id="submit" name="addcomment" value="{{ lbl_submit }}" >
+                    {% endif %}
+                </p>
+            </div>
+
+        </form>
+    </div>
+
+</div>

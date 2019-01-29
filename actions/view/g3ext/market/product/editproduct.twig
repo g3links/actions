@@ -1,0 +1,127 @@
+<script>
+
+    $(document).ready(function () {
+        let ele = document.getElementById('productmanifest');
+        adjustNoteTextHeight(ele);
+
+        let eledes = document.getElementById('productdescription');
+        adjustNoteTextHeight(eledes);
+
+        let eletag = document.getElementById('metatags');
+        adjustNoteTextHeight(eletag);
+
+    });
+
+</script>
+
+<form action="{{ updateproductroute }}" method="post" enctype="multipart/form-data" onsubmit="closeForm();" >
+
+    <div class="txtLabel floatRight margin">
+        <div class="tableRow imgEdit" title="{{ lbl_edit }}">
+            <div class="tableCell"><label>{{ lastmodifiedon|date("j M Y g:ia") }}</label></div>
+        </div>
+        <div class="tableRow imgIn" title="{{ lbl_in }}">
+            <div class="tableCell"><label>{{ createdon|date("j M Y g:ia") }}</label></div>
+        </div>
+    </div>
+
+    <div class="table">
+        {% if product.idproject == '0' %}
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_image }}</div>
+                <div class="tableCell formInputText">
+                    <input type="file" name="upfile" id="fileSelect" >
+                </div>
+            </div>
+        {% endif %}
+
+        <p>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_name }}</div>
+            <div class="tableCell formInputText">
+                <input type="text" name="name" value="{{ product.name }}" required  {% if product.idproject != '0' %}disabled{% endif %} >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_keycode }}</div>
+            <div class="tableCell">
+                <input type="text" name="keycode" value="{{ product.keycode }}" {% if product.idproject != '0' %}disabled{% endif %} >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_inactive }}</div>
+            <div class="tableCell">
+                <input type="checkbox" name="inactive" {% if product.inactive %}checked{% endif %} >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_issales }}</div>
+            <div class="tableCell">
+                <input type="checkbox" name="issales" {% if product.issales %}checked{% endif %} >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_ispurchase }}</div>
+            <div class="tableCell">
+                <input type="checkbox" name="ispurchase" {% if product.ispurchase %}checked{% endif %} {% if product.idproject != '0' %}disabled{% endif %}  >
+            </div>
+        </div>
+
+        <p>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_productdescription }}</div>
+            <div class="tableCell">
+                <textarea class="formInputTextAuto" id="productdescription" name="productdescription" cols="1" rows="2" onkeyup="adjustNoteTextHeight(this);">{{ product.productdescription }}</textarea>
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_productmanifest }}</div>
+            <div class="tableCell">
+                <textarea class="formInputTextAuto" id="productmanifest" name="productmanifest" cols="1" rows="2" onkeyup="adjustNoteTextHeight(this);">{{ product.productmanifest }}</textarea>
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_metatag }}</div>
+            <div class="tableCell">
+                <textarea class="formInputTextAuto" id="metatags" name="metatags" cols="1" rows="1" onkeyup="adjustNoteTextHeight(this);">{{ product.tags }}</textarea>
+            </div>
+        </div>
+
+        <p>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_currency }}</div>
+            <div class="tableCell">
+                {% if currencies is not empty %}
+                    <select name="idcurrency" >
+                        {% for currency in currencies %}
+                            <option value="{{ currency.idcurrency }}"
+                                    {% if currency.idcurrency == product.idcurrency %}
+                                        selected="selected"
+                                    {% endif %}
+                                    >{{ currency.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_price }}</div>
+            <div class="tableCell">
+                <label>{{ product.idcurrency }}</label>
+                <input class="formInputText right" name="saleprice" type="number" placeholder="0.00" min="0" step="0.1" value="{{ product.saleprice }}" style="width: 120px;"  >
+            </div>
+        </div>
+
+    </div>
+
+    <p class="center" id="submitpnl">
+        {% if updateproductroute is not empty %}
+            <input type="submit" id="submit" name="save" value="{{ lbl_submit }}" >
+            {% if product.idproject == '0' %}
+                <input class="linkBtnMenu taskselect" type="submit" id="submitdelete" name="delete" value="{{ lbl_submitdelete }}" >
+            {% endif %}
+        {% endif %}
+    </p>
+
+</form>

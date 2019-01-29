@@ -1,0 +1,122 @@
+<script>
+
+    $(document).ready(function () {
+        this.addEventListener("scroll", function () {
+            getDataSet();
+        });
+
+        pageSelected();
+
+    {% for statusrow in Gates %}
+            document.getElementById("ss{{ statusrow.idgate }}").addEventListener("click", function () {
+                selectStatus('{{ statusrow.idgate }}');
+            });
+    {% endfor %}
+
+            loadServices();
+        });
+
+        var sorttype_th = "";
+        var sortdirection_th = "";
+        var idtrack_th = 0;
+
+        async function loadTaks()
+        {
+            $("#loading").show();
+
+            if (navpage === 0) {
+                $("#renderTasks").html("");
+            }
+
+            let apppath = "{{ listroute }}";
+            let replacedpath = apppath.replace('[navpage]', navpage);
+            replacedpath = replacedpath.replace('[sorttype]', sorttype_th);
+            replacedpath = replacedpath.replace('[sortdirection]', sortdirection_th);
+            replacedpath = replacedpath.replace('[idtrack]', idtrack_th);
+
+            let response = await fetch(replacedpath);
+            $("#renderTasks").append(await response.text());
+            $("#loading").hide();
+            stoploading = false;
+        }
+
+        function trackFilter(idtrack) {
+            idtrack_th = idtrack;
+            pageSelected();
+        }
+
+        async function removeFilter() {
+            let response = await fetch("{{ removefilterroute }}");
+            var resp = await response.text();
+
+            $("#filterlist").html("");
+            pageSelected();
+        }
+
+        async function loadServices() {
+            let response = await fetch("{{ servicesroute }}");
+            $("#renderservice").html(await response.text());
+        }
+
+        function selectStatus(idgate) {
+            let apppath = "{{ actionstatusroute }}";
+            let replacedpath = apppath.replace("[idgate]", idgate);
+
+            location.href = replacedpath;
+        }
+
+        function searchTags(tagtype, tagname) {
+            console.log("search tag: " + tagtype + ", " + tagname);
+            let apppath = '{{ searchtagactionsroute.window }}';
+            let replacedpath = apppath.replace("[type]", tagtype);
+            replacedpath = replacedpath.replace("[searchtext]", tagname);
+
+            g3.Action(replacedpath);
+        }
+
+        // used by footpage control
+        function pageSelected(navtopage = 0) {
+            navpage = navtopage;
+            loadTaks();
+        }
+
+        var navpage = 0;
+        var totalpages = 0;
+        var stoploading = false;
+        function getDataSet() {
+            if (stoploading) {
+                return;
+            }
+
+            const elm = document.scrollingElement || document.documentElement;
+            pos = elm.scrollTop / (elm.scrollHeight - elm.clientHeight);
+            if (pos > 0.95) {
+                stoploading = true;
+                if ((navpage + 1) < totalpages) {
+                    console.log('page: ' + (navpage + 2) + "/" + totalpages);
+                    pageSelected(navpage + 1);
+                }
+            }
+        }
+
+</script>
+
+<div id="renderservice"></div>
+
+<div>
+    {% for statusrow in Gates %}
+        <span id="ss{{ statusrow.idgate }}" class="{% if lastviewgate == statusrow.idgate %}linkBtnGateSelected{% else %}linkBtnGate taskselect{% endif %}" >
+            {% if lastviewgate == statusrow.idgate %}
+                <span class="{{ statusrow.img }}" ></span>
+            {% endif %}
+            {{ statusrow.name|capitalize }}
+        </span>
+    {% endfor %}
+</div>
+
+<div id="loading" class="loading floatRight"></div>
+<div class="marginsmall"></div>
+
+<div id="renderMaps"></div>
+<div id="renderTasks"></div>
+<div id="modalform"></div>

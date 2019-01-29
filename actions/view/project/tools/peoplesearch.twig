@@ -1,0 +1,33 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById("sfp").addEventListener("click", function () {
+            searchForPeople();
+        });
+    });
+
+    async function searchForPeople() {
+
+        let searhfor = $("#search").val();
+        if (searhfor.length === 0) {
+            return false;
+        }
+
+        let apppath = "{{ searchpeopleroute }}";
+        let replacedpath = apppath.replace("[search]", searhfor);
+
+        let response = await fetch(replacedpath);
+        $("#peoplelist").html(await response.text());
+    }
+
+</script>
+
+<p>
+    <label class="txtDark">{{ lbl_search }}:</label>
+    <input type="text" id="search" value="{{ search }}" required autofocus >
+    <button id="sfp" class="search right" >{{ lbl_search }}</button>
+</p>
+
+<div id="peoplelist"></div>
+
+<br>
+<p class="txtDark">{{ lbl_tip }}</p>

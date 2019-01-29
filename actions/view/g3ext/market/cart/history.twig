@@ -1,0 +1,39 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("hidehistory").addEventListener("click", function () {
+            $("#viewhistory").hide();
+        });
+    });
+
+</script>
+
+<div id="viewhistory" class="pnlBackMint">
+    <div id="hidehistory" class="linkPlain right">{{ lbl_hidehistory }}</div>
+
+    <div class="table">
+        {% for log in history %}
+            <div class="tableRow">
+                <div class="tableCell {{ log.img }}"  style="width: 25px;"></div>
+                <div class="tableCell txtLabel">  {{ log.createdon|date("j M Y g:ia") }}</div>
+                <div class="tableCell txtsmall">
+                    {% if log.idhate is not empty %}
+                        <span>{{ log.description }}</span>
+                        {% if log.img != 'imgAdd' %}
+                            <span> [{{ log.gatename }}, {{ log.idorder }}]</span>
+                        {% endif %}            
+                    {% endif %}            
+                    {% if log.idcartdetail is not empty %}
+                        <span>{{ log.productname }} [{{ log.productcode }}</span>
+                        {% if log.img != 'imgAdd' %}
+                            <span>, {{ log.orderquantity }}, {{ log.idcurrencyfrom }}, {{ log.rateconv }}</span>
+                        {% endif %}            
+                        <span>]</span>
+                    {% endif %}            
+                </div>
+                <div class="tableCell txtLabel">{{ log.username }}</div>
+                <div class="tableCell txtLabel center">{{ log.idcartdetail }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

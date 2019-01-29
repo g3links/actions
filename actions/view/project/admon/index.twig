@@ -1,0 +1,294 @@
+<script>
+    $(document).ready(function () {
+    {% if deleteprojectroute is not empty %}
+            document.getElementById("cpd").addEventListener("click", function () {
+                $("#confirmdeleteprojectview").toggle();
+            });
+            document.getElementById("cpdc").addEventListener("click", function () {
+                $("#confirmdeleteprojectview").toggle();
+            });
+            document.getElementById("sap").addEventListener("click", function () {
+                loaction.href = "{{ deleteprojectroute }}";
+            });
+    {% endif %}
+    {% if deleteprojownerroute is not empty %}
+            document.getElementById("cpwd").addEventListener("click", function () {
+                $("#confirmdeleteprojownerview").toggle();
+            });
+            document.getElementById("cpwdc").addEventListener("click", function () {
+                $("#confirmdeleteprojownerview").toggle();
+            });
+            document.getElementById("dpo").addEventListener("click", function () {
+                deleteprojowner();
+            });
+        {% for projectowner in project.users %}
+                document.getElementById("sod{{ projectowner.iduser }}").addEventListener("click", function () {
+                    selectedOwnerToDelete("{{ projectowner.iduser }}", "{{ projectowner.name }}");
+                });
+        {% endfor %}
+    {% endif %}
+    {% if addprojectownerroute is not empty %}
+            document.getElementById("apo").addEventListener("click", function () {
+                addprojowner();
+            });
+    {% endif %}
+
+    {% if restoreprojectroute is not empty%}
+            document.getElementById("vsrp").addEventListener("click", function () {
+                $("#searchrestoreproject").toggle();
+            });
+    {% endif %}
+    {% if searchprojarchivedroute is not empty %}
+            document.getElementById("searcap").addEventListener("click", function () {
+                searchArchivedProject();
+            });
+    {% endif %}
+
+        });
+
+        function closeProjForm() {
+            $("#submit").hide();
+        }
+
+    {% if addprojectownerroute is not empty %}
+        async function addprojowner() {
+            let response = await fetch("{{ addprojectownerroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+        var selectedidOwner = 0;
+        function selectedOwnerToDelete(iduser, name) {
+            selectedidOwner = iduser;
+            $("#removeuserlbl").html("{{ lbl_deleteowner }}" + ": " + name);
+
+        }
+
+    {% if deleteprojectroute is not empty %}
+        function deleteprojowner() {
+            let apppath = "{{ deleteprojownerroute }}";
+            let replacedapppath = apppath.replace("[iduser]", selectedidOwner);
+            location.href = replacedapppath;
+        }
+    {% endif %}
+
+    {% if searchprojarchivedroute is not empty %}
+        async function searchArchivedProject() {
+
+            let serachvalue = $("#search").val();
+            if (serachvalue.length === 0) {
+                return false;
+            }
+
+//hide form
+            $("#projform").hide();
+            $("#projlist").hide();
+
+            let apppath = "{{ searchprojarchivedroute }}";
+            let replacedpath = apppath.replace("[search]", serachvalue);
+
+            let response = await fetch(replacedpath);
+            $("#resultsearch").html(await response.text());
+            $("#projlist").show;
+        }
+
+        function projectArchivedSelected(idproject, title)
+        {
+            let ele = document.getElementById("title");
+            ele.innerHTML = title;
+            $("#idprojectrestore").val(idproject);
+
+
+            $("#projform").show();
+            ele.scrollIntoView();
+        }
+    {% endif %}
+
+</script>
+
+
+{% if idproject > 0 %}
+    <label class="txtsmall">{{ lbl_title }}</label>
+    <div class="txtLabel floatRight margin">
+        <div class="tableRow imgEdit" title="{{ lbl_modified }}">
+            <div class="tableCell"><label>{{ lastmodifiedon|date("j M Y g:ia") }}</label></div>
+        </div>
+        <div class="tableRow imgIn" title="{{ lbl_created }}">
+            <div class="tableCell"><label>{{ createdon|date("j M Y g:ia") }}</label></div>
+        </div>
+    </div>
+{% endif %}
+
+<form action="{{ editprojectroute }}" method="post" onsubmit="closeProjForm();" >
+
+    <div class="table">
+        <div class="tableBody">
+            <p>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_packagename }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 100%;" type="text" name="title"  value="{{ project.title }}" required >
+                </div>
+            </div>
+            </p>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_description }}</div>
+                <div class="tableCell marginsmall">
+                    <textarea style="width: 100%;" class ="formInputText" name="description" cols="1" rows="2" onkeyup="adjustNoteTextHeight(this)" >{{ project.description|nl2br }}</textarea>
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_prefix }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 50px;" type="text" name="prefix" value="{{ project.prefix }}" > - 
+                    <input class="formInputText" style="width: 50px;" type="text" name="ticketseq"  onkeypress="isNumeric(event);" value="{{ project.ticketseq }}" >
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_width }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 50px;" type="number" min="350" step="10" name="startupwidth"  value="{{ project.startupwidth }}" >
+                    <label class="txtsmall">{{ lbl_widthtip }}</label>
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_currency }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 50px;" type="text" name="idcurrency" value="{{ project.idcurrency }}" >
+                </div>
+            </div>
+            <br>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_ispublic }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" type="checkbox" name="ispublic" {% if project.ispublic %} checked{% endif %} >
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_market }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 100%;" type="text" name="marketname" value="{{ project.marketname }}" >
+                </div>
+            </div>
+            <br>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_remoteurl }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 100%;" type="text" name="remoteurl" value="{{ project.remoteurl }}" >
+                </div>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_startup }}</div>
+                <div class="tableCell marginsmall">
+                    <input class="formInputText" style="width: 100%;" type="text" name="startuppath"  value="{{ project.startuppath }}" >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="right">
+        {% if editprojectroute is not empty %}
+            {% if idproject > 0 %}
+                <input type="submit" id="submit" name="updateproj" value="{{ lbl_submitupdate }}" >
+            {% else %}
+                <input type="submit" id="submit" name="addproj" value="{{ lbl_submitnew }}" >
+            {% endif %}
+        {% endif %}
+    </p>
+
+</form>
+
+{% if deleteprojectroute is not empty %}
+    <div class="right margin">
+        {% if idproject > 0 %}
+            <div id="cpd" class="linkBtnMenu taskselect imgArchive" >
+                <label id="" class="marginleft" >{{ lbl_confirmdelete }}</label>
+            </div>
+        {% endif %}
+
+        <div id="confirmdeleteprojectview" class="pnlConfirm" hidden >
+            <label id="sap" class="linkPlain" >{{ lbl_save }}</label>
+            <br>
+            <br>
+            <label id="cpdc" class="linkPlain" >{{ lbl_cancel }}</label>
+        </div>                    
+    </div>
+{% endif %}
+
+{% if idproject > 0 %}
+    <div class="margin">
+        <div class="highlightTitle">{{ lbl_titleowner }}</div>
+
+        {% if addprojectownerroute is not empty %}
+            <div class="pnlMenuHeader">
+                <div id="apo" class="linkBtnSrv taskselect imgAdd" ><label class="marginleft">{{ lbl_addowner }}</label></div>
+                    {% if project.users is not empty %}
+                    <div id="cpwd" class="linkBtnSrv taskselect imgDelete" ><label id="removeuserlbl">{{ lbl_deleteowner }}</label></div>
+                    {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="table">
+            <div class="tableRow">
+                <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+                <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>
+            </div>
+
+            {% for projectowner in project.users %}
+                <div id="sod{{ projectowner.iduser }}" class="tableRow taskselect" id="code-{{ projectowner.iduser }}" >
+                    <div class="tableCell">
+                        <label>{{ projectowner.name }}</label>
+                    </div>
+                    <div class="tableCell">
+                        <label>{{ projectowner.email }}</label> 
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if project.users is empty %}
+                {{ lbl_notfound }}
+            {% endif %}
+
+        </div>
+    </div>
+
+    <hr>
+    <div id="confirmdeleteprojownerview" class="pnlConfirm" hidden >
+        <label id="dpo" class="linkPlain" >{{ lbl_deleteowner }}</label>
+        <br>
+        <br>
+        <label id="cpwdc" class="linkPlain" >{{ lbl_cancelowner }}</label>
+    </div>                    
+
+{% endif %}
+
+{% if restoreprojectroute is not empty%}
+
+    <div class="floatRight margin">
+        <div id="vsrp" class="linkBtnMenu taskselect imgAdd" ><label class="marginleft">{{ lbl_restore }}</label></div>
+        <p class="txtDark">{{ lbl_titlerestore }}</p>
+    </div>
+
+    <div id="searchrestoreproject" hidden >
+        <br>
+        <div>{{ lbl_search }}: 
+            <input type="text" id="search"  required autofocus >
+            <button id="searcap" class="search" >{{ lbl_search }}</button>
+        </div>
+    </div>                    
+
+    <div id="resultsearch"></div>
+
+    <div class="center" id="projform" hidden >
+
+        <form action="{{ restoreprojectroute }}" method="post" >
+            <p>
+                <label class="titleName" id="title"></label>
+                <input class="right" id="submit" type="submit" value="{{ lbl_restore }}" >
+                <input type="hidden" id="idprojectrestore" name="idprojectrestore" >
+            </p>
+        </form>
+    </div>
+{% endif%}
+
+<div id="modalform"></div>

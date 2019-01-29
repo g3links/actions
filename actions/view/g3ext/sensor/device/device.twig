@@ -1,0 +1,206 @@
+<script>
+
+    $(document).ready(function () {
+    {% if isrole and device.iddevice > 0 %}
+            document.getElementById('cdd').addEventListener('click', function () {
+                $("#confirmdevicedeleteview").toggle();
+            });
+            document.getElementById('cddc').addEventListener('click', function () {
+                $("#confirmdevicedeleteview").toggle();
+            });
+            document.getElementById('oddf').addEventListener('click', function () {
+                location.href = '{{ deletedeviceroute }}';
+            });
+    {% endif %}
+        });
+
+        function enableDeviceSave() {
+    {% if isrole %}
+            $("#submit").show();
+    {% endif %}
+        }
+
+</script>
+
+{% if isrole and device.iddevice > 0 %}
+    <div id="cdd" class="linkBtnMenu taskselect imgDelete" style="padding-left: 10px; padding-right: 5px;" >{{ lbl_confirm }}</div>
+
+    <div class="pnlConfirm" hidden id="confirmdevicedeleteview" >
+        <label id="cddc" class="linkPlain" >{{ lbl_cancel }}</label>
+        <br>
+        <br>
+
+        <label id="oddf" class="linkPlain" >{{ lbl_title }}</label>
+    </div>                    
+{% endif %}
+
+{% if device.iddevice > 0 %}
+    <div class="txtLabel floatRight margin">
+        <div class="tableRow imgEdit" title="{{ lbltip_lastupdated }}">
+            <div class="tableCell"><label>{{ lastupdated|date("j M Y g:ia") }}</label></div>
+        </div>
+        <div class="tableRow imgIn" title="{{ lbltip_created }}">
+            <div class="tableCell"><label>{{ created|date("j M Y g:ia") }}</label></div>
+        </div>
+    </div>
+{% endif %}
+
+<form action="{{ editdeviceroute }}" method="post"  onchange="enableDeviceSave();" onkeyup="enableDeviceSave();">
+
+    <div class="table">
+        <label class="titleName">{{ lbl_group1 }}</label>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_name }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="name" value="{{ device.name }}" required autofocus="" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_partnro }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 50%;" type="text" name="partnro" value="{{ device.partnro }}" >
+            </div>
+        </div>
+
+        {% if device.iddevice > 0 %}
+            <br>
+            <div class="tableRow">
+                <div class="tableCell txtLabel">{{ lbl_tokencode }}</div>
+                <div class="tableCell">
+                    <div class="txtsmall dont-break-out" style="max-width: 90%;">{{ device.tokencode }}</div>
+                </div>
+            </div>
+        {% endif %}
+        <br>
+
+        <label class="titleName">{{ lbl_group2 }}</label>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_inactive }}</div>
+            <div class="tableCell">
+                <input type="checkbox" name="inactive" {% if device.inactive %} checked {% endif %} >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_secretcode }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 50%;" type="text" name="secretcode"  value="{{ device.secretcode }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_password }}</div>
+            <div class="tableCell">
+                <input class="formInputText" type="password"  style="width: 50%;"  placeholder="********" minlength="6" name="token"  value="" >
+            </div>
+        </div>
+
+        <br>
+        <label class="titleName">{{ lbl_group3 }}</label>
+
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_ip }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="ip"  value="{{ device.ip }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_gps }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="gps"  value="{{ device.gps }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_url }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="url"  value="{{ device.url }}" >
+            </div>
+        </div>
+        <br>
+        <label class="titleName">{{ lbl_group4 }}</label>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_contact }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="contact"  value="{{ device.contact }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_email }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="email"  value="{{ device.email }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_weburl }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="weburl"  value="{{ device.weburl }}" >
+            </div>
+        </div>
+
+        <br>
+        <label class="titleName">{{ lbl_group5 }}</label>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_country }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="country"  value="{{ device.country }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_state }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 60%;" type="text" name="state"  value="{{ device.state }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_city }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 70%;" type="text" name="city"  value="{{ device.city }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_address }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="address1"  value="{{ device.address1 }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel"></div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="address2"  value="{{ device.address2 }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel"></div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 100%;" type="text" name="address3"  value="{{ device.address3 }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_zipcode }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 50%;" type="text" name="zipcode"  value="{{ device.zipcode }}" >
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_phone }}</div>
+            <div class="tableCell">
+                <input class="formInputText" style="width: 50%;" type="text" name="phone"  value="{{ device.phone }}" >
+            </div>
+        </div>
+
+        <div class="tableRow">
+            <div class="tableCell txtLabel"></div>
+            <div class="tableCell">
+                <br>
+
+                {% if device.iddevice > 0 %}
+                    <input type="submit" id="submit" class="submit" hidden name="updatedevice" value="{{ lbl_submitupdate }}" >
+                {% else %}
+                    <input type="submit" id="submit" class="submit" hidden name="adddevice" value="{{ lbl_submitnew }}" >
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<hr>

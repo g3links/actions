@@ -1,0 +1,24 @@
+<script>
+
+//    $(document).ready(function () {
+//        });
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel" ><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for priority in priorities %}
+        <div class="tableRow taskselect {% if priority.deleted == 1 %}onHoldAction{% endif %}" >
+            <div class="tableCell"><label>{{ priority.idpriority }}</label></div>
+            <div class="tableCell"><label>{{ priority.name }}</label></div>
+        </div>
+    {% endfor %}
+
+    {% if priorities is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

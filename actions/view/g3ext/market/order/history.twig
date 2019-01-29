@@ -1,0 +1,45 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("hidehistory").addEventListener("click", function () {
+            $("#viewhistory").hide();
+        });
+    });
+
+</script>
+
+<div id="viewhistory" class="pnlBackMint">
+    <div id="hidehistory" class="linkPlain right">{{ lbl_hidehistory }}</div>
+
+    <div class="table">
+        {% for log in history %}
+            <div class="tableRow">
+                <div class="tableCell {{ log.img }}"  style="width: 25px;"></div>
+                <div class="tableCell txtLabel">  {{ log.createdon|date("j M Y g:ia") }}</div>
+                <div class="tableCell txtsmall">
+                    {% if log.idgate is not empty %}
+                        <span>{{ log.description }}</span>
+                        {% if log.img != 'imgAdd' %}
+                            <span> [{{ log.gatename }}, {{ log.idtrack }}, {{ log.idcategory }}, {{ log.progress }}, {{ log.fullrequired }}]</span>
+                        {% endif %}            
+                    {% endif %}            
+                    {% if log.idproduct is not empty %}
+                        <span> {{ log.productname }} [{{ log.productcode }}</span>
+                        {% if log.img != 'imgAdd' %}
+                            <span>, {{ log.orderquantity }}, {{ log.idcurrencyto }}, {{ log.rateconv }}</span>
+                        {% endif %}            
+                        <span>]</span>
+                    {% endif %}            
+                    {% if log.idorderfulfill is not empty %}
+                        <span> {{ log.productname }} [{{ log.productcode }}, {{ log.qtyfulfill }}] </span>
+                        {% if log.img != 'imgAdd' %}
+                            <span></span>
+                        {% endif %}            
+                    {% endif %}            
+                </div>
+                <div class="tableCell txtLabel">{{ log.username }}</div>
+                <div class="tableCell txtLabel center">{{ log.idorderdetail }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

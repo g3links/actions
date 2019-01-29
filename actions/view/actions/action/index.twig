@@ -1,0 +1,511 @@
+<script>
+
+    $(document).ready(function () {
+
+    {% if taskstatusroute is not empty %}
+            document.getElementById("ccs").addEventListener("click", function () {
+                confirmChangeStatus();
+            });
+            document.getElementById("statusname").addEventListener("click", function () {
+                commitChangeStatus();
+            });
+        {% for statusrow in action.Gates %}
+            {% if statusrow.idgate != action.idgate %}
+                    document.getElementById("ccs{{ statusrow.idgate }}").addEventListener("click", function () {
+                        confirmChangeStatus("{{ statusrow.idgate }}", "{{ statusrow.name }}");
+                    });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if taskuserroute is not empty %}
+            document.getElementById("sauser").addEventListener("click", function () {
+                setActionAssignedUsers();
+            });
+        {% if action.taskusernames is not empty %}
+                document.getElementById("sau").addEventListener("click", function () {
+                    setActionAssignedUsers();
+                });
+        {% endif %}
+    {% endif %}
+
+    {% if viewtrackroute is not empty %}
+            document.getElementById("eac").addEventListener("click", function () {
+                modaleditActionCategory();
+            });
+    {% endif %}
+
+    {% if edittaskroute is not empty %}
+            document.getElementById("ea").addEventListener("click", function () {
+                modaleditAction();
+            });
+    {% endif %}
+
+    {% if afileattachroute is not empty %}
+            document.getElementById("saf").addEventListener("click", function () {
+                setActionAttachedFiles();
+            });
+        {% if attachedfileslinks is not empty %}
+                document.getElementById("safiles").addEventListener("click", function () {
+                    setActionAttachedFiles();
+                });
+        {% endif %}
+    {% endif %}
+
+    {% if taskdeletefileroute is not empty %}
+        {% for attachedfile in attachedfileslinks %}
+                document.getElementById("cdf{{ attachedfile.index }}").addEventListener("click", function () {
+                    confirmdeletefile("{{ attachedfile.index }}");
+                });
+                document.getElementById("cdfc{{ attachedfile.index }}").addEventListener("click", function () {
+                    confirmdeletefile("{{ attachedfile.index }}");
+                });
+                document.getElementById("daf{{ attachedfile.index }}").addEventListener("click", function () {
+                    deleteAttachedFile("{{ attachedfile.name }}");
+                });
+        {% endfor %}
+    {% endif %}
+
+    {% if actionattachroute is not empty %} 
+            document.getElementById("saa").addEventListener("click", function () {
+                setActionAssignedActions();
+            });
+        {% if action.attachedactions is not empty %}
+                document.getElementById("sattact").addEventListener("click", function () {
+                    setActionAssignedActions();
+                });
+        {% endif %}        
+    {% endif %}        
+
+    {% if newactionroute is not empty %}
+            document.getElementById("esa").addEventListener("click", function () {
+                editSubAction();
+            });
+    {% endif %}        
+
+    {% if aviewtrackroute is not empty %}
+            document.getElementById("eat").addEventListener("click", function () {
+                editActionTrack();
+            });
+    {% endif %}
+
+    {% if viewholdroute is not empty %}
+            document.getElementById("eh").addEventListener("click", function () {
+                editHold();
+            });
+    {% endif %}
+
+    {% if edittagroute is not empty %}
+            document.getElementById("eta").addEventListener("click", function () {
+                editTagAction();
+            });
+        {% if action.tags is not empty %}
+                document.getElementById("etag").addEventListener("click", function () {
+                    editTagAction();
+                });
+        {% endif %}
+    {% endif %}
+
+    {% if editcommentroute is not empty %}
+            document.getElementById("ec").addEventListener("click", function () {
+                editComment();
+            });
+            document.getElementById("ecomm").addEventListener("click", function () {
+                editComment();
+            });
+        {% for comment in action.comments %}
+            {% if not comment.deleted %}
+                    document.getElementById("dc{{ comment.idcomment }}").addEventListener("click", function () {
+                        discardComment({{ comment.idcomment }});
+                    });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+            document.getElementById("linkForcommentView").addEventListener("click", function () {
+                LoadHistoryComment();
+                $("#linkForcommentView").hide();
+                $("#viewcommentHistory").show();
+            });
+
+            $("#loading").hide();
+        });
+
+    {% if taskdeletefileroute is not empty %}
+        function confirmdeletefile(index)
+        {
+            $("#confirmdeletefile" + index).toggle();
+        }
+
+        function deleteAttachedFile(attachedfile) {
+            let apppath = '{{ taskdeletefileroute }}';
+            let replacedpath = apppath.replace("[attachedfile]", attachedfile);
+            location.href = replacedpath;
+        }
+    {% endif %}
+
+    {% if afileattachroute is not empty %}
+        async function setActionAttachedFiles() {
+            let response = await fetch("{{ afileattachroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if taskuserroute is not empty %}
+        async function setActionAssignedUsers() {
+            let response = await fetch("{{ taskuserroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if actionattachroute is not empty %}
+        async function setActionAssignedActions() {
+            let response = await fetch("{{ actionattachroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if aviewtrackroute is not empty %}
+        async function editActionTrack() {
+            let response = await fetch("{{ aviewtrackroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if newactionroute is not empty %}
+        function editSubAction() {
+            g3.Action('{{ newactionroute.window }}');
+        }
+    {% endif %}
+
+    {% if viewholdroute is not empty %}
+        async function editHold() {
+            let response = await fetch("{{ viewholdroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if edittagroute is not empty %}
+        async function editTagAction() {
+            let response = await fetch("{{ edittagroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if editcommentroute is not empty %}
+        async function editComment() {
+            let response = await fetch("{{ editcommentroute }}");
+            $("#modalform").html(await response.text());
+        }
+
+    {% endif %}
+
+    {% if commentdeleteroute is not empty %}
+        function discardComment(idcomment) {
+            let apppath = '{{ commentdeleteroute }}';
+            let replacedpath = apppath.replace("[idcomment]", idcomment);
+
+            location.href = replacedpath;
+        }
+    {% endif %}
+
+    {% if taskstatusroute is not empty %}
+        var replacedstatusapppath = "";
+        function confirmChangeStatus(idgate, labelname)
+        {
+            let apppath = "{{ taskstatusroute }}";
+            replacedstatusapppath = apppath.replace("[idgate]", idgate);
+            $("#confirmChangeStatusview").toggle();
+            let textvalue = "{{ lbl_statusname }}" + ": " + labelname;
+            $("#statusname").html("");
+            $("#statusname").append(textvalue);
+        }
+
+        function commitChangeStatus()
+        {
+            location.href = replacedstatusapppath;
+        }
+    {% endif %}
+
+    {% if edittaskroute is not empty %}
+        async function modaleditAction() {
+            let response = await fetch("{{ edittaskroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if viewtrackroute is not empty %}
+        async function modaleditActionCategory() {
+            let response = await fetch("{{ viewtrackroute }}");
+            $("#modalform").html(await response.text());
+        }
+    {% endif %}
+
+    {% if historycommentroute is not empty %}
+        async function LoadHistoryComment() {
+            let response = await fetch("{{ historycommentroute }}");
+            $("#viewcommentHistory").html(await response.text());
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    {% endif %}
+
+</script>
+
+<!-- info -->
+<div class="pnlMenuHeader">
+    <div class="txtLabel floatRight margin">
+        <div class="tableRow imgEdit" title="{{ lbl_edit }}">
+            <div class="tableCell">{{ action.lastmodifiedon|date("j M Y g:ia") }}</div>
+        </div>
+        <div class="tableRow imgIn" title="{{ lbl_in }}">
+            <div class="tableCell">{{ action.createdon|date("j M Y g:ia") }}</div>
+        </div>
+    </div>
+
+    <div class="txtXLarge txtBlack">{{ action.gatename|capitalize }}</div>
+    <div class="txtLabel">{{ lbl_id }}</div>
+    <div class="txtLabel">{{ lbl_user }}</div>
+</div>
+
+<div id="loading" class="loading floatRight"></div>
+
+<label class="txtLarge txtBlack">{{ action.title }}</label>
+
+<!-- holds -->
+{% if action.onhold %}
+    <div class="onHold">{{ lbl_titlehold }}</div>
+
+    {% for taskhold in action.taskholds %}
+        <div class="onHoldSelection" >{{ taskhold.description|nl2br }}</div>
+    {% endfor %}
+{% endif %}
+
+<!-- GATES -->
+{% if taskstatusroute is not empty %}
+    <div class="margin right">
+        <i class="txtLabel" >{{ lbl_titlegates }}:</i> 
+        {% for statusrow in action.Gates %}
+            {% if statusrow.idgate != action.idgate %}
+                <div id="ccs{{ statusrow.idgate }}" class="linkBtnMenu taskselect {{ statusrow.img }}"  >
+                    {{ statusrow.name|capitalize }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="pnlConfirm" hidden id="confirmChangeStatusview" >
+        <label id="ccs" class="linkPlain" >{{ lbl_titleinfo }}</label>
+        <br>
+        <br>
+
+        <label id="statusname" class="linkPlain" >{{ lbl_submitinfo }}</label>
+    </div>                    
+{% endif %}
+
+<!-- TRACKING -->
+{% if action.trackname is not empty %}
+    <div class="table highlightTitle marginsmall">
+        <div class="tableRow">
+            <div class="tableCell">{{ action.trackname }}</div>    
+            {% if viewtrackroute %}
+                <div class="tableCell right">
+                    <div id="eac" class="linkPlainLight tariskselect txtsmall imgEdit " >
+                        <label>{{ lbl_titletrack }}</label>
+                    </div>
+                </div>    
+            {% endif %}
+        </div>    
+    </div>
+{% else %}
+    <hr class="separatordark">
+{% endif %}
+
+<!-- MENUS -->
+{% if edittagroute is not empty %}
+    <div id="eta" class="linkBtnMenu taskselect imgTag" title="{{ lbl_titletag }}" ></div>
+{% endif %}
+{% if editcommentroute is not empty %}
+    <div id="ec" class="linkBtnMenu taskselect imgComment" title="{{ lbl_titlecomment }}" ></div>
+{% endif %}
+{% if edittaskroute is not empty %}
+    <div id="ea" class="linkBtnMenu taskselect imgUpdate" title="{{ lbl_titleedit }}" ></div>
+{% endif %}
+{% if taskuserroute is not empty %}
+    <div id="sauser" class="linkBtnMenu taskselect imgGroup" title="{{ lbl_titleuser }}" ></div>
+{% endif %}
+{% if afileattachroute is not empty %}
+    <div id="saf" class="linkBtnMenu taskselect imgAttach" title="{{ lbl_titlefiles }}" ></div>
+{% endif %}
+{% if actionattachroute is not empty %} 
+    <div id="saa" class="linkBtnMenu taskselect imgLinked" title="{{ lbl_titleattachtask }}" ></div>
+{% endif %}
+{% if newactionroute is not empty %} 
+    <div id="esa" class="linkBtnMenu taskselect imgAdd" title="{{ lbl_titlesubtask }}" ></div>
+{% endif %}
+{% if aviewtrackroute is not empty %}
+    <div id="eat" class="linkBtnMenu taskselect mainbodyForm" >{{ lbl_titletracking }}</div>
+{% endif %}
+{% if viewholdroute is not empty %}
+    <div id="eh" class="linkBtnMenu taskselect imgHold" title="{{ lbl_titleupdatehold }}" ></div>
+{% endif %}
+
+<hr class="separatordark">
+
+{% if action.parenttasktitle is not empty %}
+    <p>
+        <label class="txtLabel">{{ lbl_titlemaster }}: </label>
+        <label class="warning txtBlue">{{ action.parenttasktitle }}</label>
+    </p>
+{% endif %}
+
+{% if action.taskusernames is not empty or action.taskgroupnames is not empty %}
+    <p>
+        <label id="sau" class="linkPlain" >{{ lbl_titleasignedusers }}: </label>
+        {% for taskusername in action.taskusernames %}
+            <label class="btnMember">{{ taskusername.name }}</label>
+        {% endfor %}
+        {% for taskgroupname in action.taskgroupnames %}
+            <label class="btnGroup">{{ taskgroupname.name }}</label>
+        {% endfor %}
+    </p>
+{% endif %}
+
+<!-- files -->
+{% if attachedfileslinks is not empty %}
+    <div>
+        <label id="safiles" class="linkPlain" >{{ lbl_attachfile }}: </label>
+
+        {% for attachedfile in attachedfileslinks %}
+            {% if taskdeletefileroute is not empty %}
+                <label id="cdf{{ attachedfile.index }}" class="btnFile" >{{ attachedfile.name }}</label>
+
+                <div class="pnlConfirm" hidden id="confirmdeletefile{{ attachedfile.index }}" >
+                    {{ attachedfile.name }}
+                    <p>
+                        <a href="{{ attachedfile.url }}" >{{ lbl_download }}</a>
+                    </p>
+                    <label id="cdfc{{ attachedfile.index }}"  class="linkPlain" >{{ lbl_cancelfile }}</label>
+                    <br>
+                    <br>
+
+                    <label id="daf{{ attachedfile.index }}" class="linkPlain" >{{ lbl_confirmdeletefile }}</label>
+                </div>                    
+            {% else %}
+                <label class="btnFile" >{{ attachedfile.name }}</label>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Tags -->
+{% if action.tags is not empty %}
+    <div id="etag" class="floatRight">
+        {% for tag in action.tags %}
+            <span class="linkTagMenu" >{{ tag.tagname }}</span> 
+        {% endfor %}
+    </div>
+    <br>
+{% endif %}
+
+<!-- detail -->
+<div class="pnlBackWhite priority{{ action.idpriority }}">
+    <div class="tableCell txtDark marginsmall">{{ action.description|nl2br }}</div>
+
+    <div class="table">
+        {% if action.categoryname is not empty %}
+            <div class="tableRow">
+                <div class="tableCell txtLabel" style="width: 70px;">{{ lbl_categoryname }}</div>
+                <div class="tableCell txtBlack">{{ action.categoryname }}</div>
+            </div>
+        {% endif %}
+
+        <div class="tableRow">
+            <div class="tableCell txtLabel" style="width: 70px;">{{ lbl_progress }}</div>
+            <div class="tableCell">
+                <div style="border: .5px solid; border-color: limegreen;">
+                    <div class="right txtBlack" style="background-color: limegreen; width: {{ action.progress }}%; ">{{ action.progress }}%</div>
+                </div>
+            </div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_priority }}</div>
+            <div class="tableCell txtBlack">{{ action.priorityname|capitalize }}</div>
+        </div>
+        <div class="tableRow">
+            <div class="tableCell txtLabel">{{ lbl_overdue }}</div>
+            <div class="tableCell">
+                {% if action.taskdues is not empty %}
+                    <div class="table {% if action.isoverdue %}warningAction{% endif %}" >
+                        <div class="tableRow">
+                            <div class="tableHead center txtLabel">{{ th_col1 }}</div>
+                            <div class="tableHead center txtLabel">{{ th_col2 }}</div>
+                        </div>
+                        {% for taskdue in action.taskdues %}
+                            <div class="tableRow txtBlack">
+                                <div class="tableCell">
+                                    {% if taskdue.starton is not empty %}
+                                        {{ taskdue.starton|date("j M Y g:ia") }}
+                                    {% endif %}
+                                </div>
+                                <div class="tableCell">
+                                    {% if taskdue.dueon is not empty %}
+                                        {{ taskdue.dueon|date("j M Y g:ia") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- attached files -->
+{% if attachedfileslinks is not empty %}
+    {% for attachedfile in attachedfileslinks %}
+        {% if attachedfile.imagepath is not empty %}
+            <img src="{{ attachedfile.imagepath }}" >
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<!-- linked task -->
+{% if action.attachedactions is not empty %}
+    <p>
+        <span id="sattact" class="linkPlain" >{{ lbl_titlelinkedtask }}: </span>
+    <ul>
+        {% for attachedaction in action.attachedactions %}
+            <li class="txtDark">{{ attachedaction.title }}</li>
+            {% endfor %}
+    </ul>
+</p>
+{% endif %}
+
+<!-- comments -->
+<div class="right" >
+    <div id="ecomm" class="linkBtnMenu taskselect imgComment" >{{ lbl_comments }}</div>
+</div>
+<hr class="separatordark">
+
+{% for comment in action.comments %}
+    <div class="pnlBackMint" >
+        {% if editcommentroute is not empty and not comment.deleted %}
+            <label id="dc{{ comment.idcomment }}" class="linkPlain floatRight txtsmall" >{{ lbl_discard }}</label>
+        {% endif %}
+
+        <div class="txtLabel">
+            {{ comment.username }},
+            {{ comment.createdon|date("j M Y g:ia") }}
+        </div>
+        <div class="txtBlack">{{ comment.description|nl2br }}</div>
+    </div>    
+{% endfor %}
+
+<p id="linkForcommentView" class="linkPlain" >{{ lbl_commentshistory }}</p>
+
+<div id="viewcommentHistory"></div>
+<div id="rendereditcommentform"></div>
+
+<!-- comment history -->
+<div id="modalform"></div>

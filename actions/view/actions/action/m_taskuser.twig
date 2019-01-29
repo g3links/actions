@@ -1,0 +1,40 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+        document.getElementById('spsg').addEventListener('click', function () {
+            setupTheProjectSetupGroups();
+        });
+    });
+
+    function setupTheProjectSetupGroups() {
+        g3.Action('{{ projectgroupsroute.window }}');
+    }
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <label class="titleName">{{ lbl_title }}:</label>
+
+        <form action="{{ assignedusersroute }}" method="post" onsubmit="closeForm();" >
+            <p>
+                {% set vars = {'users': users, 'groups':groups} %}
+                {% include inc_users with vars %}
+            </p>
+            <p id="submitpnl" class="center" >
+                <input type="submit" id="submit" name="saveAssignedUser" value="{{ lbl_submit }}"  >
+            </p>
+            <input type="hidden" name="idproject" value="{{ idproject }}"  >
+        </form>
+
+        <label id="spsg" class="linkPlain" >{{ lbl_setupgroups }}</label>
+    </div>
+
+</div>

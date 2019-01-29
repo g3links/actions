@@ -1,0 +1,71 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("submit").addEventListener("click", function () {
+            subservice();
+        });
+    });
+
+    async function subservice() {
+        //get form  
+        var form = $("#serviceadmon");
+        var params = form.serializeArray();
+
+        //Declaring new Form Data Instance  
+        var formData = new FormData();
+        //Now Looping the parameters for all form input fields and assigning them as Name Value pairs. 
+        $(params).each(function (index, element) {
+            formData.append(element.name, element.value);
+        });
+
+        let response = await fetch("{{ updateprojectservicesroute }}",
+                {
+                    body: formData,
+                    method: "post"
+                });
+        let resp = await response.text();
+        if (resp.length > 0) {
+            $("#mssg").html(resp);
+        } else {
+            location.reload(true);
+        }
+
+//        $.ajax({
+//            type: "post",
+//            url: "{* updateprojectservicesroute }}",
+//            data: formData,
+//            contentType: false,
+        //           processData: false,
+//            success: function (response) {
+//                if (response.length > 0) {
+//                    $("#mssg").html(response);
+//                } else {
+        location.reload(true);
+        //               }
+        //           }
+        //       });
+    }
+
+</script>
+
+<form id="serviceadmon" class="margin" >
+    {% if servicetype != "fixed" %}
+        <div class="marginsmall">
+            <input id="disabled" type="radio" name="service" value="inactive" {% if activeservice == "inactive" %}checked{% endif %}>
+            <label for="disabled" class="txtDark">{{ lbl_disabled }}</label>
+        </div>
+    {% endif %}
+    <div class="marginsmall">
+        <input id="enabled" type="radio" name="service" value="active" {% if activeservice == "active" %}checked{% endif %}>
+        <label for="enabled" class="txtDark">{{ lbl_enabled }}</label>
+    </div>
+    <div class="marginsmall">
+        <input id="custom" type="radio" name="service" value="custom" {% if activeservice == "custom" %}checked{% endif %}>
+        <label for="custom" class="txtDark">{{ lbl_custom }}</label>
+        <input type="text" name="template" value="{{ template }}">
+    </div>
+</form>
+<div class="margin center">
+    <label id="submit">{{ lbl_submit }}</label>
+    <label id="mssg"></label>
+</div>

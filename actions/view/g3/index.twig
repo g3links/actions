@@ -1,0 +1,203 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("opf").addEventListener("click", function () {
+            g3.Action('{{ findprojectsroute.window }}');
+        });
+        document.getElementById("ocf").addEventListener("click", function () {
+            g3.Action('{{ findcontactsroute.window }}');
+        });
+        document.getElementById("otf").addEventListener("click", function () {
+            g3.Action('{{ tellroute.window }}');
+        });
+        document.getElementById("oaf").addEventListener("click", function () {
+            g3.Action('{{ aboutroute.window }}');
+        });
+        document.getElementById("editlang").addEventListener("click", function () {
+            g3.Action('{{ editlangroute.window }}');
+        });
+
+    {% if logoutformroute is not empty %}
+            document.getElementById("logout").addEventListener("click", function () {
+                g3.proj_selectLogout("{{ logoutformroute }}");
+            });
+            document.getElementById("olf").addEventListener("click", function () {
+                g3.proj_selectLogout("{{ logoutformroute }}");
+            });
+    {% endif %}
+    {% if loginroute is not empty %}
+            document.getElementById("oulf").addEventListener("click", function () {
+                g3.Action('{{ loginroute.window }}');
+            });
+    {% endif %}
+    {% if startroute is not empty %}
+            document.getElementById("osf").addEventListener("click", function () {
+                g3.Action('{{ startroute.window }}');
+            });
+    {% endif %}
+    {% if updateuserroute is not empty %}
+            document.getElementById("ouuf").addEventListener("click", function () {
+                g3.Action('{{ updateuserroute.window }}');
+            });
+    {% endif %}
+    {% if addprojectroute is not empty %}
+            document.getElementById("oapf").addEventListener("click", function () {
+                g3.Action('{{ addprojectroute.window }}');
+            });
+    {% endif %}
+    {% if searchactionsroute is not empty %}
+            document.getElementById("search").addEventListener("click", function () {
+                searchProjects(0);
+            });
+    {% endif %}
+
+    {% if menumssgroute is not empty %}
+            menumssgForm();
+    {% endif %}
+    {% if menuactionsroute is not empty %}
+            menuactionsForm();
+    {% endif %}
+    {% if menuinvitationroute is not empty %}
+            menuinvitationForm();
+    {% endif %}    
+    {% if menuprojectsroute is not empty %}
+            menuprojectsForm();
+    {% endif %}    
+        });
+
+    {% if menumssgroute is not empty %}
+        async function menumssgForm() {
+            let response = await fetch("{{ menumssgroute }}");
+            $("#menumssg").html(await response.text());
+        }
+    {% endif %}
+
+    {% if menuactionsroute is not empty %}
+        async function menuactionsForm() {
+            let response = await fetch("{{ menuactionsroute }}");
+            $("#menuactions").html(await response.text());
+        }
+
+    {% endif %}
+
+    {% if menuinvitationroute is not empty %}
+        async function menuinvitationForm() {
+            let response = await fetch("{{ menuinvitationroute }}");
+            $("#menuinvitation").html(await response.text());
+        }
+    {% endif %}
+
+    {% if menuprojectsroute is not empty %}
+        async function menuprojectsForm() {
+            let response = await fetch("{{ menuprojectsroute }}");
+            $("#menuprojects").html(await response.text());
+            $("#loading").hide();
+        }
+    {% endif %}
+
+    {% if searchactionsroute is not empty %}
+        function searchProjects(navtopage) {
+
+            let searchtext = $("#searchtext").val();
+            if (searchtext.length < 3) {
+                window.alert('{{ lbl_warning }}');
+                return false;
+            }
+
+            let apppath = '{{ searchactionsroute.window }}';
+            let replacedpath = apppath.replace("[searchtext]", searchtext);
+            replacedpath = replacedpath.replace("[navpage]", navtopage);
+
+            g3.Action(replacedpath);
+        }
+    {% endif %}
+
+        function searchkeyEnter() {
+            if (event.keyCode == 13) {
+                searchProjects(0);
+            }
+        }
+
+</script>
+
+<a href="https://g3links.com" target="_blank" title="G3 Links" class="g3actions"></a>
+
+<body class="mainmenucolor">
+
+    <!-- User -->
+    {% if logoutformroute is not empty %}
+        <div class="mainmenuitem labelselect">
+            <span id="logout" class="imgLogout point floatRight" title="{{ lbl_logout }}" ></span>
+            {% if updateuserroute is not empty %}
+                <span id="ouuf">
+                    <b><label title="{{ updateuserroute.title }}" >{{ username }}</label></b>
+                    <label class="txtsmall">{{ useremail }}</label>
+                </span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- LOGON -->
+    {% if loginroute is not empty %}
+        <div id="oulf" class="mainmenuitem labelselect imgLogin" >
+            <label class="marginleft"><b>{{ loginroute.title|capitalize }}</b></label>
+        </div>
+    {% endif %}
+
+    <!-- search -->
+    {% if searchactionsroute is not empty %}
+        <div>
+            <input style="width: 85%; border-width: 0px; " type="text" id="searchtext" onkeydown="searchkeyEnter();" >
+            <label id="search" class="imgSearch floatRight" title="{{ lbl_search }}" ></label>
+        </div>
+
+        <div id="loading" class="loading floatRight"></div>
+        <hr class="mainseparator" >
+    {% endif %}
+
+    {% if menumssgroute is not empty %}
+        <span id="menumssg"> </span>   
+    {% endif %}
+    {% if menuinvitationroute is not empty %}
+        <span id="menuinvitation"> </span>   
+    {% endif %}
+    {% if menuactionsroute is not empty %}
+        <span id="menuactions"> </span>   
+    {% endif %}
+
+    {% if addprojectroute is not empty %}
+        <div id="oapf" class="mainmenuitem labelselect imgAdd" >
+            <label class="marginleft">{{ addprojectroute.title }}</label>
+        </div>
+    {% endif %}
+
+    {% if menuprojectsroute is not empty %}
+        <hr class="mainseparator" >
+        <span id="menuprojects"> </span>   
+    {% endif %}
+
+    <hr class="mainseparator" >
+
+    <div id="opf" class="mainmenuitem labelselect imgProjects" ><label class="marginleft">{{ findprojectsroute.title }}</label></div>
+    <div id="ocf" class="mainmenuitem labelselect imgGroup" ><label class="marginleft">{{ findcontactsroute.title }} </label></div>   
+    <div id="otf" class="mainmenuitem labelselect imgTell" ><label class="marginleft">{{ tellroute.title }} </label></div>
+
+    {% if startroute is not empty %}
+        <div id="osf" class="mainmenuitem labelselect imgHome" >
+            <label class="marginleft">{{ startroute.title }} </label>
+        </div>
+    {% endif %}
+
+    <div id="oaf" class="mainmenuitem labelselect imgInfo" ><label class="marginleft">{{ aboutroute.title }}</label></div>
+
+    {% if logoutformroute is not empty %}
+        <div id="olf" class="mainmenuitem labelselect imgLogout" >
+            <label class="marginleft">{{ lbl_logout }}</label>
+        </div>
+    {% endif %}
+
+    <div id="editlang" class="mainmenuitem labelselect {{ lang }}Flag" >
+        <label>{{ lbl_lang }}</label>
+    </div>
+
+</body>

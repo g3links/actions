@@ -1,0 +1,35 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+    
+    var modaluser = document.getElementById('user');
+
+    function opennotification(message, autoclose)
+    {
+        $("#notificationtext").html(message);
+
+        let nowait = true;
+        if (autoclose === true || autoclose === false) {
+            nowait = autoclose;
+        }
+        if (nowait) {
+            //option to auto-close message
+            setTimeout(function () {
+                getSpan();
+            }, 10000);
+        }
+    }
+
+</script>
+
+<div id="user" class="modalNotification">
+    <div class="modalNotification-content">
+        <span id="cmod" class="modal-close" ></span>
+        <div id="notificationtext"  ></div>
+    </div>
+
+</div>

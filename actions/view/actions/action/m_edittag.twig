@@ -1,0 +1,65 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+
+    {% for tag in tags %}
+            document.getElementById('cotr{{ tag.idtag }}').addEventListener('click', function () {
+                $("#t-{{ tag.idtag }}").val('');
+            });
+    {% endfor %}
+
+    {% for r in range(1, 2) %}
+            document.getElementById('ctr{{ r }}').addEventListener('click', function () {
+                $("#ti-{{ r }}").val('');
+            });
+    {% endfor %}
+
+        });
+
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <form action="{{ updatetagroute }}" method="post"  style="width: 100%" onsubmit="closeForm();" >
+
+            <p class="titleName">{{ lbl_tag }}</p>
+            <p class="txtLabel">{{ lbl_tagedit }}:</p>
+
+            <div class="table">
+                <div class="tableRow">
+                    <div class="tableHead center txtLabel"><label>{{ th_col1 }}</label></div>
+                    <div class="tableHead"></div>                            
+                </div>
+                {% for tag in tags %}
+                    <div class="tableRow">
+                        <div class="tableCell">
+                            <input style="width: 95%;border-bottom: 0.5px solid gainsboro;" type="text" id="t-{{ tag.idtag }}"  name="t-{{ tag.idtag }}" value="{{ tag.tagname }}" >
+                        </div>                            
+                        <div class="tableCell" style="width: 5%;"><span id="cotr{{ tag.idtag }}" class="imgBtn imgHide" ></span></div>
+                    </div>
+                {% endfor %}
+
+                {% for r in range(1, 2) %}
+                    <div class="tableRow">
+                        <div class="tableCell">
+                            <input style="width: 95%;border: 0px;border-bottom: 0.5px solid gainsboro;" type="text" id="ti-{{ r }}" name="ti-{{ r }}" >
+                        </div>                            
+                        <div class="tableCell" style="width: 5%;"><span id="ctr{{ r }}" class="imgBtn imgHide" ></span></div>
+                    </div>
+                {% endfor %}
+            </div>
+            <p id="submitpnl" class="center">
+                <input type="submit" id="submit" name="updatetag" value="{{ lbl_submit }}" >
+            </p>
+
+        </form>
+    </div>
+
+</div>

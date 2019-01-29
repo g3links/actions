@@ -1,0 +1,24 @@
+<script>
+
+    $(document).ready(function () {
+    {% for action in actionshistory %}
+            document.getElementById("taskhist{{ action.idtask }}").addEventListener("click", function () {
+                viewAttachedAction("{{ action.idtask }}");
+            });
+    {% endfor %}
+
+        });
+
+</script>
+
+<div class="margin">
+    <span class="txtLabel">{{ lbl_historyaction }}</span>
+    {% for action in actionshistory %}
+        <div id="taskhist{{ action.idtask }}" class="taskselect taskBody marginsmall priority{{ action.idpriority }}" >
+            <div class="txtLabel floatRight">
+                <div class="">{{ action.createdon|date("j M Y g:ia") }}</div>
+            </div>
+            <div>{{ action.title }}</div>
+        </div>
+    {% endfor %}
+</div>

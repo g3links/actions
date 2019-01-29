@@ -1,0 +1,78 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById("cmod").addEventListener("click", function () {
+            getSpan();
+        });
+    });
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <label class="titleName">{{ lbl_title }}</label>
+
+        <div>{{ projectuser.name }}</div>
+        <div class="txtLabel">{{ projectuser.email }}</div>
+
+        <form class="margin" action="{{ editprojectroleroute }}" method="post"  onsubmit="closeForm();" >
+
+            <div class="table">
+                <div class="tableRow">
+                    <div class="tableCell txtDark">{{ lbl_role }}</div>
+                    <div class="tableCell">
+                        <select name="idrole" >
+                            {% for role in roles %}
+                                <option value="{{ role.idrole }}"
+                                        {% if role.idrole == projectuser.idrole %}
+                                            selected="selected"
+                                        {% endif %}
+                                        >
+                                    {{ role.name }}</option>
+                                {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <div class="tableRow">
+                    <div class="tableCell txtDark">{{ lbl_access }}</div>
+                    <div class="tableCell">
+                        <div>
+                            <input id="access1" type="radio" name="idaccess" value="1" {% if projectuser.idaccess == 1 %}checked{% endif %} {% if noeditaccessid %}disabled{% endif %} >
+                            <label for="access1">{{ lbl_accesslocal }}</label>
+                        </div>
+                        <div>
+                            <input id="access2" type="radio" name="idaccess" value="2" {% if projectuser.idaccess == 2 %}checked{% endif %} {% if noeditaccessid %}disabled{% endif %} >
+                            <label for="access2">{{ lbl_accesspublic }}</label>
+                        </div>
+                        <div>
+                            <input id="access3" type="radio" name="idaccess" value="3" {% if projectuser.idaccess == 3 %}checked{% endif %} {% if noeditaccessid %}disabled{% endif %} >
+                            <label for="access3">{{ lbl_accessguest }}</label>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="tableRow">
+                    <div class="tableCell txtDark">{{ lbl_activeaccount }}</div>
+                    <div class="tableCell">
+                        <input type="checkbox" name="inactive" {% if projectuser.inactive %}checked{% endif %} >
+                    </div>
+                </div>
+            </div>
+
+            <div class="center marginbig" >
+                {% if editprojectroleroute is not empty %}
+                    <input type="submit" class="submit" name="update" value="{{ lbl_submit }}" >
+                {% endif %}
+            </div>                    
+            <input type="hidden" name="targetiduser" value="{{ projectuser.iduser }}" >
+
+        </form>
+
+        <label class="txtLabel">{{ lbl_accesstip }}</label>
+    </div>
+
+</div>

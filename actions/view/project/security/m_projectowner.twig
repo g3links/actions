@@ -1,0 +1,45 @@
+<script>
+
+    var modaluser = document.getElementById('user');
+
+    $(document).ready(function () {
+        document.getElementById('cmod').addEventListener('click', function () {
+            getSpan();
+        });
+    });
+</script>
+
+<div id="user" class="modalUser">
+    <div class="modalUser-content">
+        <span id="cmod" class="modal-close" ></span>
+
+        <p>
+            <label class="titleName">{{ lbl_title }}</label>
+        </p>
+
+        <form action="{{ addprojectownerroute }}" method="post"  onsubmit="closeForm();">
+            <div class="table" >
+                <div class="tableRow">
+                    <div class="tableCell txtLabel">{{ lbl_users }}</div>
+                    <div class="tableCell">
+                        <select name="userselected" >
+                            {% for user in users %}
+                                <option value="{{ user.iduser }}"
+                                        {% if user.iduser == thisuser %}
+                                            selected="selected"
+                                        {% endif %}
+                                        >{{ user.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <p id="submitpnl" class="center" >
+                <input id="submit" type="submit" value="{{ lbl_save }}" >
+            </p>
+        </form>
+
+    </div>
+</div>

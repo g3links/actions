@@ -1,0 +1,43 @@
+.splitter {
+    background: white;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.splitter.column {
+    /*left:100px;*/
+    width: 5px;
+    min-width: 3px;
+    cursor: col-resize;
+    /*background-image: url('../img/vgripsm.png');*/
+}
+
+.splitter.row {
+    /*top:100px;*/
+    height: 5px;
+    min-height: 3px;
+    cursor: row-resize;
+    /*background-image: url('../img/hgripsm.png');*/
+}
+
+*, *:before, *:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.containercolumn {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+

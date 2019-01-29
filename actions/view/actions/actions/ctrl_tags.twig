@@ -1,0 +1,58 @@
+<script>
+
+    $(document).ready(function () {
+    {% for actiontag in actiontags %}
+            document.getElementById('stag{{ actiontag }}').addEventListener('click', function () {
+                searchTags('tag', '{{ actiontag }}');
+            });
+    {% endfor %}
+    {% for actionuser in actionusers %}
+            document.getElementById('susr{{ actionuser }}').addEventListener('click', function () {
+                searchTags('usr', '{{ actionuser }}');
+            });
+    {% endfor %}
+    
+//    {* for actionproduct in actionproducts %}
+//            document.getElementById('sprd{* actionproduct }}').addEventListener('click', function () {
+//                searchTags('prd', '{* actionproduct }}');
+//            });
+//    {* endfor %}
+//    {* for actionsensor in actionsensors %}
+//            document.getElementById('ssen{* actionsensor }}').addEventListener('click', function () {
+//                searchTags('sen', '{* actionsensor }}');
+//            });
+//    {* endfor %}
+//    {* for actionorder in actionorders %}
+//            document.getElementById('sord{* actionorder }}').addEventListener('click', function () {
+//                searchTags('ord', '{* actionorder }}');
+//            });
+//    {* endfor %}
+        });
+
+</script>
+
+<label>{{ lbl_title }}</label>
+
+<div class="pnlBackDark">
+    {% for actiontag in actiontags %}
+        <label id="stag{{ actiontag }}" class="linkTagMenu" >{{ actiontag }}</label> 
+    {% endfor %}
+
+    {% for actionuser in actionusers %}
+        <label id="susr{{ actionuser }}" class="linkServiceMenu txtsmall" >{{ actionuser }}</label> 
+    {% endfor %}
+<!--
+    {* for actionproduct in actionproducts %}
+        <label id="sprd{* actionproduct }}" class="linkServiceMenu txtsmall" >{* actionproduct }}</label> 
+    {* endfor %}
+
+    {* for actionsensor in actionsensors %}
+        <label id="ssen{* actionsensor }}" class="linkServiceMenu txtsmall" >{* actionsensor }}</label> 
+    {* endfor %}
+
+    {* for actionorder in actionorders %}
+        <label id="sord{* actionorder }}" class="linkOrderMenu txtsmall" >{* actionorder }}</label> 
+    {* endfor %}
+-->
+</div>
+<div class="marginsmall"></div>

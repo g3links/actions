@@ -1,0 +1,71 @@
+<script>
+
+    $(document).ready(function () {
+    {%  if deletejournalgrouproute is not empty %}
+            document.getElementById('cjg').addEventListener('click', function () {
+                confirmJournalGroup();
+            });
+            document.getElementById('cjgc').addEventListener('click', function () {
+                confirmJournalGroup();
+            });
+            document.getElementById('djg').addEventListener('click', function () {
+                deleteJournalGroup();
+            });
+    {%  endif %}
+    {%  if idfiscalperiod == 0 %}
+            loadBooksGroup("{{ idfiscalperiod }}");
+    {%  endif %}        
+        });
+
+        function confirmJournalGroup()
+        {
+            $("#confirmjournalgroup").toggle();
+        }
+
+        var selectedcastgroup;
+        async function loadBooksGroup(idfiscalperiod) {
+            selectedcastgroup = idfiscalperiod;
+
+            let apppath = "{{ loaddataroute }}";
+            let replacedpath = apppath.replace("[idfiscal]", idfiscalperiod);
+
+            let response = await fetch(replacedpath);
+            $("#reportlist").html(await response.text());
+            $("#loading").hide();
+        }
+
+    {%  if deletejournalgrouproute is not empty %}
+        function deleteJournalGroup()
+        {
+            let apppath = "{{ deletejournalgrouproute }}";
+            let replacedapppath = apppath.replace("[idfiscal]", selectedcastgroup);
+            location.href = replacedapppath;
+        }
+    {%  endif %}        
+
+</script>
+
+{%  if deletejournalgrouproute is not empty %}
+    <div id="cjg" class="linkBtnMenu taskselect imgDelete" >  {{ lbl_title }}</div>
+    <div id="confirmjournalgroup" class="pnlConfirm" hidden>
+        <label id="djg" class="linkPlain" >{{ lbl_deletejournal }}</label>
+        <label id="cjgc" class="linkPlain" >{{ lbl_cancel }}</label>
+    </div>                    
+{% endif %}
+
+<div class="margin" >
+    <label class="txtDark">{{ lbl_group }}:</label>
+    <select id="histgroups" name="histgroups" onchange="loadBooksGroup(this.value);" >
+        {% for fiscalperiod in fiscalperiods %}
+            <option value="{{ fiscalperiod.idfiscalperiod }}"
+                    {% if fiscalperiod.idfiscalperiod == idfiscalperiod %}
+                        selected="selected"
+                    {% endif %}
+                    >{{ fiscalperiod.fiscalname }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div id="loading" class="loading floatRight"></div>
+<div id="reportlist"></div>

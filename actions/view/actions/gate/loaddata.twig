@@ -1,0 +1,26 @@
+<script>
+
+//    $(document).ready(function () {
+//        });
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center" style="width: 30px;" ></div>
+        <div class="tableHead txtLabel" ><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel" ><label>{{ th_col2 }}</label></div>
+    </div>
+
+    {% for gate in gates %}
+        <div class="tableRow taskselect {% if gate.deleted == 1 %}onHoldAction{% endif %}" >
+            <div class="{{ gate.img }}"></div>
+            <div class="tableCell"><label>{{ gate.name }}</label></div>
+            <div class="tableCell"><label>{{ gate.idgate }}</label></div>
+        </div>
+    {% endfor %}
+
+    {% if gates is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

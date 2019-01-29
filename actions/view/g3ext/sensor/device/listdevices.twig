@@ -1,0 +1,31 @@
+<script>
+
+    $(document).ready(function () {
+    {% for projectdevice in projectdevices %}
+            document.getElementById('d1-{{ projectdevice.iddevice }}').addEventListener('click', function () {
+                selectedDeviceData({{ projectdevice.iddevice }});
+            });
+    {% endfor %}
+        });
+
+</script>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center" style="width: 40%;"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center" style="width: 40%;"><label>{{ th_col2 }}</label></div>
+        <div class="tableHead txtLabel center" style="width: 20%;"><label>{{ th_col3 }}</label></div>
+    </div>
+
+    {% for projectdevice in projectdevices %}
+        <div id="d1-{{ projectdevice.iddevice }}" class="tableRow taskselect" >
+            <div class="tableCell" style="width: 40%;"><label>{{ projectdevice.name }}</label></div>
+            <div class="tableCell" style="width: 40%;"><label>{{ projectdevice.partnro }}</label></div>
+            <div class="tableCell" style="width: 20%;"><input type="checkbox" {% if projectdevice.inactive %} checked {% endif %} disabled  ></div>
+        </div>
+    {% endfor %}
+
+    {% if projectdevices is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+</div>

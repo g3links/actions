@@ -1,0 +1,23 @@
+{% for user in users %}
+    <input class="user" type="checkbox" id="u-{{ user.iduser }}" name="u-{{ user.iduser }}" {% if user.selected %} checked {% endif %} value="{{ user.name }}" >
+    <label class="title" for="u-{{ user.iduser }}"  >{{ user.name }}</label>
+    <br>
+{% endfor %}
+
+{% if groups is not empty %}
+    <hr>
+{% endif %}
+    
+{% set idgroupheader = '' %}
+{% for group in groups %}
+    {% if idgroupheader != group.idgroup %}
+        {% set idgroupheader = group.idgroup %}
+        <input class="group" type="checkbox" id="g-{{ group.idgroup }}" name="g-{{ group.idgroup }}" {% if group.selected %} checked {% endif %} value="{{ group.groupname }}" >
+        <label class="title" for="g-{{ group.idgroup }}" >{{ group.groupname }}</label>
+        <br>
+    {% endif %}
+    {% if group.name is not null %}
+        <label class="groupMember" >{{ group.name }}</label>
+        <br>
+    {% endif %}
+{% endfor %}

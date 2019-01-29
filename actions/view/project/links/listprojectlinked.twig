@@ -1,0 +1,11 @@
+{% if projlist is not empty %}
+    <label class="txtsmall sharedDataRecord">{{ lbl_linked }}</label>
+    
+    <span class="margin">
+        {% for project in projlist %}
+            <label class="btnLinked margin {% if project.deleted %}txtRed{% endif %}">{{ project.title }}</label>
+        {% endfor %}
+    </span>
+
+    <hr class="separatordark">
+{% endif %}

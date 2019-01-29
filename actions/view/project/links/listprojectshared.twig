@@ -1,0 +1,34 @@
+<script>
+
+    $(document).ready(function () {
+    {% if syncallprojects %}
+            document.getElementById("syncdata").addEventListener("click", function () {
+                synchprojdata();
+            });
+    {% endif %}
+        });
+
+        async function synchprojdata() {
+            let response = await fetch("{{ synchprojdataroute }}");
+            var resp = await response.text();
+            $("#syncdata").hide();
+            callbackForm();
+        }
+
+</script>
+
+{% if projlist is not empty %}
+    <label class="txtsmall sharedData">{{ lbl_shared }}</label>
+
+    <span class="margin">
+        {% for project in projlist %}
+            <label class="btnLinked margin {% if project.deleted %}txtRed{% endif %}">{{ project.title }}</label>
+        {% endfor %}
+    </span>
+
+    <hr class="separatordark">
+{% endif %}
+
+{% if syncallprojects %}
+    <span id="syncdata" class="imgBtn txtRed txtLarge floatRight imgRefresh" >  {{ lbl_requirerefresh }}</span>
+{% endif %}

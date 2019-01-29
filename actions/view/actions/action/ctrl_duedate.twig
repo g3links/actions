@@ -1,0 +1,98 @@
+<script>
+
+    var idnewcrow = 0;
+
+    $(document).ready(function () {
+    {% if aaddduedateroute is not empty %}
+            document.getElementById("addr").addEventListener("click", function () {
+                addduedate();
+    {% endif %}
+            });
+
+    {% if aaddduedateroute is not empty %}
+        {% for taskdue in action.taskdues %}
+                document.getElementById("codr{{ taskdue.idtaskdue }}").addEventListener("click", function () {
+                    clearOldDatesRow("{{ taskdue.idtaskdue }}");
+                });
+        {% endfor %}
+    {% endif %}
+        });
+
+        async function addduedate() {
+            idnewcrow = idnewcrow + 1;
+            let apppath = "{{ aaddduedateroute }}";
+            let replacedpath = apppath.replace("[idrow]", idnewcrow);
+
+            let response = await fetch(replacedpath);
+            $("#rendernewdaterow").html(await response.text());
+        }
+
+        function clearOldDatesRow(idrow) {
+            $("#s-" + idrow).val('');
+            $("#sh-" + idrow).val('');
+            $("#sm-" + idrow).val('');
+            $("#d-" + idrow).val('');
+            $("#dh-" + idrow).val('');
+            $("#dm-" + idrow).val('');
+        }
+
+</script>
+
+<label id="addr" class="linkPlain floatRight" >{{ lbl_duedate }}</label>
+
+<label class="txtLabel" >{{ lbl_duedate_dueon }}:</label>
+<div  id="rendernewdaterow" class="table pnlBackWhite {% if action.isoverdue %}warningAction{% endif %}" >
+    <div class="tableRow">
+        <div class="tableHead center txtLabel"><label>{{ lbl_duedate_th_col1 }}</label></div>
+        <div class="tableHead center txtLabel"><label>{{ lbl_duedate_th_col2 }}</label></div>
+        <div class="tableHead"></div>                            
+    </div>
+    {% for taskdue in action.taskdues %}
+        <div class="tableRow">
+            <div class="tableCell center">
+                <input class="datepicker" style="width: 90px;" type="text" id="s-{{ taskdue.idtaskdue }}"  name="s-{{ taskdue.idtaskdue }}" value="{{ taskdue.lbl_starton[1] }}" >
+                <select class="formInputOption" style="margin: 0px;" id="sh-{{ taskdue.idtaskdue }}" name="sh-{{ taskdue.idtaskdue }}">
+                    {% for hour in hours %}
+                        <option value="{{ hour.pad }}"
+                                {% if hour.pad == taskdue.lbl_starton[2] %}
+                                    selected="selected"
+                                {% endif %}
+                                >{{ hour.ampm }}</option>
+                    {% endfor %}
+                </select>
+                <select class="formInputOption" style="margin: 0px;" id="sm-{{ taskdue.idtaskdue }}" name="sm-{{ taskdue.idtaskdue }}">
+                    {% for min in mins %}
+                        <option value="{{ min }}"
+                                {% if min == taskdue.lbl_starton[3] %}
+                                    selected="selected"
+                                {% endif %}
+                                >{{ min }}</option>
+                    {% endfor %}
+                </select>
+            </div>                            
+            <div class="tableCell center">
+                <input class="datepicker" style="width: 90px;" type="text" id="d-{{ taskdue.idtaskdue }}" name="d-{{ taskdue.idtaskdue }}" value="{{ taskdue.lbl_dueon[1] }}" >
+                <select class="formInputOption" style="margin: 0px;" id="dh-{{ taskdue.idtaskdue }}" name="dh-{{ taskdue.idtaskdue }}">
+                    {% for hour in hours %}
+                        <option value="{{ hour.pad }}"
+                                {% if hour.pad == taskdue.lbl_dueon[2] %}
+                                    selected="selected"
+                                {% endif %}
+                                >{{ hour.ampm }}</option>
+                    {% endfor %}
+                </select>
+                <select class="formInputOption" style="margin: 0px;" id="dm-{{ taskdue.idtaskdue }}" name="dm-{{ taskdue.idtaskdue }}">
+                    {% for min in mins %}
+                        <option value="{{ min }}"
+                                {% if min == taskdue.taskdue.idtaskdue[3] %}
+                                    selected="selected"
+                                {% endif %}
+                                >{{ min }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="tableCell center"><span id="codr{{ taskdue.idtaskdue }}" class="imgBtn imgHide" ></span></div>
+        </div>
+    {% endfor %}
+</div>
+

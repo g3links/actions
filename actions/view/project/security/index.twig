@@ -1,0 +1,61 @@
+<script>
+
+    $(document).ready(function () {
+    {% for role in roles %}
+        {% if role.secs is not empty %}
+            {% for security in role.secs %}
+                    document.getElementById("editpr{{ security.seccode }}").addEventListener("click", function () {
+                        editprojrole("{{ security.seccode }}");
+                    });
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+        });
+
+        async function editprojrole(seccode) {
+            let apppath = '{{ updatesecurityroute }}';
+            let replacedpath = apppath.replace("[seccode]", seccode);
+
+            let response = await fetch(replacedpath);
+            $("#modalform").html(await response.text());
+        }
+</script>
+
+<p>
+    <label class="txtLabel">{{ lbl_mysecurity }}: </label>
+    <label>{{ roledescription }}</label>
+</p>
+
+<div class="table pnlBackWhite">
+    <div class="tableRow">
+        <div class="tableHead txtLabel center"><label>{{ th_col1 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col2 }}</label></div>
+        <div class="tableHead txtLabel center"><label>{{ th_col3 }}</label></div>
+    </div>
+
+    {% for role in roles %}
+        {% if role.secs is not empty %}
+            {% for security in role.secs %}
+
+                <div id="editpr{{ security.seccode }}" class="tableRow taskselect {% if not security.hasaccess %}txtRed{% endif %}" id="code-{{ security.seccode }}" >
+                    <div class="tableCell">
+                        <label>{{ security.seccode }}</label>
+                    </div>
+                    <div class="tableCell">
+                        <label>{{ security.name }}</label> 
+                    </div>
+                    <div class="tableCell">
+                        <label>{{ security.rolename }}</label>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    {% if roles is empty %}
+        {{ lbl_notfound }}
+    {% endif %}
+
+</div>
+
+<div id="modalform"></div>

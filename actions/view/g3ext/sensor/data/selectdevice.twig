@@ -1,0 +1,32 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("devicelist").selectedIndex = "-1";
+    });
+
+    async function selectedDeviceRawData() {
+        let iddevice = document.getElementById("devicelist").value;
+
+        let apppath = "{{ datadeviceroute }}";
+        let replacedpath = apppath.replace("[iddevice]", iddevice);
+
+        let response = await fetch(replacedpath);
+        $("#rawdatarender").html(await response.text());
+    }
+
+</script>
+
+<div class="pnlMenuHeader">
+    <label class="txtDark">{{ lbl_data }}</label>
+    <select id="devicelist"  onchange="selectedDeviceRawData();">
+        {% for device in devices %}
+            <option value="{{ device.iddevice }}" >{{ device.lbl_name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+{% if devices is empty %}
+    {{ lbl_notfound }}
+{% endif %}
+
+<div id="rawdatarender"></div>

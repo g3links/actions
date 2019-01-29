@@ -1,0 +1,66 @@
+<html class="appbackground">
+    <head>
+        <title>G3 Links Actions</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+        <meta name=”viewport” content=”width=device-width, initial-scale=1″>
+
+        <link rel="shortcut icon" href="{{ host }}g3links.ico" type="image/x-icon" >
+        <script src="{{ host }}model/script/g3frames.js"></script>
+        <script src="{{ host }}model/script/divsplit.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{ host }}theme/css/divsplit.css" >
+
+    </head>
+
+    <body class="application" >
+
+        <script>
+            $(document).ready(function () {
+                initListeners();
+                loadstartup_page();
+            });
+
+            {% if not showstartpage %} 
+            setInterval(function () {
+                autoloadpage();
+            }, 900000); // autoload() after 15 minutes 
+            function autoloadpage() {
+                console.log('auto-refresh g3menu')
+                document.getElementById('g3menu').contentWindow.location.reload();
+            }
+            {% endif %} 
+
+            function loadstartup_page()
+            {
+                $('#welcomepage').hide();
+
+            {% if showstartpage %} 
+                // custom startup page
+                console.log('load startup page')
+                $('#welcomepage').show();
+//                document.getElementById('startup_page').src = "https://g3links.com/actions/ctrl/actions/index.php?idproject=3&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IntcInN0YW1wXCI6XCIyMDE4MDkyNS0wODU3MjlcIixcImxvZ29uc2VydmljZVwiOlwiZzNcIixcImVtYWlsXCI6XCJndXMuZ3JhbmFkb3NAZ21haWwuY29tXCIsXCJsb2dpbmlkXCI6XCJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPblJ5ZFdWOS5JbWQxYzJkeVlXNDBJZy5wR1l5aHVoc3FfR01Qbm1lRnlNdmdycVM2R0xrSVA0QXAxaWtudW8zY09JXCJ9Ig.HbeZFqNH-Fks54soSipTLs6zj6_eWaAzplGCFd3zJFU";
+                document.getElementById('welcomepage').src = "https://g3links.com";
+            {% endif %} 
+            }
+
+        </script>
+
+        <div class="container" >
+            <iframe class="mainmenu mainmenucolor" id="g3menu"></iframe>
+            <div class="container" id="snap" ></div>
+            <div class="containercolumn" >
+                <div id="tabs" class="paneltabs"></div>
+                <div id="apps"></div>
+                <div id="panels" class="container">
+                </div>
+            </div>
+
+            {% if showstartpage %} 
+                <iframe class="startupPage" id="welcomepage"></iframe>
+                {% endif %} 
+        </div>
+
+        <div id="message"></div>
+
+        <div id="floatform" class="modalFloat modalFloat-content" hidden></div>
+    </body>
+</html>

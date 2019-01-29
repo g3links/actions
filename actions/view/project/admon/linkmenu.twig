@@ -1,0 +1,29 @@
+<script>
+
+    $(document).ready(function () {
+        document.getElementById("slo").addEventListener("click", function () {
+            setupLinkowner();
+        });
+        document.getElementById("sl").addEventListener("click", function () {
+            setupLink();
+        });
+    });
+
+    function refreshMainForm() {
+        window.location.reload(true);
+    }
+
+    async function setupLink() {
+        let response = await fetch("{{ linksroute }}");
+        $("#modalform").html(await response.text());
+    }
+
+    async function setupLinkowner() {
+        let response = await fetch("{{ linksownerroute }}");
+        $("#modalform").html(await response.text());
+    }
+
+</script>
+
+<div id="slo" class="linkBtnMenu taskselect imgShare" title="{{lbl_linkowner }}" ></div>
+<div id="sl" class="linkBtnMenu taskselect imgLinked" title="{{ lbl_link }}" ></div>

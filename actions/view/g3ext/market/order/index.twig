@@ -1,0 +1,57 @@
+<script>
+
+    $(document).ready(function () {
+    {% if productsroute is not empty %}
+            document.getElementById("products").addEventListener("click", function () {
+                g3.Action('{{ productsroute.window }}');
+            });
+    {% endif %}
+        loadorders();
+    });
+
+    var navpageselected = 0;
+    var gateselected = "{{ defaultgate }}";
+//    sorttypeselected = "";
+//    sortdirectionselected = "";
+    async function loadorders()
+    {
+        $('#loading').show();
+
+        let apppath = '{{ listroute }}';
+        let replacedpath = apppath.replace('[idgate]', gateselected);
+        replacedpath = replacedpath.replace('[navpage]', navpageselected);
+        //       replacedpath = replacedpath.replace('[sorttype]', sorttypeselected);
+        //       replacedpath = replacedpath.replace('[sortdirection]', sortdirectionselected);
+
+        let response = await fetch(replacedpath);
+        $('#modalform').html(await response.text());
+        $('#loading').hide();
+    }
+
+    function selectGate(idgate)
+    {
+        gateselected = idgate;
+        loadorders();
+    }
+
+    // used by footpage control
+    function pageSelected(navtopage) {
+        navpageselected = navtopage;
+        loadorders();
+    }
+
+    //   function selectOrderStatus(sorttype, sortdirection)
+    //   {
+    //       sorttypeselected = sorttype;
+    //       sortdirectionselected = sortdirection;
+    //       loadorders();
+    //   }
+
+</script>
+
+{% if productsroute is not empty %}
+    <div id="products" class="linkBtnSrv taskselect imgProduct" >  {{ productsroute.title }}</div>
+{% endif %}
+
+<div id="loading" class="loading floatRight"></div>
+<div id="modalform"></div>
