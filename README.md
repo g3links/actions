@@ -18,8 +18,9 @@ Actions is a secure PHP  collaboration website tool for groups and/or individual
 - **create teams:** group users in teams to broadcast, assign and communicate faster.
 ### Installation
 - **[SQLite](https://www.sqlite.org/index.html)**: SQL database engine with PDO extensions.
-- **[G3 links data](https://github.com/g3links/data)**: database and config definitions
+- **[G3 links data](https://github.com/g3links/data)**: setup database and config definitions (follow instructions)
 - **MBString**: enable the php extension ‘mbstring’.
+- Edit 'index.php', replace https://localhost:8080 with a valid domain or localhost details
 - Get dependecies using composer, locate under 'actions' (or website) folder
 ```sh
 $ composer upddate --no-dev
