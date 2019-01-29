@@ -971,7 +971,7 @@ class market extends \model\dbconnect {
         if (!$allOk)
             return;
 
-        $folderpath = DATA_PATH . "attach/" . $this->src->idproject . "/";
+        $folderpath = DATA_PATH . "/attach/" . $this->src->idproject . "/";
         if (!is_dir($folderpath)) {
             mkdir($folderpath, 0777, true);
         }

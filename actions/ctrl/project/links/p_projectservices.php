@@ -26,12 +26,12 @@ if ($serviceto === 'inactive') {
 
 if ($serviceto === 'active') {
     // data must exist        
-    $filelocation = \model\route::render(\model\utils::format('{0}config/{1}/*/{2}.json', DATA_PATH, $module, $modulename));
+    $filelocation = \model\route::render(\model\utils::format('{0}/config/{1}/*/{2}.json', DATA_PATH, $module, $modulename));
     // check for project custom confg
     if (\model\env::session_idproject() > 0) {
-        $filelocationback = \model\route::render(\model\utils::format('{0}attach/{1}/config/{2}/', DATA_PATH, \model\env::session_idproject(), $module));
+        $filelocationback = \model\route::render(\model\utils::format('{0}/attach/{1}/config/{2}/', DATA_PATH, \model\env::session_idproject(), $module));
         if (file_exists($filelocationback))
-            $filelocation = \model\route::render(\model\utils::format('{0}attach/{1}/config/{2}/*/{2}.json', DATA_PATH, \model\env::session_idproject(), $module), $modulename);
+            $filelocation = \model\route::render(\model\utils::format('{0}/attach/{1}/config/{2}/*/{2}.json', DATA_PATH, \model\env::session_idproject(), $module), $modulename);
     }
 
     if (!\is_file($filelocation)) {
@@ -53,7 +53,7 @@ if ($serviceto === 'custom') {
         $template = (string) filter_input(INPUT_POST, 'template');
 
         // data must exist
-        $filelocation = \model\route::render(\model\utils::format('{0}config/{1}/*/{2}', DATA_PATH, $module, $template));
+        $filelocation = \model\route::render(\model\utils::format('{0}/config/{1}/*/{2}', DATA_PATH, $module, $template));
         if (!\is_file($filelocation)) {
             echo '<div style="color: red;">' . \model\lexi::get('', 'sys002') . '</div>';
             die();

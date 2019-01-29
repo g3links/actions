@@ -106,7 +106,9 @@ abstract class dao {
 
         $config = \model\env::getConfig($this->db_section, $this->packagename);
 
-        $dbpath = $config->provider . ':' . DATA_PATH . $config->dsn;
+        $datapath = DATA_PATH . '/';
+        
+        $dbpath = $config->provider . ':' . $datapath . $config->dsn;
 
         // inject idproject 
         if (strpos($config->dsn, '{0}') !== false) {
@@ -117,15 +119,15 @@ abstract class dao {
                 $dsn = \str_replace('{0}', \model\env::getUserIdProject(), $config->dsn);
             }
 
-            $localpath = DATA_PATH . $dsn;
+            $localpath = $datapath . $dsn;
             if (!\is_file($localpath)) {
                 //get master database 
-                $localpathsource = DATA_PATH . \str_replace('{0}', '', $config->dsn);
+                $localpathsource = $datapath . \str_replace('{0}', '', $config->dsn);
                 // intention to create database
                 \copy($localpathsource, $localpath);
             }
 
-            $dbpath = $config->provider . ':' . DATA_PATH . $dsn;
+            $dbpath = $config->provider . ':' . $datapath . $dsn;
         }
 
         if (strpos($dbpath, '{0}') !== false) {

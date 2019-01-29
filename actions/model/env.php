@@ -48,10 +48,10 @@ final class env {
         if (!isset($packagename))
             $packagename = self::CONFIG_CORE;
 
-        $filepath = \model\utils::format('{0}config/{1}.json', DATA_PATH, $packagename);            
+        $filepath = \model\utils::format('{0}/config/{1}.json', DATA_PATH, $packagename);            
     // check for project custom confg
         if($idproject > 0) {
-            $filepathback = \model\utils::format('{0}attach/{1}/config/{2}.json', DATA_PATH, $idproject, $packagename);
+            $filepathback = \model\utils::format('{0}/attach/{1}/config/{2}.json', DATA_PATH, $idproject, $packagename);
             if(is_file($filepathback))
                 $filepath = $filepathback;
         }

@@ -32,7 +32,7 @@ class syslog {
         }
         $jasonrow = json_encode($params);
 
-        $filename = DATA_PATH . 'log/' . ($idproject !== 0 ? 't' . $idproject : 'master') . '.log';
+        $filename = DATA_PATH . '/log/' . ($idproject !== 0 ? 't' . $idproject : 'master') . '.log';
 
          try {
               file_put_contents($filename, $jasonrow, FILE_APPEND);

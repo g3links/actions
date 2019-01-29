@@ -8,7 +8,7 @@ final class message {
 
         //pass data to message page
         $message = str_replace('\\', '-', str_replace('/', '-', $message));
-        $notificationpage = WEB_APP . 'view/m_notification.html';
+        $notificationpage = WEB_APP . '/view/m_notification.html';
 
         if (!empty($source)) 
             $source = \model\utils::format('<label class="txtLabel">[{0}]</label>', str_replace('\\', '-', str_replace('/', '-', $source)));
@@ -17,7 +17,7 @@ final class message {
 
 //        error_log('*** g3 mssg: ' . $message);
         require_once \model\route::script('style.php');
-        require DIR_APP . 'model/script/message_js.phtml';
+        require DIR_APP . '/model/script/message_js.phtml';
 
         if ($sendemail) {
             try {

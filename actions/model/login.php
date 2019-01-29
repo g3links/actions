@@ -158,7 +158,7 @@ final class login {
         $data = ['exp' => time() + 86400, 'iduser' => $iduser, "provider" => $provider, "email" => $email, "loginid" => $providertoken];
         $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
 
-        $token = ROOT_APP . $config->url . '/' . \model\route::url('auth.php?tokenauth={0}', $jwttoken);
+        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('auth.php?tokenauth={0}', $jwttoken));
 
         $filename = \model\route::render('g3/*/regauthorization.html');
 

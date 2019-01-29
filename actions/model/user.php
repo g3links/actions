@@ -297,7 +297,7 @@ class user extends \model\dbconnect {
 
         $data = ['exp' => time() + 86400, 'iduser' => \model\env::getIdUser(), "provider" => LOGINSRV];
         $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
-        $token = ROOT_APP . $config->url . '/' . \model\route::url('close.php?tokenauth={0}', $jwttoken);
+        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('close.php?tokenauth={0}', $jwttoken));
 
 // get email string
         $filename = \model\route::render($emailadvicefilename);
@@ -407,7 +407,7 @@ class user extends \model\dbconnect {
 
         $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, "provider" => LOGINSRV];
         $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
-        $token = ROOT_APP . $config->url . '/' . \model\route::url('reset.php?tokenauth={0}', $jwttoken);
+        $token = \model\utils::format('{0}/{1}/{2}',ROOT_APP, $config->url, \model\route::url('reset.php?tokenauth={0}', $jwttoken));
 
 // get email string
         $filename = \model\route::render('g3/*/resetpassword.html');

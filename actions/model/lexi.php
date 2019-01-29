@@ -36,7 +36,7 @@ class lexi {
         if (empty($package)) 
             $package = self::syspackage;
 
-        $filename = \model\utils::format(self::pathlexifiles, DIR_APP, $package, self::getLang());
+        $filename = \model\utils::format(self::pathlexifiles, DIR_APP .'/', $package, self::getLang());
         if (self::$lexifilename !== $filename) {
             self::$lexi = [];
             if (\is_file($filename)) {

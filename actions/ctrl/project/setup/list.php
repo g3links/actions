@@ -10,7 +10,7 @@ $t_shared = $lexiproject['sys003'];
 //load custom apps setup:
 // e.g.: "any app name": {"view": "g3ext/market/setup.php"},
 
-$filename = \model\utils::format(DATA_PATH . 'config/loadsetup.json');
+$filename = \model\utils::format(DATA_PATH . '/config/loadsetup.json');
 if (\is_file($filename)) {
     $jsetups = file_get_contents($filename);
     $setups = json_decode($jsetups);

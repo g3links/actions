@@ -1,6 +1,5 @@
 <?php
 
-//if (defined(DIR_APP) === 1)    return;
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 if (!isset($callback) || isset($messageerror)) {

@@ -96,7 +96,7 @@ class route {
     private static function getwindowindexes($windowname) {
         if (!isset(self::$windowsindexes)) {
             //load json setup
-            $jwindows = file_get_contents(DATA_PATH . self::configwindowpath);
+            $jwindows = file_get_contents(DATA_PATH .'/'. self::configwindowpath);
             self::$windowsindexes = json_decode($jwindows);
         }
 
@@ -207,7 +207,7 @@ class route {
 //        // get url without arguments and build GET arguments 
         $file = self::_buildGetArguments(self::_getpath('script', $args));
 
-        if (!\is_file($filepathname = DIR_APP . 'ctrl/' . $file)) {
+        if (!\is_file($filepathname = DIR_APP . '/ctrl/' . $file)) {
             if (!\is_file($filepathname = DIR_APP . $file)) {
                 if (!\is_file($filepathname = filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . $file)) {
                     if (!\is_file($filepathname = $file)) {
@@ -478,7 +478,7 @@ class route {
         // only evaluate relative paths
         if (substr(\strtolower($url), 0, 4) !== 'http') {
             // search under root + ctrl
-            $applocalpath = DIR_APP . 'ctrl/' . $url;
+            $applocalpath = DIR_APP . '/ctrl/' . $url;
 
             $pathreview = explode('?', $applocalpath);
             if (!isset($pathreview[0])) {
@@ -495,9 +495,9 @@ class route {
                     echo '<div style="color: red;">missing window path: <b>' . $url . '</b></div>';
                     error_log('g3*** missing url path: ' . $url);
                 }
-                $url = WEB_APP . $url;
+                $url = WEB_APP . '/' . $url;
             } else {
-                $url = WEB_APP . 'ctrl/' . $url;
+                $url = WEB_APP . '/ctrl/' . $url;
             }
         }
 
@@ -532,7 +532,7 @@ class route {
         self::$twig = new \Twig_Environment($loader, $options);
 //        } else {
 //            // cache
-//            $twig = new \Twig_Environment($loader, ['cache' => DIR_APP . 'templatescache']);
+//            $twig = new \Twig_Environment($loader, ['cache' => DIR_APP . '/templatescache']);
 //        }
     }
 

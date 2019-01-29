@@ -7,7 +7,7 @@ $project->modules = [];
 
 //here load services for the start-up 
 
-$filename = \model\utils::format(DATA_PATH . 'config/loadservices.json');
+$filename = \model\utils::format(DATA_PATH . '/config/loadservices.json');
 if (\is_file($filename)) {
     $jsetups = file_get_contents($filename);
     $services = json_decode($jsetups);

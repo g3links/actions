@@ -912,11 +912,11 @@ class action extends \model\dbconnect {
             return false;
         }
 
-        $folderpath = DATA_PATH . "attach/" . $this->src->idproject . "/";
+        $folderpath = DATA_PATH . "/attach/" . $this->src->idproject . "/";
         if (!file_exists($folderpath))
             mkdir($folderpath, 0777, true);
 
-        $folderpath = DATA_PATH . "attach/" . $this->src->idproject . "/" . $idtask . "/";
+        $folderpath = DATA_PATH . "/attach/" . $this->src->idproject . "/" . $idtask . "/";
         if (!file_exists($folderpath))
             mkdir($folderpath, 0777, true);
 
@@ -1158,7 +1158,7 @@ class action extends \model\dbconnect {
 
 //        $idproject = $this->src->idproject;
 //        $folderpath = $this->getAttachedFileFolderName($idproject, $idtaskselected, $filename);
-        $folderpath = DATA_PATH . "attach/" . $this->src->idproject . "/" . $idtaskselected . "/";
+        $folderpath = DATA_PATH . "/attach/" . $this->src->idproject . "/" . $idtaskselected . "/";
         if (!file_exists($folderpath))
             return false;
 
@@ -1187,7 +1187,7 @@ class action extends \model\dbconnect {
     }
 
     public function downloadAttachedFile($filename, $idtaskselected) {
-        $folderpath = DATA_PATH . "attach/" . $this->src->idproject . "/" . $idtaskselected . "/";
+        $folderpath = DATA_PATH . "/attach/" . $this->src->idproject . "/" . $idtaskselected . "/";
         if (!file_exists($folderpath))
             return;
 
@@ -1765,7 +1765,7 @@ class action extends \model\dbconnect {
 
     private function _getAttachedFilenames($idproject, $idtaskselected) {
         $attachedfiles = [];
-        $folderpath = DATA_PATH . "attach/" . $idproject . "/" . $idtaskselected . "/";
+        $folderpath = DATA_PATH . "/attach/" . $idproject . "/" . $idtaskselected . "/";
 
         if (file_exists($folderpath)) {
             $cdir = scandir($folderpath);

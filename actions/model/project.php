@@ -180,12 +180,12 @@ class project extends \model\dbconnect {
         if (!isset($module) || !isset($modulename))
             return [];
 
-        $filelocation = \model\utils::format('{0}config/{1}/*/{2}.json', DATA_PATH, $module, $modulename);
+        $filelocation = \model\utils::format('{0}/config/{1}/*/{2}.json', DATA_PATH, $module, $modulename);
         // check for project custom confg
         if (\model\env::session_idproject() > 0) {
-            $filelocationback = \model\utils::format('{0}attach/{1}/config/{2}/', DATA_PATH, \model\env::session_idproject(), $module);
+            $filelocationback = \model\utils::format('{0}/attach/{1}/config/{2}/', DATA_PATH, \model\env::session_idproject(), $module);
             if (file_exists($filelocationback))
-                $filelocation = \model\utils::format('{0}attach/{1}/config/{2}/*/{3}.json', DATA_PATH, \model\env::session_idproject(), $module, $modulename);
+                $filelocation = \model\utils::format('{0}/attach/{1}/config/{2}/*/{3}.json', DATA_PATH, \model\env::session_idproject(), $module, $modulename);
         }
 
         return \model\utils::loadRecords($filelocation);
@@ -195,11 +195,11 @@ class project extends \model\dbconnect {
         if (!isset($module) || !isset($modulename))
             return [];
 
-        $defaultpath = \model\utils::format('{0}config/{1}/*/', DATA_PATH, $module);
+        $defaultpath = \model\utils::format('{0}/config/{1}/*/', DATA_PATH, $module);
         if ($idproject > 0) {
-            $defaultpathback = \model\utils::format('{0}attach/{1}/config/{2}/', DATA_PATH, $idproject, $module);
+            $defaultpathback = \model\utils::format('{0}/attach/{1}/config/{2}/', DATA_PATH, $idproject, $module);
             if(file_exists($defaultpathback))
-                $defaultpath = \model\utils::format('{0}attach/{1}/config/{2}/*/', DATA_PATH, $idproject, $module);
+                $defaultpath = \model\utils::format('{0}/attach/{1}/config/{2}/*/', DATA_PATH, $idproject, $module);
         }
         
         $result = $this->getRecord('SELECT idproject,name,template,createdon,lastmodifiedon FROM projectservice WHERE idproject = ? AND name = ?', (int) $idproject, (string) $modulename);

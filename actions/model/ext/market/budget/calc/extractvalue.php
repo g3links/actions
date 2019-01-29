@@ -120,7 +120,7 @@ abstract class extractvalue {
 
         $pathobjectlogic = str_replace('\\', '/', __NAMESPACE__ . '/' . $budgetbook->template);
 
-        $localfilepath = DIR_APP . $pathobjectlogic . '.php';
+        $localfilepath = \model\utils::format('{0}/{1}.php', DIR_APP . $pathobjectlogic);
         if (!\is_file($localfilepath)) {
             echo '<label  class="onHoldSelection">file not found: ' . $localfilepath . '.php</label><br>';
             return false;
