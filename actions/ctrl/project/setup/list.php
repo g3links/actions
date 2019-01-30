@@ -8,18 +8,17 @@ $lexiproject = \model\lexi::getall('g3/project');
 $t_shared = $lexiproject['sys003'];
 
 //load custom apps setup:
-// e.g.: "any app name": {"view": "g3ext/market/setup.php"},
+if (\file_exists(DIR_APP . '/ctrl/g3ext')) {
+    $pathextservices = DIR_APP . '/ctrl/g3ext';
+    $dirfiles = \scandir($pathextservices);
 
-$filename = \model\utils::format(DATA_PATH . '/config/loadsetup.json');
-if (\is_file($filename)) {
-    $jsetups = file_get_contents($filename);
-    $setups = json_decode($jsetups);
-    foreach ($setups as $setup) {
-        $setupmoduletoload = \model\route::script($setup->ctrl);
-        if (isset($setupmoduletoload) && !empty($setupmoduletoload)) {
-            require $setupmoduletoload;
-        } else {
-          echo '<p style="color: red;">' . $setup->ctrl . ', not found at: config/loadsetup.json route script</p>';
+    foreach ($dirfiles as $file) {
+        if ($file[0] !== '.') {
+            $filename = \model\utils::format('{0}/{1}/setup.php', $pathextservices, $file);
+            if (\is_file($filename)) {
+                $appfilename = \model\utils::format('g3ext/{0}/setup.php', $file);
+                require \model\route::script($appfilename);
+            }
         }
     }
 }

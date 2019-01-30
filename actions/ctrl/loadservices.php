@@ -7,16 +7,17 @@ $project->modules = [];
 
 //here load services for the start-up 
 
-$filename = \model\utils::format(DATA_PATH . '/config/loadservices.json');
-if (\is_file($filename)) {
-    $jsetups = file_get_contents($filename);
-    $services = json_decode($jsetups);
-    foreach ($services as $service) {
-        $servicemoduletoload = \model\route::script($service->ctrl);
-        if (isset($servicemoduletoload) && !empty($servicemoduletoload)) {
-            require $servicemoduletoload;
-        } else {
-            echo '<p style="color: red;">' . $setup->ctrl . ', not found at: config/loadservices.json route script</p>';
+if (\file_exists(DIR_APP . '/ctrl/g3ext')) {
+    $pathextservices = DIR_APP . '/ctrl/g3ext';
+    $dirfiles = \scandir($pathextservices);
+
+    foreach ($dirfiles as $file) {
+        if ($file[0] !== '.') {
+            $filename = \model\utils::format('{0}/{1}/loadservices.php', $pathextservices, $file);
+            if (\is_file($filename)) {
+                $appfilename = \model\utils::format('g3ext/{0}/loadservices.php', $file);
+                require \model\route::script($appfilename);
+            }
         }
     }
 }

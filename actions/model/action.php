@@ -1174,7 +1174,7 @@ class action extends \model\dbconnect {
 
         $cdir = scandir($folderpath);
         foreach ($cdir as $key => $value) {
-            if (substr($value, 0, 1) === '.')
+            if ($value[0] === '.')
                 continue;
 
             if ($value !== $filename) { // ignore if file been deleted still active
@@ -1770,7 +1770,7 @@ class action extends \model\dbconnect {
         if (file_exists($folderpath)) {
             $cdir = scandir($folderpath);
             foreach ($cdir as $key => $value) {
-                if (substr($value, 0, 1) !== '.')
+                if ($value[0] !== '.')
                     $attachedfiles[] = $value;
             }
         }
