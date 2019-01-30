@@ -39,6 +39,8 @@ if (filter_input(INPUT_GET, 'lang')  !== null) {
 $data = [
     // for developers stop loading welcome page
     'showstartpage' => filter_input(INPUT_SERVER, 'SERVER_NAME') === 'localhost' ? false : !\model\env::isauthorized(),
+    'pagetitle' => PAGETITLE,
+    'welcomepage' => WELCOMEPAGE,
     'host' => ROOT_APP,
 ];
 \model\route::render('index.twig', $data);

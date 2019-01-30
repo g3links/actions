@@ -1,8 +1,8 @@
 <html class="appbackground">
     <head>
-        <title>G3 Links Actions</title>
+        <title>{{ pagetitle }}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-        <meta name=”viewport” content=”width=device-width, initial-scale=1″>
+<!--        <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 
         <link rel="shortcut icon" href="{{ host }}g3links.ico" type="image/x-icon" >
         <script src="{{ host }}model/script/g3frames.js"></script>
@@ -37,8 +37,7 @@
                 // custom startup page
                 console.log('load startup page')
                 $('#welcomepage').show();
-//                document.getElementById('startup_page').src = "https://g3links.com/actions/ctrl/actions/index.php?idproject=3&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IntcInN0YW1wXCI6XCIyMDE4MDkyNS0wODU3MjlcIixcImxvZ29uc2VydmljZVwiOlwiZzNcIixcImVtYWlsXCI6XCJndXMuZ3JhbmFkb3NAZ21haWwuY29tXCIsXCJsb2dpbmlkXCI6XCJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPblJ5ZFdWOS5JbWQxYzJkeVlXNDBJZy5wR1l5aHVoc3FfR01Qbm1lRnlNdmdycVM2R0xrSVA0QXAxaWtudW8zY09JXCJ9Ig.HbeZFqNH-Fks54soSipTLs6zj6_eWaAzplGCFd3zJFU";
-                document.getElementById('welcomepage').src = "https://g3links.com";
+                document.getElementById('welcomepage').src = '{{ welcomepage }}';
             {% endif %} 
             }
 
