@@ -20,8 +20,6 @@ Actions is a secure PHP  collaboration website tool for groups and/or individual
 - **[SQLite](https://www.sqlite.org/index.html)**: SQL database engine with PDO extensions.
 - **[G3 links data](https://github.com/g3links/data)**: setup database and config definitions (follow instructions)
 - **MBString**: enable the php extension ‘mbstring’.
-- Edit 'index.php', replace https://localhost:8080 with a valid domain or localhost details
-- Edit 'g3session.php', replace '<here real data folder path>' with a full path to the data folder (attention: do not include data under root website). 
 - Get dependecies using composer, locate under 'actions' (or website) folder
 ```sh
 $ composer upddate --no-dev

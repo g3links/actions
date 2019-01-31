@@ -15,8 +15,8 @@ class mailer {
         $mail->Host = $mailsettigs->host;                 // Specify main and backup SMTP servers (; separation)
         $mail->Username = $mailsettigs->username;         // SMTP username
         $mail->Password = $mailsettigs->password;         // SMTP password
-        $mail->SMTPSecure = $mailsettigs->SMTPSecure;     //'tls'; Enable TLS encryption, `ssl` also accepted
-        $mail->Port = $mailsettigs->Port;                 // TCP port to connect to
+        $mail->SMTPSecure = $mailsettigs->smtpsecure;     //'tls'; Enable TLS encryption, `ssl` also accepted
+        $mail->Port = $mailsettigs->port;                 // TCP port to connect to
         $mail->setFrom($mailsettigs->sendfrom, $mailsettigs->sender);  // header name
 //$mail->addAddress('ellen@example.com');                   // Name is optional
 //$mail->addReplyTo('info@example.com', 'Information');
@@ -27,7 +27,7 @@ class mailer {
 
         // as many addAddress()
         if (filter_input(INPUT_SERVER, 'SERVER_NAME') === 'localhost') {
-            $mail->addAddress(\trim($mailsettigs->testemail), \trim($membername)); 
+            $mail->addAddress(empty(\trim($mailsettigs->testemail)) ? \trim($mailsettigs->sendfrom) : \trim($mailsettigs->testemail), \trim($membername)); 
         } else {
             $mail->addAddress(\trim($memberemail), \trim($membername));     // Add a recipient
         }
