@@ -4,6 +4,52 @@ $customdefinitions = filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3definitio
 if (is_file($customdefinitions))
     die();
 
+//validation
+$infomessage = '';
+
+$datapath = filter_input(INPUT_POST, 'datapath');
+$pagetitle = filter_input(INPUT_POST, 'pagetitle');
+$welcomepage = filter_input(INPUT_POST, 'welcomepage');
+$mailer_host = filter_input(INPUT_POST, 'mailer_host');
+$mailer_sender = filter_input(INPUT_POST, 'mailer_sender');
+$mailer_sendfrom = filter_input(INPUT_POST, 'mailer_sendfrom');
+$mailer_username = filter_input(INPUT_POST, 'mailer_username');
+$mailer_password = filter_input(INPUT_POST, 'mailer_password');
+$mailer_smtpsecure = filter_input(INPUT_POST, 'mailer_smtpsecure');
+$mailer_port = filter_input(INPUT_POST, 'mailer_port');
+$mailer_testemail = filter_input(INPUT_POST, 'mailer_testemail');
+$emailerror_email = filter_input(INPUT_POST, 'emailerror_email');
+$token_key = filter_input(INPUT_POST, 'token_key');
+//$maxrecords_actions = filter_input(INPUT_POST, 'maxrecords_actions');
+//$maxrecords_search = filter_input(INPUT_POST, 'maxrecords_search');
+//$maxrecords_products = filter_input(INPUT_POST, 'maxrecords_products');
+//$maxrecords_orders = filter_input(INPUT_POST, 'maxrecords_orders');
+//$maxrecords_sensors = filter_input(INPUT_POST, 'maxrecords_sensors');
+
+if (!is_dir($datapath)) {
+    $infomessage = 'real data path not found';
+}
+
+if (empty($welcomepage) |
+        empty($mailer_host) |
+        empty($mailer_sender) |
+        empty($mailer_sendfrom) |
+        empty($mailer_username) |
+        empty($mailer_password) |
+        empty($mailer_smtpsecure) |
+        empty($mailer_port) |
+        empty($mailer_testemail) |
+        empty($emailerror_email) |
+        empty($token_key)
+) {
+    $infomessage = 'missing data';
+}
+
+if (!empty($infomessage)) {
+    require filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
+    die();
+}
+
 // config file
 $config = "<?php \n"
         . "define('WEB_APP', '/[WEB_APP]'); \n"
@@ -52,30 +98,6 @@ $result->maxrecords->search = '50'; //filter_input(INPUT_POST, 'maxrecords_searc
 //    $result->maxrecords->orders = '50'; //filter_input(INPUT_POST, 'maxrecords_orders');
 //    $result->maxrecords->sensors = '50'; //filter_input(INPUT_POST, 'maxrecords_sensors');
 //
-//    "fbapp": {
-//        "oauth_link": "https://www.facebook.com/v3.0/dialog/oauth?client_id=(app_id)&redirect_uri=(loginUrl)&state=(email)",
-//        "code_link": "https://graph.facebook.com/v3.0/oauth/access_token?client_id={app-id}&redirect_uri={redirect-uri}&client_secret={app-secret}&code={code-parameter}",
-//        "melink": "https://graph.facebook.com/me?fields=id,name&access_token=(access_token)&appsecret_proof=(appsecret_proof)",
-//        "app_id": "1825130917804433",
-//        "app_secret": "f5cf59ecd053d1abbf896b086e535455",
-//        "default_graph_version": "v2.12",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/facebook-callback.php"
-//    },
-//    "goapp": {
-//        "oauth_link": "https://accounts.google.com/o/oauth2/auth?response_type=id_token&client_id=(app_id)&redirect_uri=(loginUrl)&scope=openid&response_mode=form_post&state=(email)",
-//        "app_id": "646753156767-udb89uen47qt324e1ofm477j8idopjhd.apps.googleusercontent.com",
-//        "app_secret": "kd7doqG0yHP_uhqAYRHSMrW5",
-//        "default_graph_version": "",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/google-callback.php"
-//    },
-//    "msapp": {
-//        "oauth_link": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=(app_id)&response_type=id_token&redirect_uri=(loginUrl)&scope=openid&response_mode=form_post&nonce=678910&state=(email)",
-//        "app_id": "07222bb5-f43f-45d6-bc54-658a416d5a07",
-//        "app_secret": "aMRWW52exdcjgPNk73DGax8",
-//        "default_graph_version": "",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/ms-callback.php",
-//        "logoutUrl": "https://g3links.com/actions/registerlogin/ms-logout.php"
-//    }
 
 $filename = filter_input(INPUT_POST, 'datapath') . '/config/g3.json';
 $jasondata = json_encode($result);
