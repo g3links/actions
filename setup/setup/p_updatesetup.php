@@ -52,30 +52,6 @@ $result->maxrecords->search = '50'; //filter_input(INPUT_POST, 'maxrecords_searc
 //    $result->maxrecords->orders = '50'; //filter_input(INPUT_POST, 'maxrecords_orders');
 //    $result->maxrecords->sensors = '50'; //filter_input(INPUT_POST, 'maxrecords_sensors');
 //
-//    "fbapp": {
-//        "oauth_link": "https://www.facebook.com/v3.0/dialog/oauth?client_id=(app_id)&redirect_uri=(loginUrl)&state=(email)",
-//        "code_link": "https://graph.facebook.com/v3.0/oauth/access_token?client_id={app-id}&redirect_uri={redirect-uri}&client_secret={app-secret}&code={code-parameter}",
-//        "melink": "https://graph.facebook.com/me?fields=id,name&access_token=(access_token)&appsecret_proof=(appsecret_proof)",
-//        "app_id": "1825130917804433",
-//        "app_secret": "f5cf59ecd053d1abbf896b086e535455",
-//        "default_graph_version": "v2.12",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/facebook-callback.php"
-//    },
-//    "goapp": {
-//        "oauth_link": "https://accounts.google.com/o/oauth2/auth?response_type=id_token&client_id=(app_id)&redirect_uri=(loginUrl)&scope=openid&response_mode=form_post&state=(email)",
-//        "app_id": "646753156767-udb89uen47qt324e1ofm477j8idopjhd.apps.googleusercontent.com",
-//        "app_secret": "kd7doqG0yHP_uhqAYRHSMrW5",
-//        "default_graph_version": "",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/google-callback.php"
-//    },
-//    "msapp": {
-//        "oauth_link": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=(app_id)&response_type=id_token&redirect_uri=(loginUrl)&scope=openid&response_mode=form_post&nonce=678910&state=(email)",
-//        "app_id": "07222bb5-f43f-45d6-bc54-658a416d5a07",
-//        "app_secret": "aMRWW52exdcjgPNk73DGax8",
-//        "default_graph_version": "",
-//        "loginUrl": "https://g3links.com/actions/registerlogin/ms-callback.php",
-//        "logoutUrl": "https://g3links.com/actions/registerlogin/ms-logout.php"
-//    }
 
 $filename = filter_input(INPUT_POST, 'datapath') . '/config/g3.json';
 $jasondata = json_encode($result);
