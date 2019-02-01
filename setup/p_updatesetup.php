@@ -51,60 +51,80 @@ if (!empty($infomessage)) {
 }
 
 // config file
-$config = "<?php \n"
+$configdefinitions = "<?php \n"
         . "define('WEB_APP', '/[WEB_APP]'); \n"
         . "define('DATA_PATH', '[DATA_PATH]'); \n"
         . "define('PAGETITLE', '[PAGETITLE]'); \n"
         . "define('WELCOMEPAGE', '[WELCOMEPAGE]');";
 
-$config = \str_replace('[WEB_APP]', 'actions', $config); //filter_input(INPUT_POST, 'webapp')
-$config = \str_replace('[DATA_PATH]', filter_input(INPUT_POST, 'datapath'), $config);
-$config = \str_replace('[PAGETITLE]', filter_input(INPUT_POST, 'pagetitle'), $config);
-$config = \str_replace('[WELCOMEPAGE]', filter_input(INPUT_POST, 'welcomepage'), $config);
+$configdefinitions = \str_replace('[WEB_APP]', 'actions', $configdefinitions);
+$configdefinitions = \str_replace('[DATA_PATH]', filter_input(INPUT_POST, 'datapath'), $configdefinitions);
+$configdefinitions = \str_replace('[PAGETITLE]', filter_input(INPUT_POST, 'pagetitle'), $configdefinitions);
+$configdefinitions = \str_replace('[WELCOMEPAGE]', filter_input(INPUT_POST, 'welcomepage'), $configdefinitions);
 
 
 // settings
-$result = new stdClass();
+$g3result = new stdClass();
 
-$result->db = new stdClass();
-$result->db->provider = 'sqlite'; //filter_input(INPUT_POST, 'db_provider');
-$result->db->dsn = 'db/g3core.db'; //filter_input(INPUT_POST, 'db_dsn');
-$result->db->username = ''; //filter_input(INPUT_POST, 'db_username');
-$result->db->password = ''; //filter_input(INPUT_POST, 'db_password');
+$g3result->db = new stdClass();
+$g3result->db->provider = 'sqlite';
+$g3result->db->dsn = 'db/g3core.db';
+$g3result->db->username = '';
+$g3result->db->password = '';
 
-$result->mailer = new stdClass();
-$result->mailer->host = filter_input(INPUT_POST, 'mailer_host');
-$result->mailer->sender = filter_input(INPUT_POST, 'mailer_sender');
-$result->mailer->sendfrom = filter_input(INPUT_POST, 'mailer_sendfrom');
-$result->mailer->username = filter_input(INPUT_POST, 'mailer_username');
-$result->mailer->password = filter_input(INPUT_POST, 'mailer_password');
-$result->mailer->smtpsecure = filter_input(INPUT_POST, 'mailer_smtpsecure');
-$result->mailer->port = filter_input(INPUT_POST, 'mailer_port');
-$result->mailer->testemail = filter_input(INPUT_POST, 'mailer_testemail');
+$g3result->mailer = new stdClass();
+$g3result->mailer->host = filter_input(INPUT_POST, 'mailer_host');
+$g3result->mailer->sender = filter_input(INPUT_POST, 'mailer_sender');
+$g3result->mailer->sendfrom = filter_input(INPUT_POST, 'mailer_sendfrom');
+$g3result->mailer->username = filter_input(INPUT_POST, 'mailer_username');
+$g3result->mailer->password = filter_input(INPUT_POST, 'mailer_password');
+$g3result->mailer->smtpsecure = filter_input(INPUT_POST, 'mailer_smtpsecure');
+$g3result->mailer->port = filter_input(INPUT_POST, 'mailer_port');
+$g3result->mailer->testemail = filter_input(INPUT_POST, 'mailer_testemail');
 
-$result->emailerror = new stdClass();
-$result->emailerror->email = filter_input(INPUT_POST, 'emailerror_email');
+$g3result->emailerror = new stdClass();
+$g3result->emailerror->email = filter_input(INPUT_POST, 'emailerror_email');
 
-$result->api = new stdClass();
-$result->api->url = 'api.1'; //filter_input(INPUT_POST, 'api_url');
+$g3result->api = new stdClass();
+$g3result->api->url = 'api.1';
 
-$result->token = new stdClass();
-$result->token->key = filter_input(INPUT_POST, 'token_key');
+$g3result->token = new stdClass();
+$g3result->token->key = filter_input(INPUT_POST, 'token_key');
 
-$result->maxrecords = new stdClass();
-$result->maxrecords->actions = '50'; //filter_input(INPUT_POST, 'maxrecords_actions');
-$result->maxrecords->search = '50'; //filter_input(INPUT_POST, 'maxrecords_search');
-//    $result->maxrecords->products = '50'; //filter_input(INPUT_POST, 'maxrecords_products');
-//    $result->maxrecords->orders = '50'; //filter_input(INPUT_POST, 'maxrecords_orders');
-//    $result->maxrecords->sensors = '50'; //filter_input(INPUT_POST, 'maxrecords_sensors');
+$g3result->maxrecords = new stdClass();
+$g3result->maxrecords->actions = '50';
+$g3result->maxrecords->search = '50';
+//    $g3result->maxrecords->products = '50';
+//    $g3result->maxrecords->orders = '50';
+//    $g3result->maxrecords->sensors = '50';
 //
 
-$filename = filter_input(INPUT_POST, 'datapath') . '/config/g3.json';
-$jasondata = json_encode($result);
+$g3filename = filter_input(INPUT_POST, 'datapath') . '/config/g3.json';
+$g3jasondata = json_encode($g3result);
+
+// setup g3actions settings
+$g3actionsfilename = filter_input(INPUT_POST, 'datapath') . '/config/g3actions.json';
+if (!is_file($g3actionsfilename)) {
+    $g3actionsresult = new stdClass();
+
+    $g3actionsresult->db = new stdClass();
+    $g3actionsresult->db->provider = 'sqlite';
+    $g3actionsresult->db->dsn = 'db/g3task{0}.db';
+    $g3actionsresult->db->username = '';
+    $g3actionsresult->db->password = '';
+
+    $g3actionsresult->filelimits = new stdClass();
+    $g3actionsresult->filelimits->attachedfile = '5';
+
+    $g3actionsjasondata = json_encode($g3actionsresult);
+}
 
 try {
-    \file_put_contents($filename, $jasondata);
-    \file_put_contents($customdefinitions, $config);
+    if (isset($g3actionsjasondata))
+        \file_put_contents($g3actionsfilename, $g3actionsjasondata);
+
+    \file_put_contents($g3filename, $g3jasondata);
+    \file_put_contents($customdefinitions, $configdefinitions);
 } catch (Exception $ex) {
     echo $ex->getMessage();
     die();
