@@ -20,5 +20,5 @@ if (!isset($user)) {
     die();
 }
 
-(new \model\login())->registerUser($user->email, LOGINSRV, $uk, $callback ?? '');
+(new \model\user)->registerUser($user->email, LOGINSRV, $uk, $callback ?? '');
 

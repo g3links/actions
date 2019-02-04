@@ -60,7 +60,7 @@ class user extends \model\dbconnect {
 
         $uk = $pwdnew;
 
-        $user = $this->exist($email);
+        $user = $this->getuserByEmail($email);
         if (isset($user)) {
             \model\message::render(\model\lexi::get('g3', 'sys031', $email));
             return false;
@@ -77,7 +77,7 @@ class user extends \model\dbconnect {
         if (!isset($lastInsertId))
             return false;
 
-        $user = $this->exist($email);
+        $user = $this->getuserByEmail($email);
         if (!isset($user))
             \model\env::sendErroremail('login', $email . ': not found');
         return false;
@@ -97,7 +97,7 @@ class user extends \model\dbconnect {
         return $lastInsertId;
     }
 
-    public function exist($email) {
+    public function getuserByEmail($email) {
         return $this->getRecord('SELECT iduser,name FROM user WHERE email = ?', (string) $email);
     }
 
@@ -159,7 +159,7 @@ class user extends \model\dbconnect {
         return $this->getRecord('SELECT user.iduser,user.lastaccesson,user.deleted,user.isvalidated,user.email,user.name,user.keyname FROM user LEFT JOIN userprovider USING ( iduser ) WHERE userprovider.token = ? AND userprovider.idprovider = ? AND user.email = ?', \trim((string) $idToken), \trim((string) $logonservice), (string) $useremail);
     }
 
-    public function getuserwithEmail($token, $logonservice, $useremail = null) {
+    public function getUserLogonByEmail($token, $logonservice, $useremail = null) {
         if (!isset($useremail) || empty($useremail))
             return null;
 
@@ -204,11 +204,7 @@ class user extends \model\dbconnect {
         return $user;
     }
 
-    private function _getAuth($iduser, $provider) {
-        return $this->getRecord('SELECT isauth, issend FROM needauth WHERE iduser = ? and provider = ?', (int) $iduser, \trim((string) $provider));
-    }
-
-    public function confirmAuthorization($iduser, $provider) {
+    public function isAuthorizationConfirm($iduser, $provider) {
         $needauth = $this->_getAuth($iduser, $provider);
         if (isset($needauth)) {
             if ($needauth->isauth) {
@@ -221,10 +217,93 @@ class user extends \model\dbconnect {
         return true;
     }
 
+    private function _getAuth($iduser, $provider) {
+        return $this->getRecord('SELECT isauth, issend FROM needauth WHERE iduser = ? and provider = ?', (int) $iduser, \trim((string) $provider));
+    }
+
     private function _deleteAuthUser($iduser, $provider) {
         $this->executeSql('DELETE FROM needauth WHERE iduser = ? AND provider = ?', (int) $iduser, trim((string) $provider));
     }
 
+    private function _registeruser($useremail, $logonservice, $logintoken) {
+        $data = ['pr' => $logonservice, 'email' => $useremail];
+        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
+
+        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        return isset($user);
+    }
+    
+    private function _updatetoken($iduser, $token, $logonservice, $email = null) {
+        if (empty($token)) {
+            $this->executeSql('DELETE FROM userprovider WHERE iduser = ? AND idprovider = ?', (int) $iduser, (string) $logonservice);
+            return;
+        }
+
+        $result = $this->getRecord('SELECT userprovider.iduser FROM userprovider WHERE userprovider.iduser = ? and userprovider.idprovider = ?', (int) $iduser, \trim((string) $logonservice));
+
+        if (isset($result))
+            $this->executeSql('UPDATE userprovider SET token = ? WHERE iduser = ? AND idprovider = ?', \trim((string) $token), (int) $iduser, (string) $logonservice);
+
+        if (!isset($result))
+            $this->executeSql('INSERT INTO userprovider (iduser, idprovider, token, createdon) VALUES (?, ?, ?, ?)', trim((int) $iduser), trim((string) $logonservice), trim((string) $token), \model\utils::forDatabaseDateTime(new \DateTime()));
+
+        if (isset($email))
+            $this->executeSql('UPDATE user set email = ? WHERE iduser = ?', \trim((string) $email), (int) $iduser);
+    }
+
+    private function _registerEmail($useremail, $logonservice, $logintoken) {
+        try {
+            $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), \model\env::getKey(), ['HS256']);
+
+            try {
+                $data = ['pr' => $logonservice, 'email' => $useremail];
+                $providertoken = \Firebase\JWT\JWT::encode($data, $logintoken);
+                $this->changeUserToken($jsondecoded->iduser, $logonservice, $providertoken, $useremail);
+
+                try {
+//                    // keep new info for future sessions
+                    (new \model\env)->saveSession($jsondecoded->iduser, $useremail);
+                } catch (Exception $excS) {
+                    \model\env::sendErroremail('error encode session: ' . $jsondecoded->useremail, $excS->getMessage() . ', public key');
+                    \model\message::render($jsondecoded->useremail . ', session cannot be registered.');
+                    return;
+                }
+            } catch (Exception $excC) {
+                \model\env::sendErroremail('update profile, error encode credentials: ' . $jsondecoded->useremail, $excC->getMessage() . ', public key');
+                \model\message::render($jsondecoded->useremail . ', credentials cannot be registered.');
+                return;
+            }
+        } catch (\Firebase\JWT\ExpiredException $vexc) {
+            \model\message::render(\model\lexi::get('', 'sys017', $vexc->getMessage()), 'login', true);
+        } catch (Exception $excSd) {
+            \model\env::sendErroremail('update email, error decode session: ' . \model\env::getUserEmail(), $excSd->getMessage() . ', public key');
+            \model\message::render(\model\env::getUserEmail() . ', cannot decode session credentials.');
+            return;
+        }
+    }
+    
+    private function _authEmail($iduser, $provider, $name, $email, $providertoken) {
+        // 24 hours before exprire
+        $config = \model\env::getConfig('api');
+        $data = ['exp' => time() + 86400, 'iduser' => $iduser, "provider" => $provider, "email" => $email, "loginid" => $providertoken];
+        $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
+
+        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('auth.php?tokenauth={0}', $jwttoken));
+
+        $filename = \model\route::render('g3/*/regauthorization.html');
+
+        $emailstring = array();
+        $lines = file($filename);
+        foreach ($lines as $line) {
+            $line = str_replace('[membername]', $name, $line);
+            $line = str_replace('[provider]', LOGINSRVNAME, $line);
+            $line = str_replace('[token]', $token, $line);
+            $emailstring[] = $line;
+        }
+
+        \model\env::sendMail($name, $email, \model\lexi::get('g3', 'sys024'), $emailstring);
+    }
+    
     public function resetUserPassword($iduser, $logonservice) {
         $this->_updatetoken($iduser, '', $logonservice);
         $this->_deleteAuthUser($iduser, $logonservice);
@@ -243,7 +322,7 @@ class user extends \model\dbconnect {
             return false;
         }
 
-        $user = $this->exist($emaillogon);
+        $user = $this->getuserByEmail($emaillogon);
         if (!isset($user)) {
             \model\message::render(\model\lexi::get('g3', 'sys031'));
             return false;
@@ -260,14 +339,6 @@ class user extends \model\dbconnect {
         return true;
     }
 
-    private function _registeruser($useremail, $logonservice, $logintoken) {
-        $data = ['pr' => $logonservice, 'email' => $useremail];
-        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
-
-        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
-        return isset($user);
-    }
-    
     public function changeUserToken($iduser, $logonservice, $token, $email = null) {
         $this->_updatetoken($iduser, $token, $logonservice, $email);
     }
@@ -276,24 +347,6 @@ class user extends \model\dbconnect {
         $this->executeSql('UPDATE needauth SET issend = ? WHERE iduser = ? AND provider = ?', 1, (int) $iduser, trim((string) $provider));
 
         $this->_updatetoken($iduser, $idToken, $provider);
-    }
-
-    private function _updatetoken($iduser, $token, $logonservice, $email = null) {
-        if (empty($token)) {
-            $this->executeSql('DELETE FROM userprovider WHERE iduser = ? AND idprovider = ?', (int) $iduser, (string) $logonservice);
-            return;
-        }
-
-        $result = $this->getRecord('SELECT userprovider.iduser FROM userprovider WHERE userprovider.iduser = ? and userprovider.idprovider = ?', (int) $iduser, \trim((string) $logonservice));
-
-        if (isset($result))
-            $this->executeSql('UPDATE userprovider SET token = ? WHERE iduser = ? AND idprovider = ?', \trim((string) $token), (int) $iduser, (string) $logonservice);
-
-        if (!isset($result))
-            $this->executeSql('INSERT INTO userprovider (iduser, idprovider, token, createdon) VALUES (?, ?, ?, ?)', trim((int) $iduser), trim((string) $logonservice), trim((string) $token), \model\utils::forDatabaseDateTime(new \DateTime()));
-
-        if (isset($email))
-            $this->executeSql('UPDATE user set email = ? WHERE iduser = ?', \trim((string) $email), (int) $iduser);
     }
 
     public function setAuthUserEmail($iduser, $provider) {
@@ -373,37 +426,6 @@ class user extends \model\dbconnect {
         \model\env::sendMail($user->name, $user->storedemail, \model\lexi::get('g3', 'sys065'), $emailstring);
     }
 
-    private function _registerEmail($useremail, $logonservice, $logintoken) {
-        try {
-            $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), \model\env::getKey(), ['HS256']);
-
-            try {
-                $data = ['pr' => $logonservice, 'email' => $useremail];
-                $providertoken = \Firebase\JWT\JWT::encode($data, $logintoken);
-                $this->changeUserToken($jsondecoded->iduser, $logonservice, $providertoken, $useremail);
-
-                try {
-//                    // keep new info for future sessions
-                    (new \model\env)->saveSession($jsondecoded->iduser, $useremail);
-                } catch (Exception $excS) {
-                    \model\env::sendErroremail('error encode session: ' . $jsondecoded->useremail, $excS->getMessage() . ', public key');
-                    \model\message::render($jsondecoded->useremail . ', session cannot be registered.');
-                    return;
-                }
-            } catch (Exception $excC) {
-                \model\env::sendErroremail('update profile, error encode credentials: ' . $jsondecoded->useremail, $excC->getMessage() . ', public key');
-                \model\message::render($jsondecoded->useremail . ', credentials cannot be registered.');
-                return;
-            }
-        } catch (\Firebase\JWT\ExpiredException $vexc) {
-            \model\message::render(\model\lexi::get('', 'sys017', $vexc->getMessage()), 'login', true);
-        } catch (Exception $excSd) {
-            \model\env::sendErroremail('update email, error decode session: ' . \model\env::getUserEmail(), $excSd->getMessage() . ', public key');
-            \model\message::render(\model\env::getUserEmail() . ', cannot decode session credentials.');
-            return;
-        }
-    }
-    
     public function sleepaccount() {
         $this->executeSql('UPDATE user SET deleted = ? WHERE iduser = ? AND email = ? AND deleted = ? AND isvalidated = ?', 1, (int) \model\env::getIdUser(), trim((string) \model\env::getUserEmail()), 0, 0);
 
@@ -436,7 +458,7 @@ class user extends \model\dbconnect {
             return false;
         }
 
-        $user = $this->exist($email);
+        $user = $this->getuserByEmail($email);
         if (!isset($user)) {
             \model\message::render($lexi('sys031'));
             return false;
@@ -474,6 +496,101 @@ class user extends \model\dbconnect {
             return;
 
         (new \model\env)->saveSession($user->iduser, $user->email);
+    }
+
+    public function registerUser($useremail, $logonservice, $logintoken, $callback = '') {
+        $data = ['pr' => $logonservice, 'email' => $useremail];
+        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
+
+//        $modeluser = new \model\user();
+//*******************************
+//get user by provider only (must be registered)
+//*******************************
+        //find user email + token
+        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        if (!isset($user->iduser)) {
+            // call was made to validate iidentity only
+            if (!empty($callback)) {
+                // STOP return to logon
+                $_SERVER['REQUEST_URI'] = $callback;
+                $messageerror = \model\lexi::get('g3', 'sys031');
+                require \model\route::script('login/confirmidentity.php');
+                die();
+            }
+
+            //user not found, find user by email
+            $user = $this->getUserLogonByEmail($loginid, $logonservice, $useremail);
+            if (!isset($user->iduser)) {
+                $messageerror = \model\lexi::get('g3', 'sys031');
+                require \model\route::script('login/index.php');
+                die();
+            }
+
+            if (isset($user->iduser)) {
+                if ($user->accountdonotmatch) {
+                    //account different from credentials, stop here
+                    unset($user);
+                    $messageerror = \model\lexi::get('g3', 'sys031');
+                    require \model\route::script('login/index.php');
+                    die();
+                }
+
+                if ($user->needauth) {
+                    if (!$user->issend) {
+                        $this->_authEmail($user->iduser, $logonservice, $user->name, $user->email, $loginid);
+                        $this->setAuthEmailSent($user->iduser, $logonservice, $loginid);
+                    }
+
+                    $username = $user->name;
+                    $useremail = $user->email;
+                    unset($user);
+
+                    // authorization required
+                    require \model\route::script('login/authrequired.php');
+                    die();
+                }
+            }
+        }
+
+        if ($user->isvalidated) {
+            unset($user);
+
+            $messageerror = \model\lexi::get('g3', 'sys033');
+            require \model\route::script('login/index.php');
+            die();
+        }
+        // user needs to activate the account to continue
+        if ($user->deleted) {
+            require \model\route::script('login/activateaccount.php');
+            die();
+        }
+
+        if (!$this->isAuthorizationConfirm($user->iduser, $logonservice)) {
+            // authorization required
+            $this->_authEmail($user->iduser, $logonservice, $user->name, $user->email, $loginid);
+            $username = $user->name;
+            $useremail = $user->email;
+            require \model\route::script('login/authrequired.php');
+            die();
+        }
+
+//*******************************
+// let them in
+//*******************************
+        //name and email can be empty, the UI must force entry data before continuing
+        if (!\model\env::isauthorized())
+            (new \model\env)->saveSession($user->iduser, $user->email);
+
+        // confirm identity before callback execution
+        if (!empty($callback)) {
+            // indetity confirmed, just return to callback
+            \model\utils::console('login callback: ' . $callback);
+            require \model\route::script($callback);
+            die();
+        }
+
+        // otherwise, start over
+        require \model\route::script('restart.php');
     }
 
 }

@@ -25,5 +25,5 @@ if ((new \model\user())->insertUser($emaillogon, $username, $pwdnew, $pwdnew1) =
     die();
 }
 
-(new \model\login())->registerUser($emaillogon, LOGINSRV, $pwdnew, $callback ?? '');
+(new \model\user)->registerUser($emaillogon, LOGINSRV, $pwdnew, $callback ?? '');
 die();

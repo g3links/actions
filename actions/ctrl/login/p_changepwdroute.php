@@ -23,5 +23,5 @@ if((new \model\user)->changeUserPassword($emaillogon, $uk, $pwdchg, $pwdchg1) ==
     die();
 }
 
-(new \model\login())->registerUser($emaillogon, LOGINSRV, $pwdchg, $callback ?? '');
+(new \model\user)->registerUser($emaillogon, LOGINSRV, $pwdchg, $callback ?? '');
 die();

@@ -21,7 +21,7 @@ if (empty($emaillogon))
 if (filter_input(INPUT_POST, 'pwdlogon') !== null) 
     $uk = filter_input(INPUT_POST, 'pwdlogon');
 
-$user = (new \model\user)->exist($emaillogon);
+$user = (new \model\user)->getuserByEmail($emaillogon);
 if (!isset($user)) 
     $messageerror = \model\lexi::get('g3', 'sys031');
 
@@ -34,5 +34,5 @@ if(isset($messageerror) && !empty($messageerror)) {
     die();
 }
 
-(new \model\login())->registerUser($emaillogon, LOGINSRV, $uk, $callback ?? '');
+(new \model\user)->registerUser($emaillogon, LOGINSRV, $uk, $callback ?? '');
 
