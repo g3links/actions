@@ -11,12 +11,6 @@ if(!is_file($customdefinitions)) {
     die();
 }
 
-//// CUSTOMIZE SEETINGS ******************
-//define('WEB_APP', '/test'); //  define app folder
-//define('DATA_PATH', '/home/gus/NetBeansProjects/g3linksdata');  // define data location for db, config, attach and log folders
-//define('PAGETITLE', 'G3 Links Actions');
-//define('WELCOMEPAGE', 'https://g3links.com/wp');
-////**************************************
 require $customdefinitions;
 
 define('LOGINSRV', 'g3');  // logon service id
@@ -31,4 +25,4 @@ define('DIR_APP', $rootpath . WEB_APP . '/');
 
 require_once DIR_APP . '/autoload.php';
 
-(new \model\login)->getUserCredentials();
+(new \model\env)->getUserSession();

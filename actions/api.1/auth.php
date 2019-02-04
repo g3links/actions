@@ -15,9 +15,10 @@ if (!isset($token))
     \model\message::severe('sys004', \model\lexi::get('', 'sys004'));
 
 try {
-    $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), array('HS256'));
-    (new \model\login())->registerTokenUser($jsondecoded->email, $jsondecoded->provider, $jsondecoded->loginid);
-    (new \model\user)->setAuthUserEmail($jsondecoded->iduser, $jsondecoded->provider);
+    $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), ['HS256']);
+    $usermodel = new \model\user();
+    $usermodel->registerTokenUser($jsondecoded->email, $jsondecoded->provider, $jsondecoded->loginid);
+    $usermodel->setAuthUserEmail($jsondecoded->iduser, $jsondecoded->provider);
 } catch (\Firebase\JWT\ExpiredException $vexc) {
     \model\message::severe('sys017', \model\lexi::get('', 'sys017', $vexc->getMessage()), 'auth', true);
 } catch (Exception $exc) {

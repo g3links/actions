@@ -249,7 +249,7 @@ class user extends \model\dbconnect {
             return false;
         }
 
-        if ((new \model\login)->registerUserExist($emaillogon, LOGINSRV, $uk) === false) {
+        if ($this->_registeruser($emaillogon, LOGINSRV, $uk) === false) {
             \model\message::render(\model\lexi::get('g3', 'sys031'));
             return false;
         }
@@ -260,6 +260,14 @@ class user extends \model\dbconnect {
         return true;
     }
 
+    private function _registeruser($useremail, $logonservice, $logintoken) {
+        $data = ['pr' => $logonservice, 'email' => $useremail];
+        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
+
+        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        return isset($user);
+    }
+    
     public function changeUserToken($iduser, $logonservice, $token, $email = null) {
         $this->_updatetoken($iduser, $token, $logonservice, $email);
     }
@@ -335,7 +343,7 @@ class user extends \model\dbconnect {
         $user->storedemail = $storedemail;
         if (\strtolower(\trim($storedemail)) !== \strtolower(\trim($user->email))) {
             if (isset($user->logintoken)) {
-                (new \model\login())->registerEmail($user->email, LOGINSRV, $user->logintoken);
+                $this->_registerEmail($user->email, LOGINSRV, $user->logintoken);
                 $sendwarning = true;
             }
         }
@@ -365,6 +373,37 @@ class user extends \model\dbconnect {
         \model\env::sendMail($user->name, $user->storedemail, \model\lexi::get('g3', 'sys065'), $emailstring);
     }
 
+    private function _registerEmail($useremail, $logonservice, $logintoken) {
+        try {
+            $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), \model\env::getKey(), ['HS256']);
+
+            try {
+                $data = ['pr' => $logonservice, 'email' => $useremail];
+                $providertoken = \Firebase\JWT\JWT::encode($data, $logintoken);
+                $this->changeUserToken($jsondecoded->iduser, $logonservice, $providertoken, $useremail);
+
+                try {
+//                    // keep new info for future sessions
+                    (new \model\env)->saveSession($jsondecoded->iduser, $useremail);
+                } catch (Exception $excS) {
+                    \model\env::sendErroremail('error encode session: ' . $jsondecoded->useremail, $excS->getMessage() . ', public key');
+                    \model\message::render($jsondecoded->useremail . ', session cannot be registered.');
+                    return;
+                }
+            } catch (Exception $excC) {
+                \model\env::sendErroremail('update profile, error encode credentials: ' . $jsondecoded->useremail, $excC->getMessage() . ', public key');
+                \model\message::render($jsondecoded->useremail . ', credentials cannot be registered.');
+                return;
+            }
+        } catch (\Firebase\JWT\ExpiredException $vexc) {
+            \model\message::render(\model\lexi::get('', 'sys017', $vexc->getMessage()), 'login', true);
+        } catch (Exception $excSd) {
+            \model\env::sendErroremail('update email, error decode session: ' . \model\env::getUserEmail(), $excSd->getMessage() . ', public key');
+            \model\message::render(\model\env::getUserEmail() . ', cannot decode session credentials.');
+            return;
+        }
+    }
+    
     public function sleepaccount() {
         $this->executeSql('UPDATE user SET deleted = ? WHERE iduser = ? AND email = ? AND deleted = ? AND isvalidated = ?', 1, (int) \model\env::getIdUser(), trim((string) \model\env::getUserEmail()), 0, 0);
 
@@ -423,6 +462,18 @@ class user extends \model\dbconnect {
 
         \model\env::sendMail($user->name, $email, $lexi['sys024'], $emailstring);
         return $user;
+    }
+
+    public function registerTokenUser($useremail, $logonservice, $loginid) {
+        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        if (!isset($user))
+            return;
+
+//not validated
+        if ($user->isvalidated || $user->deleted)
+            return;
+
+        (new \model\env)->saveSession($user->iduser, $user->email);
     }
 
 }

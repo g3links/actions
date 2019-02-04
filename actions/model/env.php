@@ -82,6 +82,51 @@ final class env {
 
     // user
     //**********************************************
+    public function getUserSession() {
+        $token = null;
+        if (filter_input(INPUT_GET, 'tokenid') !== null) {
+        // LOGIN token ******************
+            // security passed from URL
+            $token = filter_input(INPUT_GET, 'tokenid');
+
+            if (isset($token)) {
+                try {
+                    $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), ['HS256']);
+                    (new \model\user)->registerTokenUser($jsondecoded->email, $jsondecoded->logonservice, $jsondecoded->loginid);
+                } catch (\Firebase\JWT\ExpiredException $vexc) {
+                    \model\message::severe('sys004', $vexc->getMessage());
+                } catch (Exception $exc) {
+                    \model\message::severe('sys004', $exc->getMessage());
+                }
+            }
+        }
+
+        // retrieve email name ******************
+        if (filter_input(INPUT_COOKIE, 'g3links') !== null) {
+            $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
+            list($headb64, $bodyb64, $cryptob64) = $tks;
+            $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
+            self::setUserEmail($payload->useremail);
+        }
+
+        //validate user access
+        if (!self::isauthorized() && filter_input(INPUT_COOKIE, 'g3links') !== null) {
+            try {
+                $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), self::getKey(), ['HS256']);
+
+                if (\model\utils::get_remote_addr() === $jsondecoded->remoteip) {
+                    self::setUser($jsondecoded->iduser);
+                    self::setUserEmail($jsondecoded->useremail);
+                } else {
+                    self::closelogon();
+                }
+            } catch (\Firebase\JWT\ExpiredException $vexc) {
+                //ignore
+            } catch (Exception $exc) {
+                //ignore
+            }
+        }
+    }
 
     public static function isauthorized() {
         if (!(self::$app_iduser > 0))
@@ -100,7 +145,16 @@ final class env {
 
     public static function closelogon() {
         self::$app_iduser = 0;
-        (new \model\login)->closeSession();
+
+        $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
+        list($headb64, $bodyb64, $cryptob64) = $tks;
+        $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
+
+        self::setUserEmail($payload->useremail);
+
+        // shotdown access
+        $data = ['exp' => time() - 1, "iduser" => $payload->iduser, "useremail" => $payload->useremail];
+        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, self::getKey()));
     }
 
     public static function setUser($iduser) {
@@ -207,7 +261,7 @@ final class env {
 
         if (isset($token) && self::isauthorized()) {
             try {
-                $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), array('HS256'));
+                $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), ['HS256']);
                 if ($jsondecoded->iduser === self::$app_iduser && $jsondecoded->useremail === self::$app_useremail)
                     $sucess = true;
             } catch (\Firebase\JWT\ExpiredException $vexc) {
@@ -219,6 +273,16 @@ final class env {
 
         if (!$sucess)
             \model\message::severe('sys004', $errormssg);
+    }
+
+    public static function saveSession($iduser, $useremail) {
+        self::setUser($iduser);
+
+        $remote_addr = \model\utils::get_remote_addr();
+            
+        // 5 days expire session
+        $data = ['exp' => time() + 432000, "iduser" => $iduser, "useremail" => \trim($useremail), "remoteip" => $remote_addr];
+        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, self::getKey()));
     }
 
     // user level access security

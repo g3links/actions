@@ -275,4 +275,8 @@ class utils {
         return [];
     }
 
+    public static function get_remote_addr() {
+        return filter_input(INPUT_SERVER, 'HTTP_X_REAL_IP') ?? filter_input(INPUT_SERVER, 'HTTP_X_FORWARDED_FOR') ?? filter_input(INPUT_SERVER, 'HTTP_CLIENT_IP') ?? filter_input(INPUT_SERVER, 'REMOTE_ADDR') ?? null;
+    }
+
 }

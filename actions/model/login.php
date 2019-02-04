@@ -4,59 +4,6 @@ namespace model;
 
 final class login {
 
-    public function registerTokenUser($useremail, $logonservice, $loginid) {
-        $user = (new \model\user)->getuserByToken($loginid, $logonservice, $useremail);
-        if (!isset($user))
-            return;
-
-        if ($user->isvalidated || $user->deleted) {
-            //not validated
-            unset($user);
-            return;
-        }
-
-        $this->_saveSession($user->iduser, $user->email);
-    }
-
-    public function registerEmail($useremail, $logonservice, $logintoken) {
-        try {
-            $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), \model\env::getKey(), array('HS256'));
-
-            try {
-                $data = ['pr' => $logonservice, 'email' => $useremail];
-                $providertoken = \Firebase\JWT\JWT::encode($data, $logintoken);
-                (new \model\user)->changeUserToken($jsondecoded->iduser, $logonservice, $providertoken, $useremail);
-
-                try {
-//                    // keep new info for future sessions
-                    $this->_saveSession($jsondecoded->iduser, $useremail);
-                } catch (Exception $excS) {
-                    \model\env::sendErroremail('error encode session: ' . $jsondecoded->useremail, $excS->getMessage() . ', public key');
-                    \model\message::render($jsondecoded->useremail . ', session cannot be registered.');
-                    return;
-                }
-            } catch (Exception $excC) {
-                \model\env::sendErroremail('update profile, error encode credentials: ' . $jsondecoded->useremail, $excC->getMessage() . ', public key');
-                \model\message::render($jsondecoded->useremail . ', credentials cannot be registered.');
-                return;
-            }
-        } catch (\Firebase\JWT\ExpiredException $vexc) {
-            \model\message::render(\model\lexi::get('', 'sys017', $vexc->getMessage()), 'login', true);
-        } catch (Exception $excSd) {
-            \model\env::sendErroremail('update email, error decode session: ' . \model\env::getUserEmail(), $excSd->getMessage() . ', public key');
-            \model\message::render(\model\env::getUserEmail() . ', cannot decode session credentials.');
-            return;
-        }
-    }
-
-    public function registerUserExist($useremail, $logonservice, $logintoken) {
-        $data = ['pr' => $logonservice, 'email' => $useremail];
-        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
-
-        $user = (new \model\user)->getuserByToken($loginid, $logonservice, $useremail);
-        return isset($user);
-    }
-    
     public function registerUser($useremail, $logonservice, $logintoken, $callback = '') {
         $data = ['pr' => $logonservice, 'email' => $useremail];
         $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
@@ -137,8 +84,8 @@ final class login {
 // let them in
 //*******************************
         //name and email can be empty, the UI must force entry data before continuing
-        if (!\model\env::isauthorized()) 
-            $this->_saveSession($user->iduser, $user->email);
+        if (!\model\env::isauthorized())
+            (new \model\env)->saveSession($user->iduser, $user->email);
 
         // confirm identity before callback execution
         if (!empty($callback)) {
@@ -172,66 +119,6 @@ final class login {
         }
 
         \model\env::sendMail($name, $email, \model\lexi::get('g3', 'sys024'), $emailstring);
-    }
-
-    private function _saveSession($iduser, $useremail) {
-        \model\env::setUser($iduser);
-
-        // 5 days expire session
-        $data = ['exp' => time() + 432000, "iduser" => $iduser, "useremail" => \trim($useremail)];
-        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, \model\env::getKey()));
-    }
-
-    public function closeSession() {
-        $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
-        list($headb64, $bodyb64, $cryptob64) = $tks;
-        $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
-
-        \model\env::setUserEmail($payload->useremail);
-
-        // shotdown access
-        $data = ['exp' => time() - 1, "iduser" => $payload->iduser, "useremail" => $payload->useremail];
-        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, \model\env::getKey()));
-    }
-
-    public function getUserCredentials() {
-        // LOGIN token ******************
-        $token = null;
-        if (filter_input(INPUT_GET, 'tokenid') !== null) 
-            $token = filter_input(INPUT_GET, 'tokenid');
-
-        if (isset($token)) {
-            try {
-                $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), array('HS256'));
-                $this->registerTokenUser($jsondecoded->email, $jsondecoded->logonservice, $jsondecoded->loginid);
-            } catch (\Firebase\JWT\ExpiredException $vexc) {
-                \model\message::severe('sys004', $vexc->getMessage());
-            } catch (Exception $exc) {
-                \model\message::severe('sys004', $exc->getMessage());
-            }
-        }
-
-        // retrieve email name ******************
-        if (filter_input(INPUT_COOKIE,'g3links') !== null) {
-            $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
-            list($headb64, $bodyb64, $cryptob64) = $tks;
-            $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
-            \model\env::setUserEmail($payload->useremail);
-        }
-
-        //validate user access
-        if (!\model\env::isauthorized() && filter_input(INPUT_COOKIE,'g3links') !== null) {
-            try {
-                $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), \model\env::getKey(), array('HS256'));
-
-                \model\env::setUser($jsondecoded->iduser);
-                \model\env::setUserEmail($jsondecoded->useremail);
-            } catch (\Firebase\JWT\ExpiredException $vexc) {
-                //ignore
-            } catch (Exception $exc) {
-                //ignore
-            }
-        }
     }
 
 }

@@ -15,7 +15,7 @@ if (!isset($token))
     \model\message::severe('sys004', \model\lexi::get('', 'sys004'));
 
 try {
-    $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), array('HS256'));
+    $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), ['HS256']);
     \model\env::setUser($jsondecoded->iduser);
     (new \model\user)->deleteaccount($jsondecoded->iduser);
 } catch (\Firebase\JWT\ExpiredException $vexc) {
