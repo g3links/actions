@@ -35,7 +35,7 @@ if ($serviceto === 'active') {
     }
 
     if (!\is_file($filelocation)) {
-        echo '<div style="color: red;">' . \model\lexi::get('', 'sys002') . '</div>';
+        echo '<div style="color: red;">' . \model\lexi::get('', 'msg002') . '</div>';
         die();
 //            (new \model\message)->render($mssgerror);
     }
@@ -55,7 +55,7 @@ if ($serviceto === 'custom') {
         // data must exist
         $filelocation = \model\route::render(\model\utils::format('{0}/config/{1}/*/{2}', DATA_PATH, $module, $template));
         if (!\is_file($filelocation)) {
-            echo '<div style="color: red;">' . \model\lexi::get('', 'sys002') . '</div>';
+            echo '<div style="color: red;">' . \model\lexi::get('', 'msg002') . '</div>';
             die();
 //            (new \model\message)->render($mssgerror);
         }

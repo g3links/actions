@@ -9,12 +9,12 @@ if (filter_input(INPUT_GET, 'search') !== null) {
 }
 
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
-    'lbl_title' => $lexi['sys087'],
-    'th_col1' => $lexi['sys043'],
-    'th_col2' => $lexi['sys029'],
-    'lbl_notfound' => $lexi['sys044'],
+    'lbl_title' => $lexi['prj087'],
+    'th_col1' => $lexi['prj043'],
+    'th_col2' => $lexi['prj029'],
+    'lbl_notfound' => $lexi['prj044'],
     'contacts' => $contacts ?? [],
 ];
 \model\route::render('project/tools/viewpeoplesearch.twig', $data);

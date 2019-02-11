@@ -27,7 +27,7 @@ $allOk = true;
 
 //if empty. do nothing
 if (!isset($newproj->title) || empty($newproj->title)) {
-    \model\message::render(\model\lexi::get('g3/project','sys017'));
+    \model\message::render(\model\lexi::get('','prj017'));
     $allOk = false;
 }
 

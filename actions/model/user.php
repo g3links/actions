@@ -43,18 +43,18 @@ class user extends \model\dbconnect {
     public function insertUser($email, $username, $pwdnew, $pwdnew1, $keyname = '', $theme = '') {
         // validate
         if (!isset($email) || empty($email) || !isset($username) || empty($username)) {
-            \model\message::render($this->setMessage($email . ': ' . \model\lexi::get('g3', 'sys043')));
+            \model\message::render($this->setMessage($email . ': ' . \model\lexi::get('', 'sys043')));
             return false;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            \model\message::render($email . ': ' . \model\lexi::get('g3', 'sys043'));
+            \model\message::render($email . ': ' . \model\lexi::get('', 'sys043'));
             return false;
         }
 
         $uk = '';
         if ($pwdnew !== $pwdnew1) {
-            \model\message::render(\model\lexi::get('g3', 'sys030'));
+            \model\message::render(\model\lexi::get('', 'sys030'));
             return false;
         }
 
@@ -62,7 +62,7 @@ class user extends \model\dbconnect {
 
         $user = $this->getuserByEmail($email);
         if (isset($user)) {
-            \model\message::render(\model\lexi::get('g3', 'sys031', $email));
+            \model\message::render(\model\lexi::get('', 'sys031', $email));
             return false;
         }
 
@@ -92,7 +92,7 @@ class user extends \model\dbconnect {
             $line = str_replace('[email]', $email, $line);
             $emailstring[] = $line;
         }
-        \model\env::sendMail($username, $email, \model\lexi::get('g3', 'sys045'), $emailstring);
+        \model\env::sendMail($username, $email, \model\lexi::get('', 'sys045'), $emailstring);
 
         return $lastInsertId;
     }
@@ -113,7 +113,7 @@ class user extends \model\dbconnect {
         $this->executeSql('UPDATE user SET deleted = ? WHERE iduser = ? AND email = ? AND isvalidated = ?', 0, (int) \model\env::getIdUser(), (string) \model\env::getUserEmail(), 0);
 
         if (!$this->isActive()) {
-            \model\message::render(\model\lexi::get('g3', 'sys070', \model\env::getUserEmail()));
+            \model\message::render(\model\lexi::get('', 'sys070', \model\env::getUserEmail()));
             return false;
         }
 
@@ -123,7 +123,7 @@ class user extends \model\dbconnect {
             (new \model\action(\model\env::src($project->idproject)))->setActiveUser();
 
         // send message to user
-        $emailsubject = \model\lexi::get('g3', 'sys021');
+        $emailsubject = \model\lexi::get('', 'sys021');
 
         $emailstring = [];
         $filename = \model\route::render('g3/*/accounttatus.html');
@@ -274,7 +274,7 @@ class user extends \model\dbconnect {
                 return;
             }
         } catch (\Firebase\JWT\ExpiredException $vexc) {
-            \model\message::render(\model\lexi::get('', 'sys017', $vexc->getMessage()), 'login', true);
+            \model\message::render(\model\lexi::get('', 'msg017', $vexc->getMessage()), 'login', true);
         } catch (Exception $excSd) {
             \model\env::sendErroremail('update email, error decode session: ' . \model\env::getUserEmail(), $excSd->getMessage() . ', public key');
             \model\message::render(\model\env::getUserEmail() . ', cannot decode session credentials.');
@@ -301,7 +301,7 @@ class user extends \model\dbconnect {
             $emailstring[] = $line;
         }
 
-        \model\env::sendMail($name, $email, \model\lexi::get('g3', 'sys024'), $emailstring);
+        \model\env::sendMail($name, $email, \model\lexi::get('', 'sys024'), $emailstring);
     }
     
     public function resetUserPassword($iduser, $logonservice) {
@@ -312,24 +312,24 @@ class user extends \model\dbconnect {
     public function changeUserPassword($emaillogon, $uk, $pwdchg, $pwdchg1) {
 // stop no valid email
         if (empty($emaillogon)) {
-            \model\message::render(\model\lexi::get('g3', 'sys043'));
+            \model\message::render(\model\lexi::get('', 'sys043'));
             return false;
         }
 
         // stop did not match
         if ($pwdchg !== $pwdchg1) {
-            \model\message::render(\model\lexi::get('g3', 'sys030'));
+            \model\message::render(\model\lexi::get('', 'sys030'));
             return false;
         }
 
         $user = $this->getuserByEmail($emaillogon);
         if (!isset($user)) {
-            \model\message::render(\model\lexi::get('g3', 'sys031'));
+            \model\message::render(\model\lexi::get('', 'sys031'));
             return false;
         }
 
         if ($this->_registeruser($emaillogon, LOGINSRV, $uk) === false) {
-            \model\message::render(\model\lexi::get('g3', 'sys031'));
+            \model\message::render(\model\lexi::get('', 'sys031'));
             return false;
         }
 
@@ -373,7 +373,7 @@ class user extends \model\dbconnect {
             $emailstring[] = $line;
         }
 
-        \model\env::sendMail(\model\env::getUserName(), \model\env::getUserEmail(), \model\lexi::get('g3', 'sys024'), $emailstring);
+        \model\env::sendMail(\model\env::getUserName(), \model\env::getUserEmail(), \model\lexi::get('', 'sys024'), $emailstring);
     }
 
     public function deleteaccount($iduser) {
@@ -386,7 +386,7 @@ class user extends \model\dbconnect {
         $user->theme = $user->theme === '1' ? '' : $user->theme;
 
         if (!isset($user->name) || empty($user->name)) {
-            \model\message::render(\model\lexi::get('', 'sys058'));
+            \model\message::render(\model\lexi::get('', 'msg058'));
             return false;
         }
 
@@ -423,7 +423,7 @@ class user extends \model\dbconnect {
             $emailstring[] = $line;
         }
 
-        \model\env::sendMail($user->name, $user->storedemail, \model\lexi::get('g3', 'sys065'), $emailstring);
+        \model\env::sendMail($user->name, $user->storedemail, \model\lexi::get('', 'sys065'), $emailstring);
     }
 
     public function sleepaccount() {
@@ -436,7 +436,7 @@ class user extends \model\dbconnect {
             (new \model\action(\model\env::src($project->idproject)))->setInactiveUser();
 
         // send message to user
-        $emailsubject = \model\lexi::get('g3', 'sys064');
+        $emailsubject = \model\lexi::get('', 'sys064');
         $emailstring = [];
         $filename = \model\route::render('g3/*/accounttatus.html');
 
@@ -452,7 +452,7 @@ class user extends \model\dbconnect {
 
     public function authresetpassword($email) {
         // stop no valid email
-        $lexi = \model\lexi::getall('g3');
+        $lexi = \model\lexi::getall();
         if (empty($email)) {
             \model\message::render($lexi('sys043'));
             return false;
@@ -513,7 +513,7 @@ class user extends \model\dbconnect {
             if (!empty($callback)) {
                 // STOP return to logon
                 $_SERVER['REQUEST_URI'] = $callback;
-                $messageerror = \model\lexi::get('g3', 'sys031');
+                $messageerror = \model\lexi::get('', 'sys031');
                 require \model\route::script('login/confirmidentity.php');
                 die();
             }
@@ -521,7 +521,7 @@ class user extends \model\dbconnect {
             //user not found, find user by email
             $user = $this->getUserLogonByEmail($loginid, $logonservice, $useremail);
             if (!isset($user->iduser)) {
-                $messageerror = \model\lexi::get('g3', 'sys031');
+                $messageerror = \model\lexi::get('', 'sys031');
                 require \model\route::script('login/index.php');
                 die();
             }
@@ -530,7 +530,7 @@ class user extends \model\dbconnect {
                 if ($user->accountdonotmatch) {
                     //account different from credentials, stop here
                     unset($user);
-                    $messageerror = \model\lexi::get('g3', 'sys031');
+                    $messageerror = \model\lexi::get('', 'sys031');
                     require \model\route::script('login/index.php');
                     die();
                 }
@@ -555,7 +555,7 @@ class user extends \model\dbconnect {
         if ($user->isvalidated) {
             unset($user);
 
-            $messageerror = \model\lexi::get('g3', 'sys033');
+            $messageerror = \model\lexi::get('', 'sys033');
             require \model\route::script('login/index.php');
             die();
         }

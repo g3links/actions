@@ -6,7 +6,7 @@ if (!isset($callback) || isset($messageerror)) {
 
     require_once \model\route::script('style.php');
     // is user active
-    $lexi = \model\lexi::getall('g3');
+    $lexi = \model\lexi::getall();
     $data = [
         'messageerror' => $messageerror ?? '',
         'useremail' => \model\env::getUserEmail(),

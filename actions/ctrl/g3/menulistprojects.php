@@ -11,12 +11,12 @@ if (filter_input(INPUT_GET, 'idproject') !== null)
 
 $useridproject = \model\env::session_idproject() === 0 ? \model\env::getUserIdProject() : \model\env::session_idproject();
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 $data = [
     'projects' => $projects,
     'cacheselecteproject' => $cacheselecteproject,
     'actionroute' => \model\route::window('actions', ['project/index.php?idproject=[idproject]'], '', $lexi['sys001'], ''),
-    'initsetuproute' => \model\route::window('projsetup', ['project/admon/index.php?idproject=[idproject]'], \model\env::session_idproject(), \model\lexi::get('g3/project', 'sys058')),
+    'initsetuproute' => \model\route::window('projsetup', ['project/admon/index.php?idproject=[idproject]'], \model\env::session_idproject(), \model\lexi::get('', 'prj058')),
     'lbl_title' => $lexi['sys003'],
     'lbl_share' => $lexi['sys004'],
     'lbl_remote' => $lexi['sys070'],

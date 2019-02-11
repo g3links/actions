@@ -12,13 +12,13 @@ $datasharedprojects = (new \model\action(\model\env::session_src()))->getSharedP
 $syncallprojects = \model\utils::firstOrDefault($datasharedprojects, '$v->requirerefresh === true');
 
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
     'synchprojdataroute' => \model\route::form('project/links/synchprojdata.php?idproject={0}&modulename={1}', \model\env::session_idproject(), $modulename),
     'projlist' => $datasharedprojects,
     'syncallprojects' => isset($syncallprojects),
     'modulename' => $modulename,
-    'lbl_requirerefresh' => $lexi['sys126'],
-    'lbl_shared' => $lexi['sys005'],
+    'lbl_requirerefresh' => $lexi['prj126'],
+    'lbl_shared' => $lexi['prj005'],
 ];
 \model\route::render('project/links/listprojectshared.twig', $data);

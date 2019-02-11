@@ -10,6 +10,6 @@ $projlist = (new \model\action(\model\env::session_src()))->getLinkedModule($mod
 
 $data = [
     'projlist' => $projlist,
-    'lbl_linked' => \model\lexi::get('g3/project','sys129'),
+    'lbl_linked' => \model\lexi::get('','prj129'),
 ];
 \model\route::render('project/links/listprojectlinked.twig', $data);

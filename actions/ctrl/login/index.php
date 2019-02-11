@@ -6,7 +6,7 @@ $useremail = '';
 if (!empty(\model\env::getUserEmail()))
     $useremail = \model\env::getUserEmail();
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 
 require_once \model\route::script('style.php');
 $data = [

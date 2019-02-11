@@ -8,20 +8,20 @@ if (filter_input(INPUT_GET, 'iduser') !== null)
 
 $result = (new \model\project)->getprojectbyuser(\model\env::session_idproject(), $iduser);
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
     'projectuser' => $result->projectuser,
     'roles' => $result->roles,
     'noeditaccessid' => $result->noeditaccessid,
-    'lbl_title' => $lexi['sys062'],
-    'lbl_role' => $lexi['sys048'],
-    'lbl_activeaccount' => $lexi['sys033'],
-    'lbl_access' => $lexi['sys133'],
-    'lbl_accesstip' => $lexi['sys134'],
-    'lbl_submit' => $lexi['sys060'],
-    'lbl_accesslocal' => $lexi['sys007'],
-    'lbl_accesspublic' => $lexi['sys008'],
-    'lbl_accessguest' => $lexi['sys011'],
+    'lbl_title' => $lexi['prj062'],
+    'lbl_role' => $lexi['prj048'],
+    'lbl_activeaccount' => $lexi['prj033'],
+    'lbl_access' => $lexi['prj133'],
+    'lbl_accesstip' => $lexi['prj134'],
+    'lbl_submit' => $lexi['prj060'],
+    'lbl_accesslocal' => $lexi['prj007'],
+    'lbl_accesspublic' => $lexi['prj008'],
+    'lbl_accessguest' => $lexi['prj011'],
 ];
 if($result->isrole) {
     $data += [

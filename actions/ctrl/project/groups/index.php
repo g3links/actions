@@ -4,14 +4,14 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 $result = (new \model\action(\model\env::session_src()))->getprojectgroups();
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 
 require_once \model\route::script('style.php');
 $data = [
     'groups' => $result->groups,
-    'lbl_creategroup' => $lexi['sys107'],
-    'lbl_submit' => $lexi['sys107'],
-    'lbl_notfound' => $lexi['sys044'],
+    'lbl_creategroup' => $lexi['prj107'],
+    'lbl_submit' => $lexi['prj107'],
+    'lbl_notfound' => $lexi['prj044'],
 ];
 if($result->isrole) {
     $data += [

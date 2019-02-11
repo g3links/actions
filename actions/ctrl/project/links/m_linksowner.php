@@ -12,16 +12,16 @@ $projlist = $modelshare->getLinkedOwner($modulename);
 $issharedmodule = $modelshare->isDataShared($modulename);
 $isrole = \model\env::isUserAllow(\model\env::session_idproject(), \model\project::ROLE_SHAREDATA);
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
     'projlist' => $projlist,
     'issharedmodule' => $issharedmodule,
-    'lbl_modulenamemssg' => $lexi['sys005'],
-    'th_col1' => $lexi['sys001'],
-    'th_col2' => $lexi['sys109'],
-    'th_col3' => $lexi['sys023'],
-    'lbl_notfound' => $lexi['sys044'],
-    'lbl_submit' => $lexi['sys108'],
+    'lbl_modulenamemssg' => $lexi['prj005'],
+    'th_col1' => $lexi['prj001'],
+    'th_col2' => $lexi['prj109'],
+    'th_col3' => $lexi['prj023'],
+    'lbl_notfound' => $lexi['prj044'],
+    'lbl_submit' => $lexi['prj108'],
 ];
 if($isrole) {
     $data += [

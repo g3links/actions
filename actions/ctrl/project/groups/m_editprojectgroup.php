@@ -8,15 +8,15 @@ if (filter_input(INPUT_GET, 'id') !== null)
 
 $projectgroup = (new \model\action(\model\env::session_src()))->getprojectgroupusersactive($idgroup);
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
     'projectgroup' => $projectgroup,
-    'lbl_title' => $projectgroup->idgroup === 0 ? $lexi['sys107'] : $lexi['sys106'],
-    'lbl_name' => $lexi['sys043'],
-    'lbl_submit' => $lexi['sys106'],
-    'lbl_inactive' => $lexi['sys110'],
-    'lbl_active' => $lexi['sys109'],
-    'lbl_delete' => $lexi['sys111'],
+    'lbl_title' => $projectgroup->idgroup === 0 ? $lexi['prj107'] : $lexi['prj106'],
+    'lbl_name' => $lexi['prj043'],
+    'lbl_submit' => $lexi['prj106'],
+    'lbl_inactive' => $lexi['prj110'],
+    'lbl_active' => $lexi['prj109'],
+    'lbl_delete' => $lexi['prj111'],
 ];
 if($projectgroup->isrole) {
     $data += [

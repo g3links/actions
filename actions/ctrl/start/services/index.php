@@ -4,7 +4,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 $projects = (new \model\project)->getprojects();
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 
 foreach ($projects as $project) {
     $project->actionroute = \model\route::window('actions', ['project/index.php?idproject={0}', $project->idproject],$project->idproject, $lexi['sys001'],$project->title);

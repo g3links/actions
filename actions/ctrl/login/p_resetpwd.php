@@ -14,7 +14,7 @@ if($user === false) {
     die();
 }
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 
 $data = [
     'lbl_security' => $lexi['sys018'],

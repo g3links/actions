@@ -12,7 +12,7 @@ if (filter_input(INPUT_GET, 'tokenauth') !== null) {
 }
 
 if (!isset($token))
-    \model\message::severe('sys004', \model\lexi::get('', 'sys004'));
+    \model\message::severe('sys004', \model\lexi::get('', 'msg004'));
 
 try {
     $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), ['HS256']);
@@ -20,9 +20,9 @@ try {
     $usermodel->registerTokenUser($jsondecoded->email, $jsondecoded->provider, $jsondecoded->loginid);
     $usermodel->setAuthUserEmail($jsondecoded->iduser, $jsondecoded->provider);
 } catch (\Firebase\JWT\ExpiredException $vexc) {
-    \model\message::severe('sys017', \model\lexi::get('', 'sys017', $vexc->getMessage()), 'auth', true);
+    \model\message::severe('sys017', \model\lexi::get('', 'msg017', $vexc->getMessage()), 'auth', true);
 } catch (Exception $exc) {
-    \model\message::severe('sys017', \model\lexi::get('', 'sys017', $exc->getMessage()), 'auth', true);
+    \model\message::severe('sys017', \model\lexi::get('', 'msg017', $exc->getMessage()), 'auth', true);
 }
 
 require \model\route::script('restart.php');

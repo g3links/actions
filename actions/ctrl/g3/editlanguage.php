@@ -5,7 +5,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
 $langcode = \model\lexi::getLang();
 $languages = (new \model\project)->getLangs();
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 require_once \model\route::script('style.php');
 $data = [
     'langcode' => $langcode,

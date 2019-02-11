@@ -5,7 +5,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 $results = (new \model\action(\model\env::session_src()))->getNotes();
 $total_new_notes = $results[1];
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 $data = [
     'lbl_title' => $lexi['sys048'],
     'total_new_notes' => $total_new_notes,

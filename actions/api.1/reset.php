@@ -12,16 +12,16 @@ if (filter_input(INPUT_GET, 'tokenauth') !== null) {
 }
 
 if (!isset($token))
-    \model\message::severe('sys004', \model\lexi::get('', 'sys004'));
+    \model\message::severe('sys004', \model\lexi::get('', 'msg004'));
 
 try {
     $jsondecoded = \Firebase\JWT\JWT::decode($token, \model\env::getKey(), ['HS256']);
     \model\env::setUser($jsondecoded->iduser);
     (new \model\user)->resetUserPassword($jsondecoded->iduser, $jsondecoded->provider);
 } catch (\Firebase\JWT\ExpiredException $vexc) {
-    \model\message::severe('sys017', \model\lexi::get('', 'sys017', $vexc->getMessage()), 'reset', true);
+    \model\message::severe('sys017', \model\lexi::get('', 'msg017', $vexc->getMessage()), 'reset', true);
 } catch (Exception $exc) {
-    \model\message::severe('sys017',\model\lexi::get('','sys017',$exc->getMessage()), 'reset', true);
+    \model\message::severe('sys017',\model\lexi::get('','msg017',$exc->getMessage()), 'reset', true);
 }
 
 require \model\route::script('logout.php');

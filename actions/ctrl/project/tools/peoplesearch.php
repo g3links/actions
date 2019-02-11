@@ -6,13 +6,13 @@ $search = '';
 if (filter_input(INPUT_GET, 'search') !== null) 
     $search = filter_input(INPUT_GET, 'search');
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 require_once \model\route::script('style.php');
 $data = [
     'searchpeopleroute' => \model\route::form('project/tools/viewpeoplesearch.php?search=[search]'),
-    'lbl_search' => $lexi['sys049'],
+    'lbl_search' => $lexi['prj049'],
     'search' => $search,
-    'lbl_tip' => $lexi['sys088'],
+    'lbl_tip' => $lexi['prj088'],
 ];
 \model\route::render('project/tools/peoplesearch.twig', $data);
 

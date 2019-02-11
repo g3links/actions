@@ -2,7 +2,7 @@
     <head>
         <title>{{ pagetitle }}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
-<!--        <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+        <!--        <meta name="viewport" content="width=device-width, initial-scale=1"> -->
 
         <link rel="shortcut icon" href="{{ host }}g3links.ico" type="image/x-icon" >
         <script src="{{ host }}model/script/g3frames.js"></script>
@@ -35,7 +35,7 @@
 
             {% if showstartpage %} 
                 // custom startup page
-                console.log('load startup page')
+                console.log('load startup page: {{ welcomepage }}')
                 $('#welcomepage').show();
                 document.getElementById('welcomepage').src = '{{ welcomepage }}';
             {% endif %} 
@@ -54,8 +54,9 @@
             </div>
 
             {% if showstartpage %} 
-                <iframe class="startupPage" id="welcomepage"></iframe>
-                {% endif %} 
+                <iframe class="startupPage" id="welcomepage" >
+                </iframe>
+            {% endif %} 
         </div>
 
         <div id="message"></div>

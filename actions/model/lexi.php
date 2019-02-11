@@ -8,7 +8,7 @@ class lexi {
     private static $lexi = [];
     const language = 'en';
     const country = 'US';
-    const syspackage = "sysmssg";
+    const syspackage = "g3";
     const pathlexifiles = '{0}theme/lexi/{1}/{2}.json';
 
     public static function getLang() {
@@ -29,11 +29,8 @@ class lexi {
         return self::language . '-' . self::country;
     }
     
-    public static function getall($package) {
-        if (!isset($package)) 
-            return [];
-
-        if (empty($package)) 
+    public static function getall($package = null) {
+        if (!isset($package) || empty($package)) 
             $package = self::syspackage;
 
         $filename = \model\utils::format(self::pathlexifiles, DIR_APP .'/', $package, self::getLang());
@@ -61,8 +58,8 @@ class lexi {
             return '';
 
         $package = $rawargs[0];
-        if (!isset($package)) 
-            return '';
+        if (!isset($package) || empty($package)) 
+            $package = self::syspackage;
 
         unset($rawargs[0]);
         $key = $rawargs[1];

@@ -21,16 +21,16 @@ foreach ($roles as $role) {
 // get role name from roles list
 $userrole = \model\utils::firstOrDefault($roles, '$v->idrole === '. (new \model\project)->getuserrole(\model\env::session_idproject())->idrole);
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 require_once \model\route::script('style.php');
 $data = [
     'roles' => $roles,
     'roledescription' => $userrole->name ?? '',
     'updatesecurityroute' => \model\route::form('project/security/m_security.php?idproject={0}&seccode=[seccode]', \model\env::session_idproject()),
-    'lbl_mysecurity' => $lexi['sys048'],
-    'th_col1' => $lexi['sys019'],
-    'th_col2' => $lexi['sys043'],
-    'th_col3' => $lexi['sys048'],
-    'lbl_notfound' => $lexi['sys044'],
+    'lbl_mysecurity' => $lexi['prj048'],
+    'th_col1' => $lexi['prj019'],
+    'th_col2' => $lexi['prj043'],
+    'th_col3' => $lexi['prj048'],
+    'lbl_notfound' => $lexi['prj044'],
 ];
 \model\route::render('project/security/index.twig', $data);

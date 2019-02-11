@@ -16,7 +16,7 @@ if (filter_input(INPUT_POST, 'passw') !== null)
     $user->logintoken = filter_input(INPUT_POST, 'passw');
 
 if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) 
-    \model\message::severe('sys030', \model\lexi::get('', 'sys030',$user->email));
+    \model\message::severe('sys030', \model\lexi::get('', 'msg030',$user->email));
 
 $modeluser->setuserprofile($user, 'g3/*/resetemail.html');
 

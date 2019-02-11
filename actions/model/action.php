@@ -528,7 +528,7 @@ class action extends \model\dbconnect {
 
         $user = (new \model\user)->getuser($iduser);
 
-        $note_text = \model\lexi::get('', 'sys010', $user->name);
+        $note_text = \model\lexi::get('', 'msg010', $user->name);
         $this->_insertcomment($idtask, $username, \model\env::COMMENT_USER, $note_text);
     }
 
@@ -542,7 +542,7 @@ class action extends \model\dbconnect {
 
         $group = $this->_getprojectgroup($idgroup);
 
-        $note_text = \model\lexi::get('', 'sys011', $group->groupname);
+        $note_text = \model\lexi::get('', 'msg011', $group->groupname);
         $this->_insertcomment($idtask, $username, \model\env::COMMENT_USER, $note_text);
     }
 
@@ -568,7 +568,7 @@ class action extends \model\dbconnect {
         $projectname = (new \model\project)->getproject($this->src->idproject)->title ?? '';
 
 //register message
-        $note_text = \model\lexi::get('', 'sys015', $userassigned->name);
+        $note_text = \model\lexi::get('', 'msg015', $userassigned->name);
         $this->addSystemNote($note_text, (string) $idtask);
         $this->_insertcomment($idtask, $username, \model\env::COMMENT_USER, $note_text);
 
@@ -598,7 +598,7 @@ class action extends \model\dbconnect {
         if ($lastinderted === false)
             return false;
 
-        $note_text = \model\lexi::get('', 'sys015', $projgroup->groupname);
+        $note_text = \model\lexi::get('', 'msg015', $projgroup->groupname);
         $this->addSystemNote($note_text, (string) $idtask);
         $this->_insertcomment($idtask, $username, \model\env::COMMENT_USER, $note_text);
     }
@@ -655,7 +655,7 @@ class action extends \model\dbconnect {
 
         if ($lastIdInserted > 0) {
             //insert commend
-            $val = \model\lexi::get('', 'sys006');
+            $val = \model\lexi::get('', 'msg006');
             $this->_insertcomment($lastIdInserted, $username, \model\env::COMMENT_SYS, $val);
 
             $note_text = $val . ': ' . $title;
@@ -802,7 +802,7 @@ class action extends \model\dbconnect {
             $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_USER, $naction->commenttext);
         }
 
-        $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_SYS, \model\lexi::get('', 'sys005'));
+        $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_SYS, \model\lexi::get('', 'msg005'));
     }
 
     public function setActionGate($idgate, $idtask, $emailadvicefilename) {
@@ -820,7 +820,7 @@ class action extends \model\dbconnect {
 
         $gatename = $this->getGate($idgate)->name ?? '';
         //insert comment
-        $texto = \model\lexi::get('', 'sys003') . ": " . $gatename;
+        $texto = \model\lexi::get('', 'msg003') . ": " . $gatename;
 
         $this->_insertcomment(\model\env::session_idtaskselected(), \model\env::getUserName(), \model\env::COMMENT_USER, $texto);
 
@@ -837,7 +837,7 @@ class action extends \model\dbconnect {
             return;
 
         $task = $this->getTaskById($idtask);
-        $texto = \model\lexi::get('', 'sys013', $task->title);
+        $texto = \model\lexi::get('', 'msg013', $task->title);
         $this->_insertcomment($idtaskselected, $username, \model\env::COMMENT_USER, $texto);
     }
 
@@ -850,7 +850,7 @@ class action extends \model\dbconnect {
         if ($this->_setSubAction($idtask, $idparent) === false)
             return;
 
-        $texto = \model\lexi::get('', 'sys012', $action->title);
+        $texto = \model\lexi::get('', 'msg012', $action->title);
         $this->_insertcomment($idparent, $username, \model\env::COMMENT_USER, $texto);
     }
 
@@ -858,9 +858,9 @@ class action extends \model\dbconnect {
         if ($this->_setFlagFileAttachedTask($idtask, $hasattach) === false)
             return;
 
-        $texto = \model\lexi::get('', 'sys008') . ": " . $filename;
+        $texto = \model\lexi::get('', 'msg008') . ": " . $filename;
         if (!$isupload)
-            $texto = \model\lexi::get('', 'sys009') . ": " . $filename;
+            $texto = \model\lexi::get('', 'msg009') . ": " . $filename;
 
         $this->addSystemNote($texto, (string) $idtask);
         $this->_insertcomment($idtask, $username, \model\env::COMMENT_USER, $texto);
@@ -900,7 +900,7 @@ class action extends \model\dbconnect {
         $config = \model\env::getConfig('filelimits', \model\env::CONFIG_ACTIONS, $this->src->idproject);
         $maxsize = ($config->attachedfile ?? 5) * 1024 * 1024;        
         if ($filesize > $maxsize) {
-            \model\message::render(\model\lexi::get('', 'sys027'));
+            \model\message::render(\model\lexi::get('', 'msg027'));
             return false;
         }
 
@@ -908,7 +908,7 @@ class action extends \model\dbconnect {
 
         $entrygate = $this->getDefaultGate();
         if ($action->idgate !== \trim($entrygate)) {
-            \model\message::render(\model\lexi::get('', 'sys028', $entrygate));
+            \model\message::render(\model\lexi::get('', 'msg028', $entrygate));
             return false;
         }
 
@@ -924,7 +924,7 @@ class action extends \model\dbconnect {
 // Check whether file exists before uploading it
         $targetname = $folderpath . $filename;
         if (file_exists($targetname)) {
-            \model\message::render(\model\lexi::get('', 'sys029'));
+            \model\message::render(\model\lexi::get('', 'msg029'));
             return false;
         }
 
@@ -1135,7 +1135,7 @@ class action extends \model\dbconnect {
                 continue;
 
             if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
-                \model\message::render(\model\lexi::get('', 'sys030', $user->email));
+                \model\message::render(\model\lexi::get('', 'msg030', $user->email));
                 continue;
             }
 
@@ -1148,7 +1148,7 @@ class action extends \model\dbconnect {
                 $emailstring[] = $line;
             }
 
-            \model\env::sendMail($user->name, $user->email, \model\lexi::get('', 'sys005') . ': ' . $taskname, $emailstring);
+            \model\env::sendMail($user->name, $user->email, \model\lexi::get('', 'msg005') . ': ' . $taskname, $emailstring);
         }
     }
 
@@ -1535,7 +1535,7 @@ class action extends \model\dbconnect {
             }
             $this->endTransaction();
 
-            $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_USER, \model\lexi::get('', 'sys016', $taskholddescription));
+            $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_USER, \model\lexi::get('', 'msg016', $taskholddescription));
         }
     }
 
@@ -1601,7 +1601,7 @@ class action extends \model\dbconnect {
             if ($allok !== false) {
                 $categtext = \model\utils::format('({0}) {1}', $tracking->idcategory, $this->getCategory($tracking->idcategory));
                 $tracktext = \model\utils::format('({0}) {1}', $tracking->idtrack, $this->geTrack($tracking->idtrack));
-                $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_USER, \model\lexi::get('', 'sys014', $categtext, $tracktext));
+                $this->_insertcomment($idtask, \model\env::getUserName(), \model\env::COMMENT_USER, \model\lexi::get('', 'msg014', $categtext, $tracktext));
             }
         }
 
@@ -1748,7 +1748,7 @@ class action extends \model\dbconnect {
             return false;
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            \model\message::render(\model\lexi::get('', 'sys030', $email));
+            \model\message::render(\model\lexi::get('', 'msg030', $email));
             return;
         }
 
@@ -1759,7 +1759,7 @@ class action extends \model\dbconnect {
             $line = str_replace('[taskname]', $taskname, $line);
             $emailstring[] = $line;
         }
-        $texto = \model\lexi::get('', 'sys031', $taskname, $name);
+        $texto = \model\lexi::get('', 'msg031', $taskname, $name);
         \model\env::sendMail($name, $email, $texto, $emailstring);
     }
 
@@ -1876,7 +1876,7 @@ class action extends \model\dbconnect {
         if ($source !== \model\env::COMMENT_SYS) {
             $action = $this->gettaskById($idtask);
             if (isset($action)) {
-                $note_text = \model\lexi::get('', 'sys007') . ': ' . $action->title . ' -> ' . $description;
+                $note_text = \model\lexi::get('', 'msg007') . ': ' . $action->title . ' -> ' . $description;
                 $this->addSystemNote($note_text, (string) $idtask);
             }
         }
@@ -2175,7 +2175,7 @@ class action extends \model\dbconnect {
                 $this->_insertprojgroupuser($lastrowid, $selectedusers);
 
                 if ($lastrowid !== false) {
-                    $texto = \model\lexi::get('', 'sys039') . ' -> ' . $groupname;
+                    $texto = \model\lexi::get('', 'msg039') . ' -> ' . $groupname;
                     $this->addSystemNote($texto);
                 }
             }
@@ -2196,7 +2196,7 @@ class action extends \model\dbconnect {
                 //register email invitation, this record will remain until user accept or revoke
                 $this->executeSql('DELETE FROM projgroup WHERE idgroup = ?', (int) $idgroup);
 
-                $texto = \model\lexi::get('', 'sys038') . ' -> ' . $group->groupname;
+                $texto = \model\lexi::get('', 'msg038') . ' -> ' . $group->groupname;
                 $this->addSystemNote($texto);
             }
         }
@@ -2409,7 +2409,7 @@ class action extends \model\dbconnect {
 
     public function setprojectowner($iduser) {
         if (!(new \model\user)->isActive($iduser)) {
-            \model\message::render(\model\lexi::get('', 'sys070', $iduser));
+            \model\message::render(\model\lexi::get('', 'msg070', $iduser));
             return false;
         }
 
@@ -2422,7 +2422,7 @@ class action extends \model\dbconnect {
         $lastrowid = $this->executeSql('INSERT INTO projectowner (iduser) VALUES (?)', (int) $iduser);
 
         if ($lastrowid > 0) {
-            $texto = \model\lexi::get('', 'sys057', $this->src->idproject, $iduser);
+            $texto = \model\lexi::get('', 'msg057', $this->src->idproject, $iduser);
             $this->addSystemNote($texto);
         }
 
@@ -2590,7 +2590,7 @@ class action extends \model\dbconnect {
         //add new subscription
         $lastinserted = $this->executeSql('INSERT INTO sharedataproj (deleted, idproject, setname, requirerefresh) VALUES (?, ?, ?, ?)', 0, (int) $idprojectsubscriber, (string) $modulename, 0);
 
-        $note_text = \model\lexi::get('', 'sys040', $project->title, $modulename);
+        $note_text = \model\lexi::get('', 'msg040', $project->title, $modulename);
         $this->addSystemNote($note_text);
 
         return $lastinserted;
@@ -2708,7 +2708,7 @@ class action extends \model\dbconnect {
         }
 
         if ($sucess) {
-            $texto = \model\lexi::get('', 'sys037', $modulename, \model\utils::formatBooleanToString($isshared));
+            $texto = \model\lexi::get('', 'msg037', $modulename, \model\utils::formatBooleanToString($isshared));
             $this->addSystemNote($texto);
         }
     }
@@ -2716,7 +2716,7 @@ class action extends \model\dbconnect {
     private function _updateSharedProjModule($modulename, $idsharedataproj, $deleted) {
         $this->executeSql('UPDATE sharedataproj SET deleted = ?, inactiveon = ? WHERE idsharedataproj = ?', (int) $deleted, \model\utils::forDatabaseDateTime(new \DateTime()), \model\utils::formatBooleanToInt($idsharedataproj));
 
-        $texto = \model\lexi::get('', 'sys041', $modulename, $idsharedataproj, $deleted);
+        $texto = \model\lexi::get('', 'msg041', $modulename, $idsharedataproj, $deleted);
         $this->addSystemNote($texto);
     }
 

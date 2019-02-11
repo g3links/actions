@@ -16,7 +16,7 @@ if (filter_input(INPUT_POST, 'callback') !== null)
 
 $user = (new \model\user)->getuser($iduser);
 if (!isset($user)) {
-    echo \model\utils::format('<h3 style="color: red;">{0}</h3>',\model\lexi::get('g3', 'sys031'));
+    echo \model\utils::format('<h3 style="color: red;">{0}</h3>',\model\lexi::get('', 'sys031'));
     die();
 }
 

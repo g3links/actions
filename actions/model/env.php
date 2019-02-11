@@ -257,7 +257,7 @@ final class env {
 
     public static function validateUserToken($token) {
         $sucess = false;
-        $errormssg = \model\lexi::get('', 'sys004');
+        $errormssg = \model\lexi::get('', 'msg004');
 
         if (isset($token) && self::isauthorized()) {
             try {
@@ -305,7 +305,7 @@ final class env {
         $result = self::_isuserallow($idproject, self::$app_iduser, $seccode, self::$user_accessid);
 
         if (isset($source) && !$result)
-            \model\message::render(\model\lexi::get('', 'sys053', $seccode), $source);
+            \model\message::render(\model\lexi::get('', 'msg053', $seccode), $source);
 
         return $result;
     }
@@ -491,7 +491,7 @@ final class env {
     public static function sendMail($membername, $memberemail, $subject, $mailbodyArray) {
         $mssgError = (new \model\mailer)->sendMail(self::getConfig('mailer'), $membername, $memberemail, $subject, $mailbodyArray);
         if (isset($mssgError))
-            \model\message::render(\model\lexi::get('', 'sys074', $mssgError));
+            \model\message::render(\model\lexi::get('', 'msg074', $mssgError));
     }
 
 }

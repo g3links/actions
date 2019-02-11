@@ -78,7 +78,7 @@ if ($action->isroleupdate) {
             'lbl_titleedit' => $lexi['sys067'],
             'lbl_titlesubtask' => $lexi['sys005'],
             'edittaskroute' => \model\route::form('actions/action/m_edittask.php?idproject={0}&idtask={1}', \model\env::session_idproject(), \model\env::session_idtaskselected()),
-            'newactionroute' => \model\route::window('newaction', ['actions/actionnew/index.php?idproject={0}&idtask={1}', \model\env::session_idproject(), \model\env::session_idtaskselected()], \model\env::session_idproject(), \model\lexi::get('g3/project', 'sys009')),
+            'newactionroute' => \model\route::window('newaction', ['actions/actionnew/index.php?idproject={0}&idtask={1}', \model\env::session_idproject(), \model\env::session_idtaskselected()], \model\env::session_idproject(), \model\lexi::get('', 'prj009')),
         ];
     }
     if ($action->allowedit & $action->isroletrack) {

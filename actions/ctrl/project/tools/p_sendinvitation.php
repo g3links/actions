@@ -16,12 +16,12 @@ if (filter_input(INPUT_GET, 'email') !== null)
 if (filter_input(INPUT_POST, 'email') !== null) 
     $email = filter_input(INPUT_POST, 'email');
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 require_once \model\route::script('style.php');
 
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    \model\message::render(\model\utils::format($lexi['sys070'], $email));
+    \model\message::render(\model\utils::format($lexi['prj070'], $email));
 } else {
     // get email string
     $filename = \model\route::render('g3/*/requestinvitation.html');
@@ -35,8 +35,8 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $emailstring[] = $line;
     }
 
-    \model\env::sendMail($name, $email, \model\utils::format($lexi['sys089'], \model\env::getUserName()), $emailstring);
-    \model\message::render(\model\utils::format($lexi['sys068'], $name, $email));
+    \model\env::sendMail($name, $email, \model\utils::format($lexi['prj089'], \model\env::getUserName()), $emailstring);
+    \model\message::render(\model\utils::format($lexi['prj068'], $name, $email));
 }
 
 \model\route::close(\model\env::session_idproject(),'tool');

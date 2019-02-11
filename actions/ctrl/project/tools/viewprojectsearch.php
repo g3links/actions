@@ -8,12 +8,12 @@ if (filter_input(INPUT_GET, 'search') !== null)
 
 $limit = 25;
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 $data = [
-    'lbl_title' => $lexi['sys046'],
-    'th_col1' => $lexi['sys082'],
-    'th_col2' => $lexi['sys084'],
-    'lbl_notfound' => $lexi['sys044'],
+    'lbl_title' => $lexi['prj046'],
+    'th_col1' => $lexi['prj082'],
+    'th_col2' => $lexi['prj084'],
+    'lbl_notfound' => $lexi['prj044'],
     'projects' => (new \model\project)->getpublicprojects($search, $limit),
 ];
 \model\route::render('project/tools/viewprojectsearch.twig', $data);

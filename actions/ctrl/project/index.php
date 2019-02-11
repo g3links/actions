@@ -2,12 +2,12 @@
 
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
-$lexi = \model\lexi::getall('g3/project');
+$lexi = \model\lexi::getall();
 require_once \model\route::script('style.php');
 
 $project = (new \model\project)->getproject(\model\env::session_idproject());
 if (!isset($project)) 
-    \model\message::severe('sys013', $lexi['sys013']);
+    \model\message::severe('sys013', $lexi['prj013']);
 
 if (!empty(\trim($project->startuppath))) {
     //custom URL provided
@@ -20,7 +20,7 @@ if (!empty(\trim($project->startuppath))) {
 } else {
     if (!empty(\trim($project->remoteurl))) {
         // remote actions url
-        \model\route::open('actions', $project->remoteurl, \model\env::session_idproject(), \model\lexi::get('g3', 'sys006'), \model\env::getUserName());
+        \model\route::open('actions', $project->remoteurl, \model\env::session_idproject(), \model\lexi::get('', 'sys006'), \model\env::getUserName());
     } else {
         // regular project actions
         require \model\route::script('actions/index.php?idproject={0}', \model\env::session_idproject());

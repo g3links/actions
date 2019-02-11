@@ -4,7 +4,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 $result = (new \model\user)->getProfileSession();
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 
 require_once \model\route::script('style.php');
 $data = [

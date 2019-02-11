@@ -8,7 +8,7 @@ $idnote = 0;
 if(filter_input(INPUT_GET, 'idnote') !== null) 
     $idnote = (int) filter_input(INPUT_GET, 'idnote');
         
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 $data = [
     'idnote' => $idnote,
     'lbl_action' => \model\action::NOTE_REPLY,

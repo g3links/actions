@@ -370,7 +370,7 @@ class project extends \model\dbconnect {
         if ($lastrowid == 0)
             return false;
 
-        $texto = \model\lexi::get('', 'sys065', $user->name);
+        $texto = \model\lexi::get('', 'msg065', $user->name);
         $this->src->idproject = $idproject;
         (new \model\action($this->src))->addSystemNote($texto);
 
@@ -401,7 +401,7 @@ class project extends \model\dbconnect {
 
         $this->executeSql('UPDATE project SET title = ?, description = ?, prefix = ?, ticketseq = ?, startuppath = ?, startupwidth = ?, ispublic = ?, marketname = ?, remoteurl = ?, idcurrency = ? WHERE idproject = ?', trim((string) $updateproj->title), trim((string) $updateproj->description), trim((string) $updateproj->prefix), trim((int) $updateproj->ticketseq), trim((string) $updateproj->startuppath), trim((string) $updateproj->startupwidth), \model\utils::formatBooleanToInt($updateproj->ispublic), trim((string) $updateproj->marketname), trim((string) $updateproj->remoteurl), trim((string) $updateproj->idcurrency), (int) $idproject);
 
-        $texto = \model\lexi::get('', 'sys061', $updateproj->title);
+        $texto = \model\lexi::get('', 'msg061', $updateproj->title);
         // do not broadcast changes to users, there's no sync while looping and sending messages 
 
         $this->src->idproject = $idproject;
@@ -419,7 +419,7 @@ class project extends \model\dbconnect {
         $this->executeSql('UPDATE project SET deleted = 1 WHERE idproject = ?', (int) $idproject);
 
         // send message to project users
-        $statusname = \model\lexi::get('g3/project', 'sys024');
+        $statusname = \model\lexi::get('', 'prj024');
         $emailsubject = $statusname . ': ' . $project->title;
 // get email string
         $activeusers = $this->getactiveusersinproject($idproject);
@@ -456,10 +456,10 @@ class project extends \model\dbconnect {
 
         $user = (new \model\user)->getuser($targetiduser);
         if (!isset($user))
-            \model\message::render(\model\lexi::get('g3/project', 'sys067'));
+            \model\message::render(\model\lexi::get('', 'prj067'));
 
         $projecttitle = $this->getproject($idproject)->title;
-        $subject = \model\utils::format(\model\lexi::get('g3/project', 'sys071'), $username, $projecttitle);
+        $subject = \model\utils::format(\model\lexi::get('', 'prj071'), $username, $projecttitle);
         $filename = \model\route::render($emailadvicefilename);
 
         $mailbody = [];
@@ -479,7 +479,7 @@ class project extends \model\dbconnect {
         $this->executeSql('INSERT INTO projectinvitation (idproject, iduser, iduserinvited, usernameinvited, useremailinvited, idrole, securekey) VALUES (?, ?, ?, ?, ?, ?, ?)', (int) $idproject, $this->src->iduser, (int) $targetiduser, (string) $user->name, (string) $user->email, (int) $memberrole, "");
         $this->endTransaction();
 
-        \model\message::render(\model\utils::format(\model\lexi::get('g3/project', 'sys068'), $user->name, $user->email));
+        \model\message::render(\model\utils::format(\model\lexi::get('', 'prj068'), $user->name, $user->email));
     }
 
     public function insertprojuserinvitation($idprojectinv) {
@@ -503,7 +503,7 @@ class project extends \model\dbconnect {
         //all good, remove invitation
         $this->executeSql('DELETE FROM projectinvitation WHERE idprojectinv =  ?', (int) $idprojectinv);
 
-        $texto = \model\lexi::get('', 'sys064', $projectinvitation->usernameinvited, $projectinvitation->useremailinvited);
+        $texto = \model\lexi::get('', 'msg064', $projectinvitation->usernameinvited, $projectinvitation->useremailinvited);
 
         $this->src->idproject = $projectinvitation->idproject;
         (new \model\action($this->src))->addSystemNote($texto);
@@ -520,7 +520,7 @@ class project extends \model\dbconnect {
 
         $this->executeSql('DELETE FROM projectinvitation WHERE idprojectinv = ?', (int) $idprojectinv);
 
-        $texto = \model\lexi::get('', 'sys063', $idprojectinv, $invitation->iduserinvited);
+        $texto = \model\lexi::get('', 'msg063', $idprojectinv, $invitation->iduserinvited);
 
         $tis->src->idproject = $invitation->idproject;
         (new \model\action($this->src))->addSystemNote($texto);
@@ -544,7 +544,7 @@ class project extends \model\dbconnect {
         $lastinsertedid = $this->executeSql('INSERT INTO projectuser (idproject,iduser,idrole,inactive,idaccess) VALUES (?, ?, ?, ?, ?)', (int) $idproject, (int) $targetiduser, (int) $idrole, \model\utils::formatBooleanToInt($inactive), (int) $idaccess);
 
         $this->src->idproject = $idproject;
-        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'sys066'));
+        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg066'));
 
         return $lastinsertedid;
     }
@@ -562,7 +562,7 @@ class project extends \model\dbconnect {
         $this->executeSql('UPDATE projectuser SET idrole = ?, inactive = ?, idaccess = ? WHERE idproject = ? AND iduser = ?', (int) $idrole, \model\utils::formatBooleanToInt($inactive), (int) $idaccess, (int) $idproject, (int) $targetiduser);
 
         $this->src->idproject = $idproject;
-        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'sys066'));
+        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg066'));
     }
 
     public function restoreproject($idproject, $emailadvicefilename) {
@@ -576,7 +576,7 @@ class project extends \model\dbconnect {
         $activeusers = $this->getactiveusersinproject($idproject);
 
         // send message to project users
-        $statusname = \model\lexi::get('g3/project', 'sys114');
+        $statusname = \model\lexi::get('', 'prj114');
         $emailsubject = $statusname . ': ' . $project->title;
 // get email string
         $filename = \model\route::render($emailadvicefilename);
@@ -596,7 +596,7 @@ class project extends \model\dbconnect {
         }
 
         $this->src->idproject = $idproject;
-        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'sys069'));
+        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg069'));
     }
 
     public function deleteService($idproject, $modulename) {
@@ -606,7 +606,7 @@ class project extends \model\dbconnect {
 
         $this->executeSql('DELETE FROM projectservice WHERE idproject = ? AND name = ?', (int) $idproject, (string) $modulename);
 
-        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'sys042', $modulename));
+        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg042', $modulename));
     }
 
     public function updateService($idproject, $modulename, $template) {
@@ -621,7 +621,7 @@ class project extends \model\dbconnect {
         if (!isset($result))
             $this->executeSql('INSERT INTO projectservice (idproject, name, template) VALUES (?, ?, ?)', (int) $idproject, (string) $modulename, (string) $template);
 
-        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'sys043', $modulename, $template));
+        (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg043', $modulename, $template));
     }
 
     public function setuseridproject($idproject) {

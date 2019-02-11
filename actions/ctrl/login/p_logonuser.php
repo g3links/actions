@@ -7,7 +7,7 @@ $username = '';
 $uk = '';
 
 if (filter_input(INPUT_POST, 'logon') === null) 
-    $messageerror = \model\lexi::get('g3', 'sys043');
+    $messageerror = \model\lexi::get('', 'sys043');
 
 // intent to register a new account
 if (filter_input(INPUT_POST, 'emaillogon') !== null) 
@@ -15,7 +15,7 @@ if (filter_input(INPUT_POST, 'emaillogon') !== null)
 
 // stop no valid email
 if (empty($emaillogon)) 
-    $messageerror = \model\lexi::get('g3', 'sys043');
+    $messageerror = \model\lexi::get('', 'sys043');
 
 
 if (filter_input(INPUT_POST, 'pwdlogon') !== null) 
@@ -23,7 +23,7 @@ if (filter_input(INPUT_POST, 'pwdlogon') !== null)
 
 $user = (new \model\user)->getuserByEmail($emaillogon);
 if (!isset($user)) 
-    $messageerror = \model\lexi::get('g3', 'sys031');
+    $messageerror = \model\lexi::get('', 'sys031');
 
 $callback = '';
 if (filter_input(INPUT_POST, 'callback') !== null) 

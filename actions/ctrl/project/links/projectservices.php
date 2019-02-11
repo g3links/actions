@@ -29,9 +29,9 @@ $data = [
     'template' => $template,
     'servicetype' => $servicetype,
     'updateprojectservicesroute' => \model\route::form('project/links/p_projectservices.php?idproject={0}&module={1}&modulename={2}&type={3}', \model\env::session_idproject(), $module, $modulename, $servicetype),
-    'lbl_disabled' => \model\lexi::get('g3', 'sys071'),
-    'lbl_enabled' => \model\lexi::get('g3', 'sys072'),
-    'lbl_custom' => \model\lexi::get('g3', 'sys074'),
-    'lbl_submit' => \model\lexi::get('g3', 'sys073'),
+    'lbl_disabled' => \model\lexi::get('', 'sys071'),
+    'lbl_enabled' => \model\lexi::get('', 'sys072'),
+    'lbl_custom' => \model\lexi::get('', 'sys074'),
+    'lbl_submit' => \model\lexi::get('', 'sys073'),
 ];
 \model\route::render('project/links/projectservices.twig', $data);

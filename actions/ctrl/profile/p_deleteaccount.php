@@ -4,7 +4,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 (new \model\user)->confirmDeleteAccountEmail('g3/*/closeaccount.html');
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 $data = [
     'lbl_security' => $lexi['sys018'],
     'lbl_username' => $lexi['sys025'],

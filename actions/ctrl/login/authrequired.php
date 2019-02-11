@@ -2,7 +2,7 @@
 
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 
 $data = [
     'lbl_security' => $lexi['sys018'],

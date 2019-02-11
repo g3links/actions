@@ -4,7 +4,7 @@ require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
 $result = (new \model\action(\model\env::session_src()))->getTotalActiveActions(\model\env::getUserIdProject());
 
-$lexi = \model\lexi::getall('g3');
+$lexi = \model\lexi::getall();
 $data = [
     'total' => $result->mytodos,
     'totalHold' => $result->mytodoshold,
