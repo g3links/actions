@@ -8,15 +8,15 @@ $lexiproject = \model\lexi::getall();
 $t_shared = $lexiproject['prj003'];
 
 //load custom apps setup:
-if (\file_exists(DIR_APP . '/ctrl/g3ext')) {
-    $pathextservices = DIR_APP . '/ctrl/g3ext';
+if (\file_exists(DIR_APP . '/ctrl/ext')) {
+    $pathextservices = DIR_APP . '/ctrl/ext';
     $dirfiles = \scandir($pathextservices);
 
     foreach ($dirfiles as $file) {
         if ($file[0] !== '.') {
             $filename = \model\utils::format('{0}/{1}/setup.php', $pathextservices, $file);
             if (\is_file($filename)) {
-                $appfilename = \model\utils::format('g3ext/{0}/setup.php', $file);
+                $appfilename = \model\utils::format('ext/{0}/setup.php', $file);
                 require \model\route::script($appfilename);
             }
         }
