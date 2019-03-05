@@ -220,7 +220,6 @@ class utils {
     }
 
     public static function http_get_contents($url) {
-//            error_log(curl_error('mesaje de get messages'));
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_TIMEOUT, 1);
         curl_setopt($ch, CURLOPT_URL, $url);

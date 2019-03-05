@@ -143,7 +143,7 @@ class user extends \model\dbconnect {
     }
 
     public function search($search, $take) {
-        $search = \model\utils::getSearchText($search);        
+        $search = \model\utils::getSearchText($search);
         return $this->getRecords('SELECT name,email,iduser FROM user WHERE ( name LIKE ? OR email LIKE ? ) AND deleted = ? AND isvalidated = ? LIMIT ?', $search, $search, 0, 0, (int) $take);
     }
 
@@ -152,14 +152,14 @@ class user extends \model\dbconnect {
         return $this->getRecords('SELECT name,email FROM user WHERE name LIKE ? OR email LIKE ? LIMIT ?', $search, $search, (int) $take);
     }
 
-    public function getuserByToken($idToken, $logonservice, $useremail) {
+    private function _getuserByToken($idToken, $logonservice, $useremail) {
         if (!isset($idToken) || empty($idToken))
             return null;
 
         return $this->getRecord('SELECT user.iduser,user.lastaccesson,user.deleted,user.isvalidated,user.email,user.name,user.keyname FROM user LEFT JOIN userprovider USING ( iduser ) WHERE userprovider.token = ? AND userprovider.idprovider = ? AND user.email = ?', \trim((string) $idToken), \trim((string) $logonservice), (string) $useremail);
     }
 
-    public function getUserLogonByEmail($token, $logonservice, $useremail = null) {
+    private function _getUserLogonByEmail($token, $logonservice, $useremail = null) {
         if (!isset($useremail) || empty($useremail))
             return null;
 
@@ -204,7 +204,7 @@ class user extends \model\dbconnect {
         return $user;
     }
 
-    public function isAuthorizationConfirm($iduser, $provider) {
+    private function _isAuthorizationConfirm($iduser, $provider) {
         $needauth = $this->_getAuth($iduser, $provider);
         if (isset($needauth)) {
             if ($needauth->isauth) {
@@ -229,10 +229,10 @@ class user extends \model\dbconnect {
         $data = ['pr' => $logonservice, 'email' => $useremail];
         $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
 
-        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        $user = $this->_getuserByToken($loginid, $logonservice, $useremail);
         return isset($user);
     }
-    
+
     private function _updatetoken($iduser, $token, $logonservice, $email = null) {
         if (empty($token)) {
             $this->executeSql('DELETE FROM userprovider WHERE iduser = ? AND idprovider = ?', (int) $iduser, (string) $logonservice);
@@ -281,7 +281,7 @@ class user extends \model\dbconnect {
             return;
         }
     }
-    
+
     private function _authEmail($iduser, $provider, $name, $email, $providertoken) {
         // 24 hours before exprire
         $config = \model\env::getConfig('api');
@@ -303,7 +303,7 @@ class user extends \model\dbconnect {
 
         \model\env::sendMail($name, $email, \model\lexi::get('', 'sys024'), $emailstring);
     }
-    
+
     public function resetUserPassword($iduser, $logonservice) {
         $this->_updatetoken($iduser, '', $logonservice);
         $this->_deleteAuthUser($iduser, $logonservice);
@@ -343,7 +343,7 @@ class user extends \model\dbconnect {
         $this->_updatetoken($iduser, $token, $logonservice, $email);
     }
 
-    public function setAuthEmailSent($iduser, $provider, $idToken) {
+    private function _setAuthEmailSent($iduser, $provider, $idToken) {
         $this->executeSql('UPDATE needauth SET issend = ? WHERE iduser = ? AND provider = ?', 1, (int) $iduser, trim((string) $provider));
 
         $this->_updatetoken($iduser, $idToken, $provider);
@@ -468,7 +468,7 @@ class user extends \model\dbconnect {
 
         $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, "provider" => LOGINSRV];
         $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
-        $token = \model\utils::format('{0}/{1}/{2}',ROOT_APP, $config->url, \model\route::url('reset.php?tokenauth={0}', $jwttoken));
+        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('reset.php?tokenauth={0}', $jwttoken));
 
 // get email string
         $filename = \model\route::render('g3/*/resetpassword.html');
@@ -487,7 +487,7 @@ class user extends \model\dbconnect {
     }
 
     public function registerTokenUser($useremail, $logonservice, $loginid) {
-        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        $user = $this->_getuserByToken($loginid, $logonservice, $useremail);
         if (!isset($user))
             return;
 
@@ -498,16 +498,33 @@ class user extends \model\dbconnect {
         (new \model\env)->saveSession($user->iduser, $user->email);
     }
 
-    public function registerUser($useremail, $logonservice, $logintoken, $callback = '') {
+    private function _getUserLoginId($useremail, $logonservice, $logintoken) {
         $data = ['pr' => $logonservice, 'email' => $useremail];
-        $loginid = \Firebase\JWT\JWT::encode($data, $logintoken);
+        return \Firebase\JWT\JWT::encode($data, $logintoken);
+    }
+
+    public function getUserSessionToken($useremail, $logonservice, $logintoken) {
+        $loginid = $this->_getUserLoginId($useremail, $logonservice, $logintoken);
+
+        $user = $this->_getuserByToken($loginid, $logonservice, $useremail);
+        if (!isset($user->iduser) || $user->isvalidated || $user->deleted)
+            return false;
+
+        if (!$this->_isAuthorizationConfirm($user->iduser, $logonservice))
+            return false;
+
+        return (new \model\env)->getUserSessionToken($user->iduser, $user->email);
+    }
+
+    public function registerUser($useremail, $logonservice, $logintoken, $callback = '') {
+        $loginid = $this->_getUserLoginId($useremail, $logonservice, $logintoken);
 
 //        $modeluser = new \model\user();
 //*******************************
 //get user by provider only (must be registered)
 //*******************************
         //find user email + token
-        $user = $this->getuserByToken($loginid, $logonservice, $useremail);
+        $user = $this->_getuserByToken($loginid, $logonservice, $useremail);
         if (!isset($user->iduser)) {
             // call was made to validate iidentity only
             if (!empty($callback)) {
@@ -519,7 +536,7 @@ class user extends \model\dbconnect {
             }
 
             //user not found, find user by email
-            $user = $this->getUserLogonByEmail($loginid, $logonservice, $useremail);
+            $user = $this->_getUserLogonByEmail($loginid, $logonservice, $useremail);
             if (!isset($user->iduser)) {
                 $messageerror = \model\lexi::get('', 'sys031');
                 require \model\route::script('login/index.php');
@@ -538,7 +555,7 @@ class user extends \model\dbconnect {
                 if ($user->needauth) {
                     if (!$user->issend) {
                         $this->_authEmail($user->iduser, $logonservice, $user->name, $user->email, $loginid);
-                        $this->setAuthEmailSent($user->iduser, $logonservice, $loginid);
+                        $this->_setAuthEmailSent($user->iduser, $logonservice, $loginid);
                     }
 
                     $username = $user->name;
@@ -565,7 +582,7 @@ class user extends \model\dbconnect {
             die();
         }
 
-        if (!$this->isAuthorizationConfirm($user->iduser, $logonservice)) {
+        if (!$this->_isAuthorizationConfirm($user->iduser, $logonservice)) {
             // authorization required
             $this->_authEmail($user->iduser, $logonservice, $user->name, $user->email, $loginid);
             $username = $user->name;

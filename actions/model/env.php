@@ -261,8 +261,10 @@ final class env {
 
         if (isset($token) && self::isauthorized()) {
             try {
+                $shost = filter_input(INPUT_SERVER, 'HTTP_HOST');
                 $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), ['HS256']);
-                if ($jsondecoded->iduser === self::$app_iduser && $jsondecoded->useremail === self::$app_useremail)
+
+                if ($jsondecoded->iduser === self::$app_iduser && $jsondecoded->useremail === self::$app_useremail && $jsondecoded->dom === $shost)
                     $sucess = true;
             } catch (\Firebase\JWT\ExpiredException $vexc) {
                 $errormssg .= ', ' . $vexc->getMessage();
@@ -275,14 +277,22 @@ final class env {
             \model\message::severe('sys004', $errormssg);
     }
 
+    public static function getUserSessionToken($iduser, $useremail) {
+        $remote_addr = \model\utils::get_remote_addr();
+                    
+        $daytime = 86400; // 1 day = 86400
+        $daysexpire = 3;
+        $shost = filter_input(INPUT_SERVER, 'HTTP_HOST');
+
+        $data = ['exp' => time() + ( $daytime * $daysexpire ), "iduser" => $iduser, "useremail" => \trim($useremail), "dom" => $shost, "remoteip" => $remote_addr];
+        return \Firebase\JWT\JWT::encode($data, self::getKey());
+    }
+
     public static function saveSession($iduser, $useremail) {
         self::setUser($iduser);
 
-        $remote_addr = \model\utils::get_remote_addr();
-            
-        // 5 days expire session
-        $data = ['exp' => time() + 432000, "iduser" => $iduser, "useremail" => \trim($useremail), "remoteip" => $remote_addr];
-        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, self::getKey()));
+        $token = self::getUserSessionToken($iduser, $useremail);
+        \model\utils::setCookie('g3links', $token);
     }
 
     // user level access security

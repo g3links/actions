@@ -86,7 +86,7 @@ $g3result->emailerror = new stdClass();
 $g3result->emailerror->email = filter_input(INPUT_POST, 'emailerror_email');
 
 $g3result->api = new stdClass();
-$g3result->api->url = 'api.1';
+$g3result->api->url = 'api';
 
 $g3result->token = new stdClass();
 $g3result->token->key = filter_input(INPUT_POST, 'token_key');
