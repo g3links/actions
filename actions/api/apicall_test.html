@@ -1,0 +1,43 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        callpost();
+    });
+
+    async function callpost() {
+        var dataPost = {"email": "info@g3links.com", "password": "555"};
+//        var dataPost = {"email": "gus.granados@gmail.com", "password": "gusgran4"};
+
+        let response = await fetch("http://localhost:8080/test/api/login.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataPost),
+        }
+        );
+
+        let responseobj = await response.text();
+        var obj = JSON.parse(responseobj);
+        $("#mssg").html(obj.message);
+        $("#token").html(obj.token);
+
+        if (!response.ok)
+            $("#status").html(response.statusText);
+    }
+
+////post a form
+//var form = new FormData(document.getElementById('login-form'));
+//fetch("/login", {
+//  method: "POST",
+//  body: form
+//});
+
+</script>
+
+<div id="mssg"></div>
+<div id="token"></div>
+<div id="status" style="color: red;"></div>
