@@ -1,7 +1,10 @@
 <?php
 
-if (!isset($customdefinitions) || is_file($customdefinitions))
+require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
+if (!isset($customdefinitions) || is_file($customdefinitions)) {
+    echo 'instalation been found, cannot continue install.';
     die();
+}
 
 $data = [
     'datapath' => $datapath ?? '',
@@ -18,9 +21,9 @@ $data = [
     'emailerror_email' => $emailerror_email ?? '', //'',
     'token_key' => $token_key ?? '', //'',
     'infomessage' => $infomessage ?? '',
-    'updatesetuproute' => '../setup/p_updatesetup.php',
+    'updatesetuproute' => '../install/p_updatesetup.php',
 ];
-$loader = new \Twig_Loader_Filesystem(filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/setup');
+$loader = new \Twig_Loader_Filesystem(filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/install');
 
 $options = [
     'autoescape' => '',
