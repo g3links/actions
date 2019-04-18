@@ -1,8 +1,19 @@
 <script>
     $(document).ready(function () {
-
         document.getElementById("clearuser").addEventListener("click", function () {
-            location.href = '{{ resetlogonroute }}';
+            apilogout();
+        });
+        document.getElementById("btnlogon").addEventListener("click", function () {
+            apilogon();
+        });
+        document.getElementById("btnnewlogon").addEventListener("click", function () {
+            apinewlogon();
+        });
+        document.getElementById("btnpasswlogon").addEventListener("click", function () {
+            apipasswlogon();
+        });
+        document.getElementById("btnresetpwdlogon").addEventListener("click", function () {
+            apiresetpwdlogon();
         });
     {% if allowcreateuser %}
             document.getElementById("llogin").addEventListener("click", function () {
@@ -20,6 +31,8 @@
     {% endif %}
         });
 
+        var inprogress = false;
+
         function activepanel(elem, link) {
             $("#resetform").hide();
             $("#llogin").show();
@@ -34,18 +47,180 @@
             $("#" + link).hide();
         }
 
-        function validateRegisterForm() {
-            if ($("pwdnew").val() != $("pwdnew1").val()) {
-                alert("password did not match");
+        async function apilogon() {
+            if (inprogress)
                 return false;
+            $("#apilogonmssg").hide();
+
+            if (!$('#subformlogon')[0].checkValidity())
+                return false;
+
+            let emaillogon = document.getElementById("emaillogon").value;
+            let pwdlogon = document.getElementById("pwdlogon").value;
+
+            var dataPost = {"email": emaillogon, "password": pwdlogon};
+
+            inprogress = true;
+            let response = await fetch("{{ apilogonroute }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataPost),
             }
+            );
+
+            let responseobj = await response.text();
+            var obj = JSON.parse(responseobj);
+
+            if (!response.ok) {
+                $("#apilogonmssg").show();
+                $("#apilogonmssg").html(obj.message);
+            }
+            if (response.ok) {
+                document.cookie = "g3links=" + obj.token + "; path=/";
+                //long term username 30 days
+                var time = new Date(new Date().getTime() + (30 * 24 * 60 * 60 * 1000))
+                document.cookie = "g3=" + emaillogon + "; path=/;expires=" + time;
+//                var x = document.cookie;
+//                console.log("cookie: " + x);
+                document.cookie = "g3links=" + obj.token + "; path=/";
+                location.href = "{{ apirestartroute }}";
+            }
+
+            inprogress = false;
         }
 
-        function validateChangeForm() {
-            if ($("pwdchg").val() != $("pwdchg1").val()) {
+        async function apinewlogon() {
+            if (inprogress)
+                return false;
+            $("#apilogonmssg").hide();
+
+            if (!$('#subformnewlogon')[0].checkValidity())
+                return false;
+
+            if ($("pwdnew").val() !== $("pwdnew1").val()) {
                 alert("password did not match");
                 return false;
             }
+
+            let username = document.getElementById("usernamenew").value;
+            let email = document.getElementById("emailnew").value;
+            let pwd = document.getElementById("pwdnew").value;
+            let pwd1 = document.getElementById("pwdnew1").value;
+
+            var dataPost = {"email": email, "username": username, "pwd": pwd, "pwd1": pwd1};
+
+            inprogress = true;
+            let response = await fetch("{{ apilogonnewroute }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataPost),
+            }
+            );
+            let responseobj = await response.text();
+            var obj = JSON.parse(responseobj);
+            if (!response.ok) {
+                $("#apilogonmssg").show();
+                $("#apilogonmssg").html(obj.message);
+            }
+            if (response.ok) {
+                location.href = "{{ authrequiredroute }}";
+            }
+
+            inprogress = false;
+        }
+
+        async function apipasswlogon() {
+            if (inprogress)
+                return false;
+            $("#apilogonmssg").hide();
+
+            if (!$('#subformpasswlogon')[0].checkValidity())
+                return false;
+
+            if ($("pwdchg").val() !== $("pwdchg1").val()) {
+                alert("new password did not match");
+                return false;
+            }
+
+            let emailchg = document.getElementById("emailchg").value;
+            let pwdlogonchg = document.getElementById("pwdlogonchg").value;
+            let pwdchg = document.getElementById("pwdchg").value;
+            let pwdchg1 = document.getElementById("pwdchg1").value;
+
+            var dataPost = {"emaillogon": emailchg, "pwdlogon": pwdlogonchg, "pwdchg": pwdchg, "pwdchg1": pwdchg1};
+            inprogress = true;
+            let response = await fetch("{{ changepwdroute }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataPost),
+            }
+            );
+            let responseobj = await response.text();
+            var obj = JSON.parse(responseobj);
+
+            if (!response.ok) {
+                $("#apilogonmssg").show();
+                $("#apilogonmssg").html(obj.message);
+            }
+            if (response.ok) {
+                location.href = "{{ apirestartroute }}";
+            }
+
+            inprogress = false;
+        }
+
+        async function apiresetpwdlogon() {
+            if (inprogress)
+                return false;
+            $("#apilogonmssg").hide();
+
+            if (!$('#subformresetpwdlogon')[0].checkValidity())
+                return false;
+
+            if ($("pwdreset").val() !== $("pwdreset1").val()) {
+                alert("new password did not match");
+                return false;
+            }
+            
+            let emailreset = document.getElementById("emailreset").value;
+            let pwdreset = document.getElementById("pwdreset").value;
+            let pwdreset1 = document.getElementById("pwdreset1").value;
+
+            var dataPost = {"emailreset": emailreset, "pwdreset": pwdreset, "pwdreset1": pwdreset1};
+            inprogress = true;
+            let response = await fetch("{{ emailresetpwdroute }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataPost),
+            }
+            );
+            let responseobj = await response.text();
+            var obj = JSON.parse(responseobj);
+
+            if (!response.ok) {
+                $("#apilogonmssg").show();
+                $("#apilogonmssg").html(obj.message);
+            }
+            if (response.ok) {
+                location.href = "{{ authrequiredroute }}";
+            }
+
+            inprogress = false;
+        }
+
+        async function apilogout() {
+            document.cookie = "g3links=; path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "g3=; path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+            location.href = "{{ apirestartroute }}";
         }
 
 </script>
@@ -61,59 +236,63 @@
 
 <!-- logon -->
 <div id="loginform">
-    <form class="marginbig" method="post" action="{{ logonuserroute }}">
+    <form class="marginbig" id="subformlogon">
         <div class="titleName">{{ lbl_submitlogin }}</div>
-        <input class="marginsmall pnlFloatBorder" name="emaillogon" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
-        <input class="marginsmall pnlFloatBorder" name="pwdlogon" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
+        <input class="marginsmall pnlFloatBorder" id="emaillogon" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
+        <input class="marginsmall pnlFloatBorder" id="pwdlogon" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
         <input name="callback" type="hidden" value="{{ callback }}" >
         <div class="margin"></div>
-        <input class="submit pnlFloatBorder" name="logon" type="submit" value="{{ lbl_submitlogin }}" >
+        <div class="submit pnlFloatBorder center" id="btnlogon" >{{ lbl_submitlogin }}</div>
     </form>
 </div>
 
 <!-- register account -->
 {% if allowcreateuser %}
     <div id="registerform" hidden>
-        <form class="marginbig" method="post" action="{{ logonnewroute }}" onsubmit="return validateRegisterForm()" >
+        <form class="marginbig" id="subformnewlogon" >
             <div class="titleName">{{ lbl_submitregister }}</div>
-            <input class="pnlFloatBorder" name="usernamenew" type="text" maxlength="60" placeholder="{{ lbl_username }}" autofocus required ><br>
-            <input class="pnlFloatBorder" name="emailnew" type="email" placeholder="{{ lbl_email }}" required ><br>
-            <input class="pnlFloatBorder" name="pwdnew" type="password" placeholder="{{ lbl_password }}" minlength="4" required >
-            <input class="pnlFloatBorder" name="pwdnew1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required >
+            <input class="pnlFloatBorder" id="usernamenew"type="text" maxlength="60" placeholder="{{ lbl_username }}" autofocus required ><br>
+            <input class="pnlFloatBorder" id="emailnew" type="email" placeholder="{{ lbl_email }}" required ><br>
+            <input class="pnlFloatBorder" id="pwdnew" type="password" placeholder="{{ lbl_password }}" minlength="4" required >
+            <input class="pnlFloatBorder" id="pwdnew1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required >
             <div class="margin"></div>
-            <input class="submitblue pnlFloatBorder" name="new" type="submit" value="{{ lbl_submitregister }}" >
+            <div class="submit pnlFloatBorder center" id="btnnewlogon" >{{ lbl_submitregister }}</div>
         </form>
     </div>
 
     <!-- change password -->
     <div id="changepwdform" hidden>
-        <form class="marginbig" method="post" action="{{ changepwdroute }}" onsubmit="return validateChangeForm()">
+        <form class="marginbig" id="subformpasswlogon" >
             <div class="titleName">{{ lbl_submitchnagepwd }}</div>
-            <input class="marginsmall pnlFloatBorder" name="emailchg" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
-            <input class="marginsmall pnlFloatBorder" name="pwdlogon" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
-            <input class="marginsmall pnlFloatBorder" name="pwdchg" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required><br>
-            <input class="marginsmall pnlFloatBorder" name="pwdchg1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required ><br>
+            <input class="marginsmall pnlFloatBorder" id="emailchg" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required ><br>
+            <input class="marginsmall pnlFloatBorder" id="pwdlogonchg" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
+            <input class="marginsmall pnlFloatBorder" id="pwdchg" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required><br>
+            <input class="marginsmall pnlFloatBorder" id="pwdchg1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required ><br>
             <div class="margin"></div>
-            <input class="submit pnlFloatBorder" name="change" type="submit" value="{{ lbl_submitchnagepwd }}" >
+            <div class="submit pnlFloatBorder center" id="btnpasswlogon" >{{ lbl_submitchnagepwd }}</div>
         </form>
     </div>
 {% endif %}
 
 <div id="resetform" hidden>
-    <form class="marginbig" method="post" action="{{ emailresetpwdroute  }}">
+    <form class="marginbig" id="subformresetpwdlogon" >
         <div class="titleName">{{ lbl_resetpwd }}</div>
-        <input class="marginsmall pnlFloatBorder" name="emailreset" type="email" placeholder="{{ lbl_email }}" autofocus required ><br>
+        <input class="marginsmall pnlFloatBorder" id="emailreset" type="email" placeholder="{{ lbl_email }}" autofocus required ><br>
+        <input class="marginsmall pnlFloatBorder" id="pwdreset" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required><br>
+        <input class="marginsmall pnlFloatBorder" id="pwdreset1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required ><br>
         <div class="margin"></div>
-        <input class="submit linkMessage pnlFloatBorder" name="reset" type="submit" value="{{ lbl_sendreset }}" >
+        <div class="submit linkMessage pnlFloatBorder center" id="btnresetpwdlogon" >{{ lbl_sendreset }}</div>
     </form>
 </div>
+
+<div id="apilogonmssg" class="loginNotFound margin" hidden></div>
 
 {% if allowcreateuser %}
     <div><span id="llogin" class="linkTitle" hidden >{{ lbl_submitlogin|capitalize }}</span></div>
     <div><span id="lregister" class="linkTitle" >{{ lbl_submitregister|capitalize }}</span></div>
     <div><span id="changepwd" class="linkTitle" >{{ lbl_changepwd|capitalize }}</span></div>
     <div><span id="lreset" class="linkTitle" >{{ lbl_resetpwd|capitalize }}</span></div>
-{% endif %}
+    {% endif %}
 <span id="clearuser" class="linkTitle" >{{ lbl_clearuser|capitalize }}</span><br>
 
 <div class="margin"></div>

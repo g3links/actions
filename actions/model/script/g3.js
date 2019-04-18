@@ -1,7 +1,7 @@
 const g3 = {
-    proj_selectLogout(url) {
-        window.top.location.href = url;
-    },
+//    proj_selectLogout(url) {
+//        window.top.location.href = url;
+//    },
     Action(framesetup)
     {
         let data = JSON.parse(framesetup);

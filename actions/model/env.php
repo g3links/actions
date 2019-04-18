@@ -25,12 +25,6 @@ final class env {
     const MODULE_THEME = 'theme';
     const MODULE_FILTERVIEW = 'filterview';
 
-//    const MODULE_GROUPS = "groups";
-//    const MODULE_USERS = "users";
-//    const MODULE_INVITATIONS = "invitations";
-//    const MODULE_FINANCIAL = 'financial';
-//    const MODULE_SALES = 'sales';
-
     private static $idproject = 0;
     private static $user_accessid = 0; // level access: 1=internal, 2=external, 3=public
     private static $app_iduser = 0;
@@ -48,14 +42,14 @@ final class env {
         if (!isset($packagename))
             $packagename = self::CONFIG_CORE;
 
-        $filepath = \model\utils::format('{0}/config/{1}.json', DATA_PATH, $packagename);            
-    // check for project custom confg
-        if($idproject > 0) {
+        $filepath = \model\utils::format('{0}/config/{1}.json', DATA_PATH, $packagename);
+        // check for project custom confg
+        if ($idproject > 0) {
             $filepathback = \model\utils::format('{0}/attach/{1}/config/{2}.json', DATA_PATH, $idproject, $packagename);
-            if(is_file($filepathback))
+            if (is_file($filepathback))
                 $filepath = $filepathback;
         }
-        
+
         // set cache 
         if (self::$cacheconfigpath !== $filepath) {
             $jconfig = file_get_contents($filepath);
@@ -83,48 +77,59 @@ final class env {
     // user
     //**********************************************
     public function getUserSession() {
-        $token = null;
-        if (filter_input(INPUT_GET, 'tokenid') !== null) {
-        // LOGIN token ******************
-            // security passed from URL
-            $token = filter_input(INPUT_GET, 'tokenid');
+//        // test to remove 'tokenid', and replace with two steps
+//        // a) use API login to confirm is the user
+//        // b) execute task required
+//        // c) reset logon
+//        
+////        $token = null;
+//        // auth provided by url ******************
+//        if (filter_input(INPUT_GET, 'tokenid') !== null) {
+//            // security passed from URL
+////            $token = filter_input(INPUT_GET, 'tokenid');
+////            if (isset($token)) {
+//            try {
+//                $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_GET, 'tokenid'), self::getKey(), ['HS256']);
+//                (new \model\user)->registerTokenUser($jsondecoded->email, $jsondecoded->logonservice, $jsondecoded->loginid);
+//            } catch (\Firebase\JWT\ExpiredException $vexc) {
+//                \model\message::severe('sys004', $vexc->getMessage());
+//            } catch (Exception $exc) {
+//                \model\message::severe('sys004', $exc->getMessage());
+//            }
+////            }
+//        }
 
-            if (isset($token)) {
-                try {
-                    $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), ['HS256']);
-                    (new \model\user)->registerTokenUser($jsondecoded->email, $jsondecoded->logonservice, $jsondecoded->loginid);
-                } catch (\Firebase\JWT\ExpiredException $vexc) {
-                    \model\message::severe('sys004', $vexc->getMessage());
-                } catch (Exception $exc) {
-                    \model\message::severe('sys004', $exc->getMessage());
-                }
-            }
-        }
-
-        // retrieve email name ******************
+        // already has a sessions
         if (filter_input(INPUT_COOKIE, 'g3links') !== null) {
-            $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
-            list($headb64, $bodyb64, $cryptob64) = $tks;
-            $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
-            self::setUserEmail($payload->useremail);
+            // get info from JWT without validate
+//            $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
+//            list($headb64, $bodyb64, $cryptob64) = $tks;
+//            $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
+//            self::setUserEmail($payload->useremail);
+
+            if (!self::isauthorized()) {
+                try {
+                    // decode checking security
+                    $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), self::getKey(), ['HS256']);
+
+                    if (\model\utils::get_remote_addr() === $jsondecoded->remoteip) {
+                        self::setUser($jsondecoded->iduser);
+                        self::setUserEmail($jsondecoded->useremail);
+                    } else {
+                        self::resetlogon();
+//                        \model\utils::unsetCookie('g3links');
+                    }
+                } catch (\Firebase\JWT\ExpiredException $vexc) {
+//                echo $vexc->message;
+                } catch (Exception $exc) {
+//                echo $exc->message;
+                }
+            }
         }
 
-        //validate user access
-        if (!self::isauthorized() && filter_input(INPUT_COOKIE, 'g3links') !== null) {
-            try {
-                $jsondecoded = \Firebase\JWT\JWT::decode(filter_input(INPUT_COOKIE, 'g3links'), self::getKey(), ['HS256']);
-
-                if (\model\utils::get_remote_addr() === $jsondecoded->remoteip) {
-                    self::setUser($jsondecoded->iduser);
-                    self::setUserEmail($jsondecoded->useremail);
-                } else {
-                    self::closelogon();
-                }
-            } catch (\Firebase\JWT\ExpiredException $vexc) {
-                //ignore
-            } catch (Exception $exc) {
-                //ignore
-            }
+        // not auth yet, and has been logged before ******************
+        if (filter_input(INPUT_COOKIE, 'g3links') === null && filter_input(INPUT_COOKIE, 'g3') !== null) {
+            self::setUserEmail(filter_input(INPUT_COOKIE, 'g3'));
         }
     }
 
@@ -143,20 +148,6 @@ final class env {
         \model\utils::unsetCookie('g3links');
     }
 
-    public static function closelogon() {
-        self::$app_iduser = 0;
-
-        $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
-        list($headb64, $bodyb64, $cryptob64) = $tks;
-        $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
-
-        self::setUserEmail($payload->useremail);
-
-        // shotdown access
-        $data = ['exp' => time() - 1, "iduser" => $payload->iduser, "useremail" => $payload->useremail];
-        \model\utils::setCookie('g3links', \Firebase\JWT\JWT::encode($data, self::getKey()));
-    }
-
     public static function setUser($iduser) {
         $user = (new \model\user)->getuser($iduser);
 
@@ -173,20 +164,7 @@ final class env {
         if ($user->idproject > 0)
             return;
 
-        //create project for user
-        $newproj = new \stdClass();
-        $newproj->title = self::$app_username;
-        $newproj->description = '';
-        $newproj->prefix = '';
-        $newproj->ticketseq = 0;
-        $newproj->remoteurl = '';
-        $newproj->startuppath = '';
-        $newproj->startupwidth = 0;
-        $newproj->ispublic = false;
-        $newproj->marketname = '';
-
-        self::$app_useridproject = (new \model\project)->insertproject($newproj);
-        (new \model\project)->setuseridproject(self::$app_useridproject);
+        self::$app_useridproject = (new \model\project)->insertuserproject(self::$app_username);
     }
 
     public static function getUserIdProject() {
@@ -262,9 +240,10 @@ final class env {
         if (isset($token) && self::isauthorized()) {
             try {
                 $shost = filter_input(INPUT_SERVER, 'HTTP_HOST');
+                $agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
                 $jsondecoded = \Firebase\JWT\JWT::decode($token, self::getKey(), ['HS256']);
 
-                if ($jsondecoded->iduser === self::$app_iduser && $jsondecoded->useremail === self::$app_useremail && $jsondecoded->dom === $shost)
+                if ($jsondecoded->iduser === self::$app_iduser && $jsondecoded->useremail === self::$app_useremail && $jsondecoded->dom === $shost && $jsondecoded->agent === $agent)
                     $sucess = true;
             } catch (\Firebase\JWT\ExpiredException $vexc) {
                 $errormssg .= ', ' . $vexc->getMessage();
@@ -275,24 +254,6 @@ final class env {
 
         if (!$sucess)
             \model\message::severe('sys004', $errormssg);
-    }
-
-    public static function getUserSessionToken($iduser, $useremail) {
-        $remote_addr = \model\utils::get_remote_addr();
-                    
-        $daytime = 86400; // 1 day = 86400
-        $daysexpire = 3;
-        $shost = filter_input(INPUT_SERVER, 'HTTP_HOST');
-
-        $data = ['exp' => time() + ( $daytime * $daysexpire ), "iduser" => $iduser, "useremail" => \trim($useremail), "dom" => $shost, "remoteip" => $remote_addr];
-        return \Firebase\JWT\JWT::encode($data, self::getKey());
-    }
-
-    public static function saveSession($iduser, $useremail) {
-        self::setUser($iduser);
-
-        $token = self::getUserSessionToken($iduser, $useremail);
-        \model\utils::setCookie('g3links', $token);
     }
 
     // user level access security
@@ -361,8 +322,8 @@ final class env {
     }
 
     public static function getTimezone() {
-        if (filter_input(INPUT_COOKIE,'timezone') !== null)
-            return filter_input(INPUT_COOKIE,'timezone');
+        if (filter_input(INPUT_COOKIE, 'timezone') !== null)
+            return filter_input(INPUT_COOKIE, 'timezone');
 
         return '0';
     }
@@ -373,7 +334,7 @@ final class env {
     private static $app_language = 'en';
 
     public static function setCacheLang() {
-        if (filter_input(INPUT_COOKIE,'lang') !== null) {
+        if (filter_input(INPUT_COOKIE, 'lang') !== null) {
             self::$app_language = \model\lexi::getLang();
             self::$app_country = \model\lexi::getLangCountry();
         }
@@ -391,29 +352,6 @@ final class env {
 
         \model\utils::setCookie('lang', self::$app_language . '-' . self::$app_country);
     }
-
-//    public static function getLang() {
-//        if (filter_input(INPUT_COOKIE,'lang') !== null)
-//            return filter_input(INPUT_COOKIE,'lang');
-//
-//        return self::$app_language . '-' . self::$app_country;
-//    }
-//    public static function getLangCode() {
-//        $idlanguage = self::$app_language;
-//        $parsedata = \explode('-', self::getLang());
-//        if (isset($parsedata[0]))
-//            $idlanguage = $parsedata[0];
-//
-//        return $idlanguage;
-//    }
-//    public static function getLangCountryCode() {
-//        $idcountry = self::$app_country;
-//        $parsedata = \explode('-', self::getLang());
-//        if (isset($parsedata[1]))
-//            $idcountry = $parsedata[1];
-//
-//        return $idcountry;
-//    }
 
     public static function getMaxRecords($section) {
         $config = self::getConfig('maxrecords');
@@ -505,3 +443,62 @@ final class env {
     }
 
 }
+//    public static function closesession() {
+//        self::$app_iduser = 0;
+//        if (filter_input(INPUT_COOKIE, 'g3links') !== null){
+//            $tks = explode('.', filter_input(INPUT_COOKIE, 'g3links'));
+//            list($headb64, $bodyb64, $cryptob64) = $tks;
+//            $token = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($bodyb64));
+//            self::setUserEmail($token->useremail);
+//        }
+//        \model\utils::unsetCookie('g3links');
+    // shutdown access
+//        $data = ['exp' => time() - 1, "iduser" => $token->iduser, "useremail" => $token->useremail];
+//        return \Firebase\JWT\JWT::encode($data, self::getKey());
+//    }
+
+//    public static function getUserSessionToken($iduser, $useremail) {
+//        $remote_addr = \model\utils::get_remote_addr();
+//
+////        $daytime = 86400; // 1 day = 86400
+////        $daysexpire = 3;
+//        $shost = filter_input(INPUT_SERVER, 'HTTP_HOST');
+//        $agent = filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
+//
+//        // remove expire date, moved to client cookie expiration
+////        $data = ['exp' => time() + ( $daytime * $daysexpire ), "iduser" => $iduser, "useremail" => \trim($useremail), "dom" => $shost, "remoteip" => $remote_addr, "agent" => $agent];
+//        $data = ["iduser" => $iduser, "useremail" => \trim($useremail), "dom" => $shost, "remoteip" => $remote_addr, "agent" => $agent];
+//        return \Firebase\JWT\JWT::encode($data, self::getKey());
+//    }
+
+//    // evaluate to deprecate: cookie 'g3links' must be created by only at login 
+//    public static function saveSession($iduser, $useremail) {
+//        self::setUser($iduser);
+
+//        $token = self::getUserSessionToken($iduser, $useremail);
+//        \model\utils::setCookie('g3links', $token);
+//    }
+
+//    public static function getLang() {
+//        if (filter_input(INPUT_COOKIE,'lang') !== null)
+//            return filter_input(INPUT_COOKIE,'lang');
+//
+//        return self::$app_language . '-' . self::$app_country;
+//    }
+//    public static function getLangCode() {
+//        $idlanguage = self::$app_language;
+//        $parsedata = \explode('-', self::getLang());
+//        if (isset($parsedata[0]))
+//            $idlanguage = $parsedata[0];
+//
+//        return $idlanguage;
+//    }
+//    public static function getLangCountryCode() {
+//        $idcountry = self::$app_country;
+//        $parsedata = \explode('-', self::getLang());
+//        if (isset($parsedata[1]))
+//            $idcountry = $parsedata[1];
+//
+//        return $idcountry;
+//    }
+

@@ -12,7 +12,7 @@ if (!isset($callback) || isset($messageerror)) {
         'useremail' => \model\env::getUserEmail(),
         'username' => \model\env::getUserName(),
         'iduser' => \model\env::getIdUser(),
-        'callback' => filter_input(INPUT_SERVER, 'REQUEST_URI'),
+        'callback' => isset($callback) ? $callback : filter_input(INPUT_SERVER, 'REQUEST_URI'),
         'confirmidentityroute' => \model\route::form('login/p_confirmidentity.php'),
         'lbl_password' => $lexi['sys034'],
         'lbl_submitlogin' => $lexi['sys014'],

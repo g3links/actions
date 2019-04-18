@@ -2,7 +2,7 @@
 
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3authsession.php';
 
-(new \model\user)->confirmDeleteAccountEmail('g3/*/closeaccount.html');
+(new \model\login)->confirmDeleteAccountEmail('g3/*/closeaccount.html');
 
 $lexi = \model\lexi::getall();
 $data = [

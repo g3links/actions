@@ -2,14 +2,10 @@
 
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
 
-// http responses: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-// 
+// info http responses: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+// test using RestClient (firefox) post http://localhost:8080/test/api/login.php
+//Enter the following on the body: {"email":"info@g3links.com","password":"555"}
 //***************************
-// use RestClient (firefox) post http://localhost:8080/test/api/login.php
-//Enter the following on the body.
-//{"email":"info@g3links.com","password":"555"}
-//***************************
-//
 // required headers
 //header("Access-Control-Allow-Origin: http://localhost:8080/test/api");
 header("Content-Type: application/json; charset=UTF-8");
@@ -20,22 +16,31 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
 
-$token = (new \model\user)->getUserSessionToken($data->email, LOGINSRV, $data->password);
-if ($token !== false) {
-    http_response_code(200);
+$coderesponse = 200;
+$token = '';
+$message = "";
 
-    echo json_encode(
-            [
-                "message" => "success",
-                "token" => $token
-            ]
-    );
-} else {
-// login failed
-    http_response_code(401);
-    echo json_encode(
-            [
-                "message" => "Login failed."
-            ]
-    );
+$result = (new \model\login)->getApiSessionToken($data->email ?? '', $data->password ?? '');
+if (isset($result)) {
+    if (!empty($result->message ?? '')) {
+        $coderesponse = 401;
+        $token = 'failed';
+        $message = $result->message;
+    } else {
+        $token = $result->token;
+    }
 }
+
+// login failed
+if (empty($token)) {
+    $coderesponse = 401;
+    $message = \model\lexi::get('', 'sys031');
+}
+
+http_response_code($coderesponse);
+echo json_encode(
+        [
+            "message" => $message,
+            "token" => $token
+        ]
+);

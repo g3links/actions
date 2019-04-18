@@ -17,12 +17,12 @@
             g3.Action('{{ editlangroute.window }}');
         });
 
-    {% if logoutformroute is not empty %}
+    {% if apilogout is not empty %}
             document.getElementById("logout").addEventListener("click", function () {
-                g3.proj_selectLogout("{{ logoutformroute }}");
+                apilogout();
             });
             document.getElementById("olf").addEventListener("click", function () {
-                g3.proj_selectLogout("{{ logoutformroute }}");
+                apilogout();
             });
     {% endif %}
     {% if loginroute is not empty %}
@@ -118,6 +118,24 @@
             }
         }
 
+        async function apilogout() {
+            var dataPost = {};
+
+            let response = await fetch("{{ apilogout }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataPost),
+            }
+            );
+
+            let responseobj = await response.text();
+//            var obj = JSON.parse(responseobj);
+
+            location.href = "{{ apirestart }}";
+        }
+
 </script>
 
 <a href="https://g3links.com" target="_blank" title="G3 Links" class="g3actions"></a>
@@ -125,7 +143,7 @@
 <body class="mainmenucolor">
 
     <!-- User -->
-    {% if logoutformroute is not empty %}
+    {% if apilogout is not empty %}
         <div class="mainmenuitem labelselect">
             <span id="logout" class="imgLogout point floatRight" title="{{ lbl_logout }}" ></span>
             {% if updateuserroute is not empty %}
@@ -190,7 +208,7 @@
 
     <div id="oaf" class="mainmenuitem labelselect imgInfo" ><label class="marginleft">{{ aboutroute.title }}</label></div>
 
-    {% if logoutformroute is not empty %}
+    {% if apilogout is not empty %}
         <div id="olf" class="mainmenuitem labelselect imgLogout" >
             <label class="marginleft">{{ lbl_logout }}</label>
         </div>

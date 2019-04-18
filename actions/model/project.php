@@ -377,13 +377,30 @@ class project extends \model\dbconnect {
         return $lastrowid;
     }
 
+    public function insertuserproject($titlename) {
+        // ignore package when web link is provided
+        //register project
+        $lastrowid = (int)$this->executeSql('INSERT INTO project (title) VALUES (?)', trim((string) $titlename));
+
+//        //register user default
+        $this->executeSql('INSERT INTO projectuser (idproject, iduser, idrole) VALUES (?, ?, ?)', (int) $lastrowid, \model\env::getIdUser(), 1);
+
+        //create owner
+        $this->src->idproject = $lastrowid;
+        (new \model\action($this->src))->setprojectowner(\model\env::getIdUser());
+
+        $this->executeSql('UPDATE user SET idproject = ? WHERE iduser = ? AND idproject = 0 AND deleted = 0', (int) $lastrowid, \model\env::getIdUser());
+
+        return $lastrowid;
+    }
+
     public function insertproject($newproj) {
         // ignore package when web link is provided
         if (!empty($newproj->startuppath))
             $newproj->startuppath = "";
 
         //register project
-        $lastrowid = $this->executeSql('INSERT INTO project (title, description, prefix, ticketseq, startuppath, startupwidth, ispublic, marketname, deleted, remoteurl, idcurrency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', trim((string) $newproj->title), trim((string) $newproj->description), trim((string) $newproj->prefix), trim((int) $newproj->ticketseq), trim((string) $newproj->startuppath), (int) $newproj->startupwidth, \model\utils::formatBooleanToInt($newproj->ispublic), trim((string) $newproj->marketname), 0, trim((string) $newproj->remoteurl), trim((string) $newproj->idcurrency));
+        $lastrowid = $this->executeSql('INSERT INTO project (title, description, prefix, ticketseq, startuppath, startupwidth, ispublic, marketname, deleted, remoteurl, idcurrency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', trim((string) $newproj->title), trim((string) $newproj->description ?? ''), trim((string) $newproj->prefix ?? ''), trim((int) $newproj->ticketseq ?? 0), trim((string) $newproj->startuppath ?? ''), (int) $newproj->startupwidth ?? 0, \model\utils::formatBooleanToInt($newproj->ispublic ?? false), trim((string) $newproj->marketname ?? ''), 0, trim((string) $newproj->remoteurl ?? ''), trim((string) $newproj->idcurrency ?? ''));
 
 //        //register user default
         $this->executeSql('INSERT INTO projectuser (idproject, iduser, idrole) VALUES (?, ?, ?)', (int) $lastrowid, \model\env::getIdUser(), 1);
@@ -624,9 +641,9 @@ class project extends \model\dbconnect {
         (new \model\action($this->src))->addSystemNote(\model\lexi::get('', 'msg043', $modulename, $template));
     }
 
-    public function setuseridproject($idproject) {
-        $this->executeSql('UPDATE user SET idproject = ? WHERE iduser = ? AND idproject = 0 AND deleted = 0', (int) $idproject, \model\env::getIdUser());
-    }
+//    private function _setuseridproject($idproject) {
+//        $this->executeSql('UPDATE user SET idproject = ? WHERE iduser = ? AND idproject = 0 AND deleted = 0', (int) $idproject, \model\env::getIdUser());
+//    }
 
     public function getTotalWaitingMessages() {
         $totalUnreadMessages = 0;

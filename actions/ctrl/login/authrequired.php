@@ -7,8 +7,8 @@ $lexi = \model\lexi::getall();
 $data = [
     'lbl_security' => $lexi['sys018'],
     'lbl_username' => $lexi['sys025'],
-    'username' => $username,
-    'lbl_email' => \model\utils::format($lexi['sys027'] , $useremail),
+//    'username' => $username,
+    'lbl_email' => $lexi['sys027'],
     'host' => ROOT_APP,
 ];
 \model\route::render('login/authrequired.twig', $data);
