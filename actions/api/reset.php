@@ -25,15 +25,11 @@ if (!isset($data->tokenauth)) {
     $message = \model\lexi::get('', 'msg004');
 }
 
-if (isset($data->tokenauth)) {
-    try {
-        (new \model\login)->resetUserPassword($data->tokenauth);
-    } catch (\Firebase\JWT\ExpiredException $vexc) {
+if ($coderesponse === 200) {
+    $success = (new \model\login)->resetUserPassword($data->tokenauth);
+        if ($success !== true) {
         $coderesponse = 501;
-        $message = \model\lexi::get('', 'msg017', $vexc->getMessage());
-    } catch (Exception $exc) {
-        $coderesponse = 501;
-        $message = \model\lexi::get('', 'msg017', $exc->getMessage());
+        $message = $success;
     }
 }
 

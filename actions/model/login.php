@@ -292,12 +292,31 @@ class login extends \model\dbconnect {
     }
 
     public function resetUserPassword($authtoken) {
-        $jsondecoded = \Firebase\JWT\JWT::decode($authtoken, \model\env::getKey(), ['HS256']);
+        if (!isset($authtoken))
+            return \model\lexi::get('', 'msg004');
+
+        try {
+            $jsondecoded = \Firebase\JWT\JWT::decode($authtoken, \model\env::getKey(), ['HS256']);
+        } catch (\Firebase\JWT\ExpiredException $vexc) {
+            return \model\lexi::get('', 'msg017', $vexc->getMessage());
+        } catch (Exception $exc) {
+            return \model\lexi::get('', 'msg017', $exc->getMessage());
+        }
+
+        if (!isset($jsondecoded->iduser) || !isset($jsondecoded->pwd))
+            return \model\lexi::get('', 'sys031');
+
         \model\env::setUser($jsondecoded->iduser);
 
-        $data = ['pr' => LOGINSRV, 'email' => $jsondecoded->email];
-        $providertoken = \Firebase\JWT\JWT::encode($data, $jsondecoded->pwd);
-        $this->_updatetoken($jsondecoded->iduser, $providertoken);
+        $user = (new \model\user)->getuser($jsondecoded->iduser ?? '');
+        if (!isset($user))
+            return \model\lexi::get('', 'sys031');
+
+        $data = ['pr' => LOGINSRV, 'email' => $user->email];
+        $providertoken = \Firebase\JWT\JWT::encode($data, $jsondecoded->pwd ?? '');
+        $this->_updatetoken($user->iduser, $providertoken);
+
+        return true;
     }
 
     public function changeUserPassword($emaillogon, $logintoken, $pwdchg, $pwdchg1) {
@@ -348,12 +367,34 @@ class login extends \model\dbconnect {
     }
 
     public function deleteaccount($authtoken) {
-        $jsondecoded = \Firebase\JWT\JWT::decode($authtoken, \model\env::getKey(), ['HS256']);
+        if (!isset($authtoken))
+            return \model\lexi::get('', 'msg004');
+
+        try {
+            $jsondecoded = \Firebase\JWT\JWT::decode($authtoken, \model\env::getKey(), ['HS256']);
+        } catch (\Firebase\JWT\ExpiredException $vexc) {
+            return \model\lexi::get('', 'msg017', $vexc->getMessage());
+        } catch (Exception $exc) {
+            return \model\lexi::get('', 'msg017', $exc->getMessage());
+        }
+
+        if (!isset($jsondecoded->iduser))
+            return \model\lexi::get('', 'sys031');
 
         \model\env::setUser($jsondecoded->iduser);
+        
+        $user = (new \model\user)->getuser($jsondecoded->iduser ?? '');
+        if (!isset($user))
+            return \model\lexi::get('', 'sys031');
+
+//not validated
+        if ($user->isvalidated || $user->deleted)
+            return \model\lexi::get('', 'sys076');
+
         // @TODO remove account and all data
 
         \model\env::resetlogon();
+        return true;
     }
 
     public function setuserprofile($user, $emailadvicefilename) {
@@ -437,7 +478,7 @@ class login extends \model\dbconnect {
 
         $config = \model\env::getConfig('api');
 
-        $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, 'email' => $email, 'pwd' => $pwdreset];
+        $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, 'pwd' => $pwdreset];
         $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
         $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('resetweb.php?tokenauth={0}', $jwttoken));
 
@@ -458,17 +499,23 @@ class login extends \model\dbconnect {
     }
 
     public function authUserToken($tokenauth) {
-        $jsondecoded = \Firebase\JWT\JWT::decode($tokenauth, \model\env::getKey(), ['HS256']);
+        try {
+            $jsondecoded = \Firebase\JWT\JWT::decode($tokenauth, \model\env::getKey(), ['HS256']);
+        } catch (\Firebase\JWT\ExpiredException $vexc) {
+            return \model\lexi::get('', 'msg017', $vexc->getMessage());
+        } catch (Exception $exc) {
+            return \model\lexi::get('', 'msg017', $exc->getMessage());
+        }
 
-        $user = $this->_getUserByToken($jsondecoded->loginid, $jsondecoded->email);
+        $user = $this->_getUserByToken($jsondecoded->loginid ?? '', $jsondecoded->email ?? '');
         if (!isset($user))
-            return false;
+            return \model\lexi::get('', 'sys031');
 
 //not validated
         if ($user->isvalidated || $user->deleted)
-            return false;
+            return \model\lexi::get('', 'sys076');
 
-        $this->executeSql('UPDATE needauth SET isauth = ? WHERE iduser = ? AND provider = ?', 1, (int) $jsondecoded->iduser, LOGINSRV);
+        $this->executeSql('UPDATE needauth SET isauth = ? WHERE iduser = ? AND provider = ?', 1, (int) $user->iduser, LOGINSRV);
 
         return true;
     }

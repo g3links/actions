@@ -12,15 +12,11 @@ if (filter_input(INPUT_GET, 'tokenauth') !== null)
 if (!isset($token))
     \model\message::severe('sys004', \model\lexi::get('', 'msg004'));
 
-try {
-    $activated = (new \model\login)->authUserToken($token);
-    if (!$activated) {
-        \model\message::severe('sys017', \model\lexi::get('', 'sys031'), 'auth', true);
+if (isset($token)) {
+    $success = (new \model\login)->authUserToken($token);
+    if ($success !== true) {
+        \model\message::severe('sys017', $success, 'auth', true);
     }
-} catch (\Firebase\JWT\ExpiredException $vexc) {
-    \model\message::severe('sys017', \model\lexi::get('', 'msg017', $vexc->getMessage()), 'auth', true);
-} catch (Exception $exc) {
-    \model\message::severe('sys017', \model\lexi::get('', 'msg017', $exc->getMessage()), 'auth', true);
 }
 
 require \model\route::script('restart.php');

@@ -25,19 +25,11 @@ if (!isset($data->tokenauth)) {
     $message = \model\lexi::get('', 'msg004');
 }
 
-if (isset($data->tokenauth)) {
-    try {
-        $activated = (new \model\login())->authUserToken($data->tokenauth);
-        if (!$activated) {
-            $coderesponse = 501;
-            $message = \model\lexi::get('', 'sys031');
-        }
-    } catch (\Firebase\JWT\ExpiredException $vexc) {
+if ($coderesponse === 200) {
+    $success = (new \model\login())->authUserToken($data->tokenauth);
+    if ($success !== true) {
         $coderesponse = 501;
-        $message = \model\lexi::get('', 'msg017', $vexc->getMessage());
-    } catch (Exception $exc) {
-        $coderesponse = 501;
-        $message = \model\lexi::get('', 'msg017', $exc->getMessage());
+        $message = $success;
     }
 }
 
