@@ -10,8 +10,7 @@ $lexi = \model\lexi::getall();
 
 $data = [
     'useremail' => $useremail,
-    'changepwdroute' => \model\route::form('api/loginpassw.php'),
-    'apirestartroute' => \model\route::form('restart.php'),
+    'changepwdroute' => \model\route::form('api/loginchangepwd.php'),
     'lbl_password' => $lexi['sys034'],
     'lbl_password1' => $lexi['sys069'],
     'lbl_newpassword' => $lexi['sys035'],

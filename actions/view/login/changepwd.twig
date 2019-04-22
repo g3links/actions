@@ -39,11 +39,13 @@
             $("#apilogonmssg").show();
             $("#apilogonmssg").html(obj.message);
         }
-        if (response.ok) {
-            location.href = "{{ apirestartroute }}";
-        }
 
         inprogress = false;
+        if (response.ok) {
+            $("#emaillogon").val(emailchg);
+            $("#pwdlogon").val(pwdchg);
+            apilogon();
+        }
     }
 
 </script>

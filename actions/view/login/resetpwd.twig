@@ -38,11 +38,19 @@
             $("#apilogonmssg").show();
             $("#apilogonmssg").html(obj.message);
         }
-        if (response.ok) {
-            location.href = "{{ authrequiredroute }}";
-        }
 
         inprogress = false;
+        if (response.ok) {
+            $("#resetpwdform").hide();
+            $("#subformsecuritycode").show();
+
+            $("#securitycode").val("");
+            $("#securitysource").val(obj.securesource);
+            $("#securitycodeemail").val(emailreset);
+            $("#securitypwd").val(pwdreset);
+
+            $("#securitycode").focus();
+        }
     }
 
 </script>

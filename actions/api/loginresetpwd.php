@@ -15,6 +15,8 @@ $data = json_decode(file_get_contents("php://input"));
 
 $coderesponse = 200;
 $message = "";
+$securesource = 'RP';
+$pwdreset = '';
 
 if (empty($data->emailreset ?? '')) {
     $coderesponse = 401;
@@ -27,7 +29,7 @@ if (empty($data->pwdreset ?? '') || empty($data->pwdreset1 ?? '') || $data->pwdr
 }
 
 if ($coderesponse === 200) {
-    if ((new \model\login)->authresetpassword('g3/*/resetpassword.html', $data->emailreset, $data->pwdreset) === false) {
+    if ((new \model\login)->authresetpassword('g3/*/resetpassword.html', $data->emailreset) === false) {
         $coderesponse = 401;
         $message = $data->emailreset . ': ' . \model\lexi::get('', 'sys031');
     }
@@ -37,5 +39,6 @@ http_response_code($coderesponse);
 echo json_encode(
         [
             "message" => $message,
+            "securesource" => $securesource,
         ]
 );

@@ -6,7 +6,7 @@ $lexi = \model\lexi::getall();
 
 $data = [
     'emailresetpwdroute' => \model\route::form('api/loginresetpwd.php'),
-    'authrequiredroute' => \model\route::form('login/authrequired.php'),
+//    'authrequiredroute' => \model\route::form('login/authrequired.php'),
     'lbl_email' => $lexi['sys028'],
     'lbl_password1' => $lexi['sys069'],
     'lbl_sendreset' => $lexi['sys039'],

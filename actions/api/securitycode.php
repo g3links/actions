@@ -2,7 +2,7 @@
 
 require_once filter_input(INPUT_SERVER, 'DOCUMENT_ROOT') . '/g3session.php';
 
-//Enter the following on the body: {"email":"info@g3links.com", "securesource": "??", "securekey": ########}
+//Enter the following on the body: {"email":"info@g3links.com", "securesource": "??", "securekey": "########", "pwdnew" : ""}
 
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -31,14 +31,23 @@ if (empty($data->securesource ?? '') || empty($data->securekey ?? '')) {
     $message = \model\lexi::get('', 'sys077');
 }
 
-// securesource
-// NU = new user
-//// confirm previous registrations
+//// confirm login changes
 if ($coderesponse === 200) {
-    $success = (new \model\login())->validateNewUserSecurityToken($data->email, $data->securesource, $data->securekey);
-    if ($success !== true) {
-        $coderesponse = 401;
-        $message = $success;
+    // new user
+    if ($data->securesource === "NU") {
+        $success = (new \model\login())->validateNewUserSecurityToken($data->email, $data->securekey);
+        if ($success !== true) {
+            $coderesponse = 401;
+            $message = $success;
+        }
+    }
+    // change password
+    if ($data->securesource === "RP") {
+        $success = (new \model\login())->validateResetUserPassword($data->email, $data->securekey, $data->pwdnew);
+        if ($success !== true) {
+            $coderesponse = 401;
+            $message = $success;
+        }
     }
 }
 

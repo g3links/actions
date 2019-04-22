@@ -291,31 +291,29 @@ class login extends \model\dbconnect {
         \model\env::sendMail($name, $email, \model\lexi::get('', 'sys024'), $emailstring);
     }
 
-    public function resetUserPassword($authtoken) {
-        if (!isset($authtoken))
-            return \model\lexi::get('', 'msg004');
-
-        try {
-            $jsondecoded = \Firebase\JWT\JWT::decode($authtoken, \model\env::getKey(), ['HS256']);
-        } catch (\Firebase\JWT\ExpiredException $vexc) {
-            return \model\lexi::get('', 'msg017', $vexc->getMessage());
-        } catch (Exception $exc) {
-            return \model\lexi::get('', 'msg017', $exc->getMessage());
-        }
-
-        if (!isset($jsondecoded->iduser) || !isset($jsondecoded->pwd))
-            return \model\lexi::get('', 'sys031');
-
-        \model\env::setUser($jsondecoded->iduser);
-
-        $user = (new \model\user)->getuser($jsondecoded->iduser ?? '');
+    public function validateResetUserPassword($email, $securekey, $pwdnew) {
+        $user = $this->getuserByEmail($email ?? '');
         if (!isset($user))
             return \model\lexi::get('', 'sys031');
 
-        $data = ['pr' => LOGINSRV, 'email' => $user->email];
-        $providertoken = \Firebase\JWT\JWT::encode($data, $jsondecoded->pwd ?? '');
+        if ($user->securekey !== (int)$securekey)
+            return \model\lexi::get('', 'sys077');
+
+//not validated
+        if ($user->isvalidated || $user->deleted)
+            return \model\lexi::get('', 'sys076');
+        
+        if (empty($pwdnew ?? ''))
+            return \model\lexi::get('', 'sys077');
+
+        \model\env::setUser($user->iduser);
+
+        $data = ['pr' => LOGINSRV, 'email' => $email];
+        $providertoken = \Firebase\JWT\JWT::encode($data, $pwdnew);
         $this->_updatetoken($user->iduser, $providertoken);
 
+        $this->executeSql('UPDATE user SET securekey = 0 WHERE iduser = ?', (int) $user->iduser);
+        
         return true;
     }
 
@@ -467,20 +465,24 @@ class login extends \model\dbconnect {
         \model\env::resetlogon();
     }
 
-    public function authresetpassword($emailadvicefilename, $email, $pwdreset) {
+    public function authresetpassword($emailadvicefilename, $email) {
+        $securekey = \rand(1000000, 9999999);
+
         // stop no valid email
-        if (empty($email) || empty($pwdreset))
+        if (empty($email))
             return false;
 
         $user = $this->getuserByEmail($email);
         if (!isset($user))
             return false;
 
-        $config = \model\env::getConfig('api');
+//        $config = \model\env::getConfig('api');
 
-        $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, 'pwd' => $pwdreset];
-        $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
-        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('resetweb.php?tokenauth={0}', $jwttoken));
+//        $data = ['exp' => time() + 86400, 'iduser' => $user->iduser, 'pwd' => $pwdreset];
+//        $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
+//        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('resetweb.php?tokenauth={0}', $jwttoken));
+
+        $this->executeSql('UPDATE user SET securekey = ? WHERE iduser = ?', $securekey, (int)$user->iduser);
 
 // get email string
         $filename = \model\route::render($emailadvicefilename);
@@ -490,7 +492,7 @@ class login extends \model\dbconnect {
         foreach ($lines as $line) {
             $line = str_replace('[membername]', $user->name, $line);
             $line = str_replace('[provider]', LOGINSRVNAME, $line);
-            $line = str_replace('[token]', $token, $line);
+            $line = str_replace('[token]', $securekey, $line);
             $emailstring[] = $line;
         }
 
@@ -520,10 +522,7 @@ class login extends \model\dbconnect {
         return true;
     }
 
-    public function validateNewUserSecurityToken($email, $securesource, $securekey) {
-        if ($securesource !== 'NU')
-            return \model\lexi::get('', 'sys077');
-
+    public function validateNewUserSecurityToken($email, $securekey) {
         $user = $this->getuserByEmail($email ?? '');
         if (!isset($user))
             return \model\lexi::get('', 'sys031');

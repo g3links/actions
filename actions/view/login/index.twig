@@ -132,6 +132,7 @@
                 $("#securitycode").val("");
                 $("#securitysource").val(obj.securesource);
                 $("#securitycodeemail").val(email);
+                $("#securitypwd").val(pwd);
 
                 $("#securitycode").focus();
             }
@@ -162,10 +163,11 @@
                 return false;
 
             let email = document.getElementById("securitycodeemail").value;
+            let pwdnew = document.getElementById("securitypwd").value;
             let securitysource = document.getElementById("securitysource").value;
             let securitycode = document.getElementById("securitycode").value;
 
-            var dataPost = {"email": email, "securesource": securitysource, "securekey": securitycode};
+            var dataPost = {"email": email, "securesource": securitysource, "securekey": securitycode, "pwdnew": pwdnew};
 
             inprogress = true;
             let response = await fetch("{{ apisecuritycoderoute }}", {
@@ -185,7 +187,6 @@
 
             inprogress = false;
             if (response.ok) {
-                let pwdnew = document.getElementById("pwdnew").value;
                 $("#emaillogon").val(email);
                 $("#pwdlogon").val(pwdnew);
                 apilogon();
@@ -242,6 +243,7 @@
         <div class="submit pnlFloat marginsmall center" id="btnsecuritycode" >{{ lbl_submitsecuritycode }}</div>
         <input type="hidden" id="securitysource" >
         <input type="hidden" id="securitycodeemail" >
+        <input type="hidden" id="securitypwd" >
     </form>
 {% endif %}
 
