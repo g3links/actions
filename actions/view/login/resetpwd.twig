@@ -1,0 +1,56 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById("btnresetpwdlogon").addEventListener("click", function () {
+            apiresetpwdlogon();
+        });
+    });
+
+    async function apiresetpwdlogon() {
+        if (inprogress)
+            return false;
+
+        if (!$('#subformresetpwdlogon')[0].checkValidity())
+            return false;
+
+        if ($("pwdreset").val() !== $("pwdreset1").val()) {
+            alert("new password did not match");
+            return false;
+        }
+
+        let emailreset = document.getElementById("emailreset").value;
+        let pwdreset = document.getElementById("pwdreset").value;
+        let pwdreset1 = document.getElementById("pwdreset1").value;
+
+        var dataPost = {"emailreset": emailreset, "pwdreset": pwdreset, "pwdreset1": pwdreset1};
+        inprogress = true;
+        let response = await fetch("{{ emailresetpwdroute }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataPost),
+        }
+        );
+        let responseobj = await response.text();
+        var obj = JSON.parse(responseobj);
+
+        if (!response.ok) {
+            $("#apilogonmssg").show();
+            $("#apilogonmssg").html(obj.message);
+        }
+        if (response.ok) {
+            location.href = "{{ authrequiredroute }}";
+        }
+
+        inprogress = false;
+    }
+
+</script>
+
+<form class="marginbig" id="subformresetpwdlogon" >
+    <div class="titleName">{{ lbl_resetpwd }}</div>
+    <input class="marginsmall pnlFloatBorder" id="emailreset" type="email" placeholder="{{ lbl_email }}" autofocus required ><br>
+    <input class="marginsmall pnlFloatBorder" id="pwdreset" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required>
+    <input class="marginsmall pnlFloatBorder" id="pwdreset1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required >
+    <div class="submit linkMessage pnlFloat marginsmall center" id="btnresetpwdlogon" >{{ lbl_sendreset }}</div>
+</form>

@@ -1,0 +1,59 @@
+<script>
+    $(document).ready(function () {
+        document.getElementById("btnpasswlogon").addEventListener("click", function () {
+            apipasswlogon();
+        });
+    });
+
+    async function apipasswlogon() {
+        if (inprogress)
+            return false;
+
+        if (!$('#subformpasswlogon')[0].checkValidity())
+            return false;
+
+        if ($("pwdchg").val() !== $("pwdchg1").val()) {
+            alert("new password did not match");
+            return false;
+        }
+
+        let emailchg = document.getElementById("emailchg").value;
+        let pwdlogonchg = document.getElementById("pwdlogonchg").value;
+        let pwdchg = document.getElementById("pwdchg").value;
+        let pwdchg1 = document.getElementById("pwdchg1").value;
+
+        var dataPost = {"emaillogon": emailchg, "pwdlogon": pwdlogonchg, "pwdchg": pwdchg, "pwdchg1": pwdchg1};
+        inprogress = true;
+        let response = await fetch("{{ changepwdroute }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataPost),
+        }
+        );
+        let responseobj = await response.text();
+        var obj = JSON.parse(responseobj);
+
+        if (!response.ok) {
+            $("#apilogonmssg").show();
+            $("#apilogonmssg").html(obj.message);
+        }
+        if (response.ok) {
+            location.href = "{{ apirestartroute }}";
+        }
+
+        inprogress = false;
+    }
+
+</script>
+
+<form class="marginbig" id="subformpasswlogon" >
+    <div class="titleName">{{ lbl_submitchangepwd }}</div>
+    <input class="marginsmall pnlFloatBorder" id="emailchg" type="email" placeholder="{{ lbl_email }}" value="{{ useremail }}" autofocus required >
+    <input class="marginsmall pnlFloatBorder" id="pwdlogonchg" type="password" placeholder="{{ lbl_password }}" minlength="4" required ><br>
+    <input class="marginsmall pnlFloatBorder" id="pwdchg" type="password" placeholder="{{ lbl_newpassword }}" minlength="4" required>
+    <input class="marginsmall pnlFloatBorder" id="pwdchg1" type="password" placeholder="{{ lbl_password1 }}" minlength="4" required >
+    <div class="submit pnlFloat marginsmall center" id="btnpasswlogon" >{{ lbl_submitchangepwd }}</div>
+</form>
+
