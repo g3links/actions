@@ -14,6 +14,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 $coderesponse = 200;
 $message = "";
+$securesource = 'NU';
 
 // validate data
 //*******************************
@@ -41,7 +42,7 @@ if ($coderesponse === 200) {
         $message = $statusreg;
     } else {
 // insert user
-        $sucess = $usermodel->insertUser($data->email, $data->username, $data->pwd);
+        $sucess = $usermodel->insertUser('g3/*/regauthorization.html', $data->email, $data->username, $data->pwd);
         if (!$sucess) {
             $coderesponse = 401;
             $message = $data->email . ': cannot be created';
@@ -68,5 +69,6 @@ http_response_code($coderesponse);
 echo json_encode(
         [
             "message" => $message,
+            "securesource" => $securesource,
         ]
 );

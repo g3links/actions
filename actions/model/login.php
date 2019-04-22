@@ -72,8 +72,10 @@ class login extends \model\dbconnect {
         return '';
     }
 
-    public function insertUser($email, $username, $pwd, $keyname = '', $theme = '') {
+    public function insertUser($emailadvicefilename, $email, $username, $pwd, $keyname = '', $theme = '') {
         // validate
+        $securekey = \rand(1000000, 9999999);
+
         $alreadyuser = $this->getuserByEmail($email);
         if (!isset($alreadyuser)) {
             // create
@@ -82,8 +84,12 @@ class login extends \model\dbconnect {
             $keyname = \strtolower($keyname);
             $keyname = str_replace('@', '', $keyname);
             $keyname = str_replace(' ', '', $keyname);
+            
+            $securekey = \rand(1000000, 9999999);
 
-            $lastInsertId = $this->executeSql('INSERT INTO user (email, name, keyname, theme, idproject) VALUES (?, ?, ?, ?, ?)', trim((string) $email), trim((string) $username), trim((string) $keyname), trim((string) $theme), 0);
+            $lastInsertId = $this->executeSql('INSERT INTO user (email, name, keyname, theme, idproject, securekey) VALUES (?,?,?,?,?,?)', trim((string) $email), trim((string) $username), trim((string) $keyname), trim((string) $theme), 0, $securekey);
+        } else {
+            $this->executeSql('UPDATE user SET securekey = ? WHERE iduser = ?', $securekey, (int)$alreadyuser->iduser);
         }
 
         // find user by email
@@ -93,10 +99,11 @@ class login extends \model\dbconnect {
             return false;
         }
 
+        $this->_authEmail($emailadvicefilename, $user->name, $user->email, $securekey);
+
         if ($user->needauth) {
             if (!$user->issend) {
                 // send email
-                $this->_authEmail($user->iduser, $user->name, $user->email, $user->loginid);
                 $needauth = $this->_getAuth($user->iduser);
                 if (!isset($needauth)) {
                     // create auth
@@ -118,7 +125,7 @@ class login extends \model\dbconnect {
     }
 
     public function getuserByEmail($email) {
-        return $this->getRecord('SELECT iduser,name,deleted,isvalidated FROM user WHERE email = ?', (string) $email);
+        return $this->getRecord('SELECT iduser,name,deleted,isvalidated,securekey FROM user WHERE email = ?', (string) $email);
     }
 
     public function setActiveAccount($emailadvicefile) {
@@ -161,7 +168,7 @@ class login extends \model\dbconnect {
         if (empty($useremail ?? ''))
             return null;
 
-        $user = $this->getRecord('SELECT iduser,lastaccesson,deleted,isvalidated,email,name,keyname,theme,idproject FROM user WHERE email = ?', \trim(\strtolower($useremail)));
+        $user = $this->getRecord('SELECT iduser,lastaccesson,deleted,isvalidated,email,name,keyname,theme,idproject, securekey FROM user WHERE email = ?', \trim(\strtolower($useremail)));
         if (!isset($user->iduser))
             return null;
 
@@ -269,22 +276,15 @@ class login extends \model\dbconnect {
         }
     }
 
-    private function _authEmail($iduser, $name, $email, $providertoken) {
-        // 24 hours before exprire
-        $config = \model\env::getConfig('api');
-        $data = ['exp' => time() + 86400, 'iduser' => $iduser, "email" => $email, "loginid" => $providertoken];
-        $jwttoken = \Firebase\JWT\JWT::encode($data, \model\env::getKey());
-
-        $token = \model\utils::format('{0}/{1}/{2}', ROOT_APP, $config->url, \model\route::url('authweb.php?tokenauth={0}', $jwttoken));
-
-        $filename = \model\route::render('g3/*/regauthorization.html');
+    private function _authEmail($emailadivefilename, $name, $email, $securekey) {
+        $filename = \model\route::render($emailadivefilename);
 
         $emailstring = array();
         $lines = file($filename);
         foreach ($lines as $line) {
             $line = str_replace('[membername]', $name, $line);
             $line = str_replace('[provider]', LOGINSRVNAME, $line);
-            $line = str_replace('[token]', $token, $line);
+            $line = str_replace('[token]', $securekey, $line);
             $emailstring[] = $line;
         }
 
@@ -516,6 +516,27 @@ class login extends \model\dbconnect {
             return \model\lexi::get('', 'sys076');
 
         $this->executeSql('UPDATE needauth SET isauth = ? WHERE iduser = ? AND provider = ?', 1, (int) $user->iduser, LOGINSRV);
+
+        return true;
+    }
+
+    public function validateNewUserSecurityToken($email, $securesource, $securekey) {
+        if ($securesource !== 'NU')
+            return \model\lexi::get('', 'sys077');
+
+        $user = $this->getuserByEmail($email ?? '');
+        if (!isset($user))
+            return \model\lexi::get('', 'sys031');
+
+        if ($user->securekey !== (int)$securekey)
+            return \model\lexi::get('', 'sys077');
+
+//not validated
+        if ($user->isvalidated || $user->deleted)
+            return \model\lexi::get('', 'sys076');
+
+        $this->executeSql('UPDATE needauth SET isauth = ? WHERE iduser = ? AND provider = ?', 1, (int) $user->iduser, LOGINSRV);
+        $this->executeSql('UPDATE user SET securekey = 0 WHERE iduser = ?', (int) $user->iduser);
 
         return true;
     }
